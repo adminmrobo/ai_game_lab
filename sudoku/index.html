@@ -255,6 +255,7 @@ footer td,footer th{border:1px solid var(--rule);padding:6px 8px;text-align:left
 @media(max-width:760px){.sec{padding-top:64px}}
 p,li{line-height:1.8}
 /* 임시 표지 */
+.scene{margin:16px 0}.scene img{width:100%;height:auto;border-radius:12px;border:1px solid var(--rule);display:block}.scene figcaption{font-size:13.5px;color:var(--muted);margin-top:6px;text-align:center}
 .tcover{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--rule);background:linear-gradient(180deg,#f3f8ff 0%,#ffffff 58%,#eef7f3 100%);container-type:inline-size}
 .tcover .board{position:absolute;left:5%;top:7%;width:34%;aspect-ratio:1}
 .tcover svg.bowl{position:absolute;left:44%;top:42%;width:52%;height:36%}
@@ -348,13 +349,13 @@ p,li{line-height:1.8}
   </div>
 </div></nav>
 
-<!-- lab-cover : 새 표지(img/sdk_cover.webp)가 오면 이 블록을 그림으로 바꾼다 -->
-<div class="cover" id="cover" data-img="sdk_cover"><div class="tcover" role="img" aria-label="스도쿠 판 옆에서 하루·시아·모아가 그릇 바닥으로 굴러가는 공을 바라보는 임시 표지">
-  <div class="board sdk ro" id="cv-board"></div>
-  <span class="bub">공을 굴리면 답이 나온다고요?</span>
-  <div class="ppl"><img data-mood="asst_e19" alt=""><img data-mood="sia_e09" alt=""><img data-mood="moa_e04" alt=""></div>
-  <svg class="bowl" viewBox="0 0 400 160" aria-hidden="true"><path d="M10,20 C90,22 120,150 200,150 C280,150 310,22 390,20" fill="none" stroke="#0f7f86" stroke-width="5"/><circle cx="118" cy="88" r="12" fill="#c42a6e"/><path d="M128,98 q20,26 44,40" fill="none" stroke="#c42a6e" stroke-width="3" stroke-dasharray="6 6"/><text x="200" y="140" text-anchor="middle" font-size="16" font-weight="700" fill="#13733a">정답 = 바닥</text></svg>
-  <div class="ttl">AI는 스도쿠를 어떻게 풀까?<small>AI로 풀어보는 게임 시리즈 ①</small></div>
+<!-- lab-cover -->
+<div class="cover" id="cover" data-img="sdk_cover"><div class="frame">
+  <picture>
+    <source type="image/webp" srcset="img/sdk_cover_960.webp 960w, img/sdk_cover.webp 1600w" sizes="(max-width:1080px) 100vw, 1080px">
+    <img class="art" src="img/sdk_cover.webp" width="1600" height="900" alt="스도쿠가 적힌 화이트보드 앞에서 하루가 그릇 모양 빛의 곡선을 가리키고, 시아와 모아가 바닥으로 굴러가는 공을 바라보는 픽셀아트 표지" fetchpriority="high" decoding="async">
+  </picture>
+  <span class="cover-chip">AI로 풀어보는 게임 시리즈 · ① 스도쿠</span>
 </div></div>
 <!-- /lab-cover -->
 
@@ -476,6 +477,7 @@ p,li{line-height:1.8}
     <li><b>줄을 세웁니다.</b> 정답을 한가운데에 두고, 정답과 한 자리만 다른 답안은 바로 옆, 두 자리 다른 답안은 그 바깥…처럼 <b>정답과 닮은 순서</b>로 세웁니다.</li>
     <li><b>옆에서 봅니다.</b> 가운데만 푹 꺼지고 바깥으로 갈수록 높아지는 모양, 바로 <b>그릇</b>입니다. 정답은 그릇의 바닥에 있습니다.</li>
   </ol>
+  <figure class="scene"><img src="img/sdk_scene_bowl.webp" width="1200" height="800" loading="lazy" decoding="async" alt="하루가 답안지마다 블록을 쌓고 모아가 감탄하는 장면. 가운데 초록 답안지만 블록이 없고 바깥으로 갈수록 탑이 높아져 그릇 모양이 된다"><figcaption>답안마다 벌점만큼 블록을 쌓으면, 가운데 정답만 비어 있는 그릇이 됩니다.</figcaption></figure>
   <div class="pair">
     <div><div class="tl">일상으로 치면</div>운동장에 답안지를 줄 세우고, 틀린 만큼 블록을 쌓아 올립니다. 정답과 많이 다른 답안일수록 탑이 높아서, 정답 자리만 움푹한 운동장이 됩니다.</div>
     <div><div class="tr">스도쿠에서는</div>정답과 다른 자리가 늘수록 부딪히는 짝도 늘어납니다. 아래 판에서 셈하면 평균 벌점이 0 → 2.33 → 4.46 → 6.38 → … 처럼 한 자리 멀어질 때마다 약 2점씩 올라갑니다.</div>
@@ -627,6 +629,7 @@ p,li{line-height:1.8}
 <section class="sec" id="race" aria-labelledby="h-race"><div class="wrap">
   <h2 id="h-race">레이스 — 하루·시아·모아, 누가 먼저 바닥에 닿을까?</h2>
   <div data-dlg="race"></div>
+  <figure class="scene"><img src="img/sdk_scene_race.webp" width="1200" height="800" loading="lazy" decoding="async" alt="박사가 깃발을 든 가운데 하루·시아·모아가 각자 빛나는 그릇을 흔드는 장면. 하루의 공은 벽에 걸리고, 시아의 공은 바닥에 닿고, 모아의 공은 높이 튀어 오른다"><figcaption>흔들기 0 · 0.45 · 0.9 — 누구의 공이 바닥에 먼저 닿을까요?</figcaption></figure>
   <p class="lead">같은 9 × 9 쉬움 판(힌트 40개)을 세 사람이 각자 아무 숫자로 채운 데서 출발합니다. 다른 것은 <b>흔들기</b> 하나뿐입니다. 4,000걸음 안에 벌점 0에 닿으면 성공입니다.</p>
   <div class="race" id="rc-lanes"></div>
   <div class="panel">
@@ -702,7 +705,7 @@ p,li{line-height:1.8}
   <ul><li>4 × 4 연습판, 9 × 9 쉬움(힌트 40개)·보통(힌트 36개) 판은 이 페이지가 만든 문제입니다(정답이 하나뿐인지 검산함).</li>
     <li>벌점은 사람이 정한 규칙 벌점(같은 숫자 짝 1점)이고, 5단계의 벌점표 배우기는 비율 차이로 단순화한 계산입니다. 논문의 실제 학습 방법과 다릅니다.</li>
     <li>4단계의 공과 곡선은 설명용 그림이고, 6단계·레이스의 숫자는 이 페이지의 단순한 내리막 규칙으로 얻은 값입니다(검산: 저장소의 code/check_sudoku.js, 씨앗 고정 40판).</li>
-    <li>표지는 임시 그림입니다. 새 표지는 연구실 시리즈 화풍(16비트 픽셀아트)으로 준비 중입니다.</li></ul>
+    <li>표지와 장면 그림 두 장은 연구실 시리즈 화풍(16비트 픽셀아트)으로 생성한 그림입니다. 표지 화이트보드의 숫자는 장식이며 실제 문제가 아닙니다.</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a> · <a href="https://adminmrobo.github.io/optimization_3d_map/index.html">좌표축 위의 그릇</a></p>
 </div></footer>
@@ -1053,8 +1056,6 @@ function grid(host,g,n,o){o=o||{};var b=n===4?2:3,h='',bad={};if(o.bad)o.bad.for
   host.style.gridTemplateColumns='repeat('+n+',1fr)';host.style.gridTemplateRows='repeat('+n+',1fr)';host.style.setProperty('--fs',o.fs||(n===4?'26px':'clamp(13px,3.6vw,22px)'));host.innerHTML=h;}
 function P(key){var p=PZ.puzzles[key];return {n:p.n,puz:SD.parse(p.p),sol:SD.parse(p.s),label:p.label};}
 function tabs(host,list,cur,on){host.innerHTML='';list.forEach(function(it){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=it[1];b.setAttribute('aria-pressed',String(it[0]===cur));b.onclick=function(){$$('button',host).forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');on(it[0]);};host.appendChild(b);});}
-/* 표지 판 */
-(function(){var p=P('p9a');grid($('#cv-board'),p.puz,9,{clue:p.puz.map(function(x){return x>0;}),fs:'clamp(6px,1.6cqw,16px)'});})();
 
 /* ── 단계 1: 직접 해 보기 ── */
 var PL={};
