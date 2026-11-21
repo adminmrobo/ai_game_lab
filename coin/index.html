@@ -456,7 +456,7 @@ p,li{line-height:1.8}
     <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
       <div class="group"><span class="glabel">시작 개수</span><span class="tabs" id="pl-n" role="group" aria-label="시작 개수"></span></div>
       <div class="group"><span class="glabel">먼저 두는 쪽</span><span class="tabs" id="pl-first" role="group" aria-label="먼저 두는 쪽"></span></div>
-      <div class="group"><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
+      <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
     <div class="stagebox">
       <div class="stage">
         <img class="bg" src="img/bg_tavern.webp" width="1600" height="900" alt="" aria-hidden="true">
@@ -570,7 +570,7 @@ p,li{line-height:1.8}
         <div id="mv-row"></div>
       </div>
     </div>
-    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="mv-L">← 맨 왼쪽으로</button><button class="bt primary" type="button" id="mv-R">맨 오른쪽으로 →</button><button class="bt" type="button" id="mv-reset">처음부터</button></div></div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="mv-L">← 맨 왼쪽으로</button><button class="bt primary" type="button" id="mv-R">맨 오른쪽으로 →</button><button class="bt" type="button" id="mv-reset">처음부터</button><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button></div></div>
     <div class="minis"><div class="mini a"><span>옮긴 횟수</span><b id="mv-k">0</b></div><div class="mini m"><span>집은 동전</span><b id="mv-sel" style="font-size:16px">없음</b></div><div class="mini g"><span>상태</span><b id="mv-st" style="font-size:16px">—</b></div><div class="mini r"><span>가장 짧은 풀이</span><b>2수</b></div></div>
     <div id="mv-say"></div>
   </div>
@@ -933,6 +933,55 @@ return {MAXN:MAXN,RNG:RNG,legal:legal,table:table,perfect:perfect,Learner:Learne
 })();
 if(typeof module!=='undefined')module.exports=CG;
 
+/* 효과음 — 음원 파일 없이 Web Audio로 8비트풍 소리를 만든다. 첫 클릭 뒤에만 소리가 난다(브라우저 정책). */
+var SFX=(function(){
+'use strict';
+var ctx=null,master=null,on=true;
+try{on=localStorage.getItem('ai_game_lab_sfx')!=='off';}catch(e){}
+function ac(){if(!on)return null;try{if(!ctx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;ctx=new A();master=ctx.createGain();master.gain.value=0.55;master.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();}catch(e){return null;}return ctx;}
+function env(g,t,a,peak,d,end){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(Math.max(end||0.0001,0.0001),t+a+d);}
+/* 음 하나: 파형·주파수·길이·크기, 끝 주파수(미끄러짐), 떨림(비브라토) */
+function tone(o){var c=ac();if(!c)return;var t=c.currentTime+(o.at||0),os=c.createOscillator(),g=c.createGain();os.type=o.type||'square';os.frequency.setValueAtTime(o.f,t);
+  if(o.to)os.frequency.exponentialRampToValueAtTime(o.to,t+o.d);
+  if(o.vib){var l=c.createOscillator(),lg=c.createGain();l.frequency.value=o.vib;lg.gain.value=o.depth||5;l.connect(lg);lg.connect(os.frequency);l.start(t);l.stop(t+o.d+0.05);}
+  var node=os;if(o.lp){var f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(o.lp,t);if(o.lpTo)f.frequency.linearRampToValueAtTime(o.lpTo,t+o.d*0.35),f.frequency.linearRampToValueAtTime(o.lp,t+o.d);f.Q.value=o.q||6;os.connect(f);node=f;}
+  node.connect(g);g.connect(master);env(g,t,o.a||0.005,o.v||0.2,o.d);os.start(t);os.stop(t+o.d+0.05);}
+/* 잡음(쾅·쓱) */
+function noise(o){var c=ac();if(!c)return;var t=c.currentTime+(o.at||0),n=Math.floor(c.sampleRate*o.d),b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(var i=0;i<n;i++)x[i]=Math.random()*2-1;
+  var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type=o.hp?'highpass':'lowpass';f.frequency.setValueAtTime(o.f||1200,t);if(o.to)f.frequency.exponentialRampToValueAtTime(o.to,t+o.d);
+  var g=c.createGain();s.connect(f);f.connect(g);g.connect(master);env(g,t,o.a||0.004,o.v||0.3,o.d);s.start(t);s.stop(t+o.d+0.02);}
+var LIB={
+ click:function(){tone({f:880,d:0.05,type:'square',v:0.08});},
+ coin:function(k){tone({f:1318+(k||0)*60,d:0.07,type:'square',v:0.11,at:0});tone({f:1976+(k||0)*60,d:0.18,type:'square',v:0.09,at:0.06});},
+ take:function(n){for(var i=0;i<n;i++)(function(i){var c=ac();if(!c)return;tone({f:1318+i*120,d:0.07,type:'square',v:0.1,at:i*0.12});tone({f:1976+i*120,d:0.16,type:'square',v:0.08,at:i*0.12+0.06});})(i);},
+ think:function(){[0,0.14,0.28].forEach(function(t,i){tone({f:[523,659,587][i],d:0.08,type:'square',v:0.07,at:t});});},
+ panic:function(){tone({f:700,to:350,d:0.25,type:'square',v:0.1,vib:14,depth:40});tone({f:650,to:300,d:0.25,type:'square',v:0.09,vib:14,depth:40,at:0.27});},
+ buzz:function(){tone({f:110,d:0.18,type:'sawtooth',v:0.12});tone({f:104,d:0.18,type:'square',v:0.08});},
+ slide:function(){noise({d:0.32,f:600,to:3200,v:0.12,hp:false});tone({f:330,to:520,d:0.25,type:'triangle',v:0.06});},
+ lift:function(){tone({f:523,to:784,d:0.09,type:'triangle',v:0.1});},
+ solve:function(){[523,659,784,1047].forEach(function(f,i){tone({f:f,d:0.14,type:'square',v:0.1,at:i*0.09});});tone({f:1568,d:0.5,type:'triangle',v:0.1,at:0.36});},
+ win:function(){var n=[523,659,784,1047,784,1047,1319];n.forEach(function(f,i){tone({f:f,d:i===n.length-1?0.7:0.13,type:'square',v:0.11,at:i*0.11,vib:i===n.length-1?7:0,depth:6});tone({f:f/2,d:i===n.length-1?0.7:0.13,type:'triangle',v:0.08,at:i*0.11});});
+   [0,0.08,0.16].forEach(function(t){tone({f:2637,d:0.06,type:'square',v:0.05,at:0.85+t});});},
+ /* 게임오버: 쾅! → 어두운 화음 → 처량하게 내려앉는 네 음 → 바닥으로 꺼지는 울림 */
+ gameover:function(){
+   noise({d:0.9,f:1800,to:120,v:0.5,a:0.002});
+   tone({f:55,to:38,d:1.0,type:'sine',v:0.5,a:0.003});
+   [110,130.8,155.6].forEach(function(f){tone({f:f,d:0.55,type:'square',v:0.07,a:0.003});});
+   var seq=[[196,0.42],[185,0.42],[174.6,0.42],[164.8,1.7]],t=0.6;
+   seq.forEach(function(s,i){var last=i===seq.length-1;
+     tone({f:s[0],to:last?s[0]*0.94:null,d:s[1],type:'sawtooth',v:0.3,at:t,a:0.03,lp:420,lpTo:1500,q:7,vib:last?5.5:0,depth:last?7:0});
+     tone({f:s[0]/2,d:s[1],type:'triangle',v:0.16,at:t,a:0.03});t+=s[1]+0.06;});
+   tone({f:82,to:30,d:1.6,type:'sine',v:0.35,at:t-0.9,a:0.05});
+   noise({d:1.4,f:400,to:60,v:0.12,at:t-0.9,a:0.2});}
+};
+function play(name,arg){if(!on)return;var f=LIB[name];if(f)try{f(arg);}catch(e){}}
+function toggle(){on=!on;try{localStorage.setItem('ai_game_lab_sfx',on?'on':'off');}catch(e){}if(on){ac();play('click');}return on;}
+/* 효과음 단추: 같은 class 단추를 모두 함께 갱신 */
+function bind(){var bs=document.querySelectorAll('.sfx-btn');function lab(){bs.forEach(function(b){b.textContent=on?'🔊 효과음 켜짐':'🔈 효과음 꺼짐';b.setAttribute('aria-pressed',String(on));});}
+  bs.forEach(function(b){b.onclick=function(){toggle();lab();};});lab();}
+return {play:play,toggle:toggle,bind:bind,isOn:function(){return on;}};
+})();
+
 (function(){
 'use strict';
 var $=U.$,$$=U.$$;
@@ -1005,13 +1054,13 @@ function plNew(){PL.n=PL.start==='rand'?10+Math.floor(Math.random()*16):PL.start
   PL.log=['동전 '+PL.n+'개로 시작. '+(PL.turn==='me'?WHO[PL.who][0].split(' ')[1]+'가':'주판봇이')+' 먼저 둡니다.'];plCoins(0);
   if(PL.turn==='me'){say2(PL.who,WHO[PL.who][2].start,'동전 '+PL.n+'개! 제가 먼저 둘게요. 몇 개를 가져갈까요?');plStatus();}
   else{say2('robo','robo_e16','동전 '+PL.n+'개. 내가 먼저 간다! 공식은 다 외웠지.');PL.busy=true;plStatus();setTimeout(plRobo,reduce?0:1100);}}
-function plTake(a,who){if(PL.over)return;PL.n-=a;PL.mark=0;PL.log.push((who==='me'?WHO[PL.who][0].split(' ')[1]:'주판봇')+': '+a+'개 → 남은 동전 '+PL.n+'개');plCoins(a);
+function plTake(a,who){if(PL.over)return;PL.n-=a;PL.mark=0;PL.log.push((who==='me'?WHO[PL.who][0].split(' ')[1]:'주판봇')+': '+a+'개 → 남은 동전 '+PL.n+'개');plCoins(a);SFX.play('take',a);
   if(PL.n===0){PL.over=true;var meLost=who==='me';PL.lastRoboLost=!meLost;if(meLost)PL.l++;else PL.w++;plStatus();
-    setTimeout(function(){$('#pl-rimg').src='img/scene_'+(meLost?'lose':'win')+'.webp';$('#pl-rimg').alt=meLost?'주판봇이 주판을 높이 들고 기뻐하고, 하루·시아·모아가 아쉬워하는 장면':'하루·시아·모아가 환호하고, 주판봇이 눈이 빙글빙글 돈 채 주저앉은 장면';
+    setTimeout(function(){SFX.play(meLost?'gameover':'win');$('#pl-rimg').src='img/scene_'+(meLost?'lose':'win')+'.webp';$('#pl-rimg').alt=meLost?'주판봇이 주판을 높이 들고 기뻐하고, 하루·시아·모아가 아쉬워하는 장면':'하루·시아·모아가 환호하고, 주판봇이 눈이 빙글빙글 돈 채 주저앉은 장면';
       $('#pl-rtxt').textContent=meLost?'주판봇 승리… 마지막 동전을 가져갔어요':'승리! 주판봇 차례에 1개를 남겼어요';$('#pl-result').hidden=false;},reduce?0:500);
     if(meLost)say2(PL.who,WHO[PL.who][2].sad,'으앗, 1개 남은 게 제 차례였어요… 다음엔 주판봇 앞에 1 + 4N개를 남길래요.');else say2(PL.who,WHO[PL.who][2].happy,'이겼다! 주판봇 차례에 마지막 1개를 남겼어요!');return;}
   PL.turn=who==='me'?'robo':'me';
-  if(PL.turn==='robo'){PL.busy=true;var losing=(PL.n-1)%4===0;say2('robo',losing?'robo_e20':'robo_e14',losing?'동전 '+PL.n+'개… 이, 이건 공식으로 지는 자리인데?!':'흠, 동전 '+PL.n+'개라… 계산 중…');plStatus();setTimeout(plRobo,reduce?0:1100);}
+  if(PL.turn==='robo'){PL.busy=true;var losing=(PL.n-1)%4===0;setTimeout(function(){SFX.play(losing?'panic':'think');},reduce?0:350);say2('robo',losing?'robo_e20':'robo_e14',losing?'동전 '+PL.n+'개… 이, 이건 공식으로 지는 자리인데?!':'흠, 동전 '+PL.n+'개라… 계산 중…');plStatus();setTimeout(plRobo,reduce?0:1100);}
   else{plStatus();myLine();}}
 function plRobo(){if(PL.over)return;PL.busy=false;var a=CG.perfect(PL.n);var rem=PL.n-a;PL.mark=0;
   if(rem>0)say2('robo','robo_e16',a+'개 가져간다! 네 앞에 '+rem+'개. '+((rem-1)%4===0?'공식대로 1 + 4N이다!':'…어라?'));
@@ -1054,13 +1103,13 @@ $('#ql-match').onclick=function(){var w=CG.match(QL.L,100);$('#ql-m').textConten
 /* ── 단계 5: 동전 옮기기 (게임 화면) ── */
 var MV;function mvInit(){MV={ids:[0,1,2,3,4],col:{0:'G',1:'S',2:'G',3:'S',4:'G'},sel:-1,k:0};
   $('#mv-row').innerHTML=MV.ids.map(function(id){return '<button type="button" class="slot" data-id="'+id+'" aria-label="'+(MV.col[id]==='G'?'금화':'은화')+'"><img src="img/coin_'+(MV.col[id]==='G'?'gold':'silver')+'.webp" alt=""></button><div class="ctag" data-tag="'+id+'">'+(MV.col[id]==='G'?'금':'은')+'</div>';}).join('')+'<div class="done" id="mv-done" hidden>같은 색끼리 모였어요!</div>';
-  $$('#mv-row .slot').forEach(function(b){b.onclick=function(){var i=MV.ids.indexOf(+b.dataset.id);MV.sel=Math.min(i,3);mvDraw();};});mvDraw();}
+  $$('#mv-row .slot').forEach(function(b){b.onclick=function(){var i=MV.ids.indexOf(+b.dataset.id);MV.sel=Math.min(i,3);SFX.play('lift');mvDraw();};});mvDraw();}
 function mvStr(){return MV.ids.map(function(id){return MV.col[id];}).join('');}
 function mvDraw(){var X=function(i){return (14+i*15.2)+'%';};
   MV.ids.forEach(function(id,i){var b=$('#mv-row .slot[data-id="'+id+'"]'),t=$('#mv-row .ctag[data-tag="'+id+'"]');b.style.left=X(i);t.style.left=X(i);b.classList.toggle('sel',MV.sel>=0&&(i===MV.sel||i===MV.sel+1));});
   var s=mvStr(),done=CG.solved(s);$('#mv-done').hidden=!done;$('#mv-k').textContent=MV.k;$('#mv-sel').textContent=MV.sel<0?'없음':(MV.sel+1)+'·'+(MV.sel+2)+'번';$('#mv-st').textContent=done?'성공!':'정리 중';
   $('#mv-say').innerHTML=done?U.say('asst',MV.k<=2?'asst_e19':'asst_e16',MV.k<=2?MV.k+'번 만에 성공! 이게 가장 짧은 풀이예요.':MV.k+'번 만에 성공! 그런데 2번이면 되는 길이 있대요. 다시 해 볼까요?'):U.say('asst','asst_e09',MV.sel<0?'동전 하나를 누르면 그 동전과 오른쪽 이웃이 함께 들려요.':'들린 두 개를 맨 왼쪽이나 맨 오른쪽으로 보내 보세요.');}
-function mvGo(d){if(MV.sel<0||CG.solved(mvStr()))return;var i=MV.sel,p=MV.ids.slice(i,i+2),r=MV.ids.slice(0,i).concat(MV.ids.slice(i+2));MV.ids=d==='L'?p.concat(r):r.concat(p);MV.k++;MV.sel=-1;mvDraw();}
+function mvGo(d){if(MV.sel<0||CG.solved(mvStr()))return;var i=MV.sel,p=MV.ids.slice(i,i+2),r=MV.ids.slice(0,i).concat(MV.ids.slice(i+2));MV.ids=d==='L'?p.concat(r):r.concat(p);MV.k++;MV.sel=-1;SFX.play('slide');mvDraw();if(CG.solved(mvStr()))setTimeout(function(){SFX.play('solve');},reduce?0:450);}
 $('#mv-L').onclick=function(){mvGo('L');};$('#mv-R').onclick=function(){mvGo('R');};$('#mv-reset').onclick=mvInit;mvInit();
 /* 넓이 우선 탐색 */
 var BF={d:0,goal:'GGGSS'},BFS=CG.bfs('GSGSG');
@@ -1097,9 +1146,10 @@ $('#dl-go').onclick=function(){var btn=this;btn.disabled=true;var res=[];
     U.say('doc','doc_e10','판정: 연습이 쌓일수록 강해집니다. 스스로 둔 AI가 아무도 알려 주지 않은 1 + 4N을 찾아냈어요.',true)].join('');
   var ok=DP?res[DL.map(function(x){return x[0];}).indexOf(DP)]>70:null;
   $('#dl-score').textContent='하루 '+res[0]+' · 시아 '+res[1]+' · 모아 '+res[2]+' (100판 중 이긴 판)';$('#dl-my').textContent=DP?('내 예상: '+DL.filter(function(x){return x[0]===DP;})[0][1]+(ok?' — 70판 넘게 이겼어요!':' — 70판을 넘지 못했어요')):'';
-  $('#dl-res').hidden=false;btn.disabled=false;btn.textContent='새로 기르고 다시 대결';};
+  $('#dl-res').hidden=false;SFX.play('solve');btn.disabled=false;btn.textContent='새로 기르고 다시 대결';};
 
 /* ── 용어·퀴즈 ── */
+SFX.bind();
 U.Gloss({
  '이기는 자리':['이기는 자리','게임 이론','지금 차례인 사람이 잘 두면 반드시 이기는 동전 수.'],
  '지는 자리':['지는 자리','게임 이론','지금 차례인 사람이 무엇을 해도 (상대가 잘 두면) 지는 동전 수. 이 게임에서는 1 + 4N.'],

@@ -36,10 +36,10 @@ function out(rel,H){const f=path.join(R,rel);fs.mkdirSync(path.dirname(f),{recur
 // 시리즈 목차
 out('index.html',fill(rd('series/index.src.html')));
 // 게임 페이지
-const pagecss=rd('page.css');
+const pagecss=rd('page.css'),sfx=rd('sfx.js');
 const GAMES=[['sudoku','sudoku.js'],['coin','coin.js']];
 for(const [game,engine] of GAMES){const d=game+'/';
-  let H=fill(rd(d+'src.html')).replace('/*@@PAGECSS@@*/',()=>pagecss).replace('/*@@ENGINE@@*/',()=>rd(d+engine)).replace('/*@@SUDOKU@@*/',()=>rd(d+engine));
+  let H=fill(rd(d+'src.html')).replace('/*@@PAGECSS@@*/',()=>pagecss).replace('/*@@ENGINE@@*/',()=>rd(d+engine)).replace('/*@@SUDOKU@@*/',()=>rd(d+engine)).replace('/*@@SFX@@*/',()=>sfx);
   if(fs.existsSync(path.join(B,d+'puzzles.json')))H=H.replace('/*@@PUZZLES@@*/null',()=>JSON.stringify(JSON.parse(rd(d+'puzzles.json'))));
   H=attach(H,JSON.parse(rd(d+'kg.json')),JSON.parse(rd(d+'refs.json')),JSON.parse(rd(d+'meta.json')));
   out(game+'/index.html',H);}

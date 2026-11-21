@@ -165,7 +165,7 @@ p,li{line-height:1.8}
     <div class="playwrap">
       <div><div class="sdk" id="pl-grid" aria-label="스도쿠 판"></div>
         <div class="pad" id="pl-pad"></div>
-        <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-hint">하루의 힌트</button><button class="bt" type="button" id="pl-check">다 채웠나 확인</button><button class="bt" type="button" id="pl-reset">처음부터</button></div></div>
+        <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-hint">하루의 힌트</button><button class="bt" type="button" id="pl-check">다 채웠나 확인</button><button class="bt" type="button" id="pl-reset">처음부터</button><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button></div></div>
       </div>
       <div>
         <div class="minis" style="grid-template-columns:repeat(2,1fr)"><div class="mini a"><span>남은 빈자리</span><b id="pl-left">—</b></div><div class="mini r"><span>부딪힌 짝(벌점)</span><b id="pl-e">—</b></div><div class="mini m"><span>쓴 힌트</span><b id="pl-h">0</b></div><div class="mini g"><span>상태</span><b id="pl-s" style="font-size:16px">—</b></div></div>
@@ -388,7 +388,7 @@ p,li{line-height:1.8}
   <div class="race" id="rc-lanes"></div>
   <div class="panel">
     <div class="ctrl"><div class="group"><span class="glabel">먼저 맞혀 보기</span><span id="rc-pred"></span></div>
-      <div class="group"><button class="bt primary" type="button" id="rc-go">레이스 시작</button><button class="bt" type="button" id="rc-10">10판씩 돌려 보기</button></div></div>
+      <div class="group"><button class="bt primary" type="button" id="rc-go">레이스 시작</button><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="rc-10">10판씩 돌려 보기</button></div></div>
     <div class="cwrap"><canvas id="rc-cv" aria-label="세 플레이어의 걸음별 벌점 곡선"></canvas></div>
     <div class="legend"><span><i style="background:#c42a6e"></i>하루 (흔들기 0)</span><span><i style="background:#5a5a6e"></i>시아 (흔들기 0.45)</span><span><i style="background:#93651a"></i>모아 (흔들기 0.9)</span></div>
     <div id="rc-res" hidden>
@@ -452,6 +452,7 @@ p,li{line-height:1.8}
 /*@@SPRITES@@*/
 /*@@COMMON@@*/
 /*@@SUDOKU@@*/
+/*@@SFX@@*/
 var PZ=/*@@PUZZLES@@*/null;
 (function(){
 'use strict';
@@ -528,7 +529,8 @@ var PL={};
 function plLoad(key){var p=P(key);PL={key:key,n:p.n,puz:p.puz,sol:p.sol,g:p.puz.slice(),sel:-1,hints:0,done:false};
   var pad=$('#pl-pad');pad.innerHTML='';for(var v=1;v<=p.n;v++)(function(v){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=v;b.onclick=function(){plPut(v);};pad.appendChild(b);})(v);
   var e=document.createElement('button');e.type='button';e.className='bt';e.textContent='지우기';e.onclick=function(){plPut(0);};pad.appendChild(e);plDraw();}
-function plPut(v){if(PL.sel<0||PL.puz[PL.sel])return;PL.g[PL.sel]=v;plDraw();}
+function plPut(v){if(PL.sel<0||PL.puz[PL.sel])return;var e0=SD.energy(PL.g,PL.n);PL.g[PL.sel]=v;var e1=SD.energy(PL.g,PL.n);plDraw();
+  if(!PL.g.filter(function(x){return !x;}).length&&!e1)SFX.play('win');else if(e1>e0)SFX.play('buzz');else if(v)SFX.play('click');}
 function plDraw(){var bad=SD.conflictPairs(PL.g,PL.n),left=PL.g.filter(function(x){return !x;}).length,E=bad.length,win=!left&&!E;
   grid($('#pl-grid'),PL.g,PL.n,{clue:PL.puz.map(function(x){return x>0;}),bad:bad,sel:PL.sel,win:win});
   $('#pl-left').textContent=left;$('#pl-e').textContent=E;$('#pl-h').textContent=PL.hints;
@@ -541,7 +543,7 @@ document.addEventListener('keydown',function(e){if(PL.sel<0)return;var r=documen
   if(/^[1-9]$/.test(e.key)&&+e.key<=n){plPut(+e.key);e.preventDefault();}
   else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){plPut(0);e.preventDefault();}
   else{var d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-n,ArrowDown:n}[e.key];if(d){var k=PL.sel+d;if(k>=0&&k<n*n){PL.sel=k;plDraw();}e.preventDefault();}}});
-$('#pl-hint').onclick=function(){var c=[];for(var k=0;k<PL.g.length;k++)if(!PL.puz[k]&&PL.g[k]!==PL.sol[k])c.push(k);if(!c.length)return;var k=c[Math.floor(Math.random()*c.length)];PL.g[k]=PL.sol[k];PL.sel=k;PL.hints++;plDraw();};
+$('#pl-hint').onclick=function(){var c=[];for(var k=0;k<PL.g.length;k++)if(!PL.puz[k]&&PL.g[k]!==PL.sol[k])c.push(k);if(!c.length)return;var k=c[Math.floor(Math.random()*c.length)];PL.g[k]=PL.sol[k];PL.sel=k;PL.hints++;plDraw();SFX.play(!PL.g.filter(function(x){return !x;}).length&&!SD.energy(PL.g,PL.n)?'win':'coin');};
 $('#pl-check').onclick=function(){var left=PL.g.filter(function(x){return !x;}).length,E=SD.energy(PL.g,PL.n);
   $('#pl-say').innerHTML=U.say('sia',left?'sia_e09':E?'sia_e20':'sia_e16',left?'아직 빈자리가 '+left+'개 남았어요.':E?'다 채웠지만 부딪힌 짝이 '+E+'개예요. 빨간 자리를 고쳐 봐요.':'빈자리 0, 부딪힌 짝 0. 완벽해요!');};
 $('#pl-reset').onclick=function(){plLoad(PL.key);};
@@ -652,7 +654,7 @@ function rlDraw(){var W=RL.W,p=RL.p,bad=SD.conflictPairs(W.g,p.n);grid($('#rl-gr
   else if(W.steps>=PZ.raceMax)U.ins($('#rl-i'),[['r',PZ.raceMax.toLocaleString()+'걸음 안에 바닥에 닿지 못했습니다.'],['m',RL.sh>0.75?'흔들기가 너무 세면 바닥 근처에서도 다시 튀어 나갑니다.':'판이 어려울수록 걸음이 많이 듭니다. 다시 해 보세요.']]);
   else $('#rl-i').innerHTML='';}
 function rlTick(){if(!RL.run)return;var W=RL.W,n=reduce?400:(RL.p.n===4?1:8);for(var i=0;i<n&&!W.done&&W.steps<PZ.raceMax;i++){W.step();if(W.kind==='shake')W.shakes=(W.shakes||0)+1;}
-  if(W.done||W.steps>=PZ.raceMax){RL.run=false;$('#rl-go').textContent='굴리기 ▶';}rlDraw();if(RL.run)requestAnimationFrame(rlTick);}
+  if(W.done||W.steps>=PZ.raceMax){RL.run=false;$('#rl-go').textContent='굴리기 ▶';SFX.play(W.E===0?'solve':'buzz');}rlDraw();if(RL.run)requestAnimationFrame(rlTick);}
 $('#rl-go').onclick=function(){if(RL.W.done||RL.W.steps>=PZ.raceMax)rlNew();RL.run=!RL.run;this.textContent=RL.run?'멈춤 ❚❚':'굴리기 ▶';if(RL.run)requestAnimationFrame(rlTick);};
 $('#rl-one').onclick=function(){RL.run=false;$('#rl-go').textContent='굴리기 ▶';if(!RL.W.done){RL.W.step();if(RL.W.kind==='shake')RL.W.shakes=(RL.W.shakes||0)+1;}rlDraw();};
 $('#rl-new').onclick=rlNew;
@@ -691,7 +693,7 @@ function rcEnd(){RC.run=false;var ok=RC.W.map(function(W){return W.E===0;}),win=
   says.push(['doc','doc_e10',win<0?'이번 판은 아무도 바닥에 닿지 못했습니다. 다시 해 보세요.':'판정: <b>'+PL3[win][1]+' 승</b>. 흔들기가 없으면 웅덩이에 갇히고, 너무 세면 바닥에 머물지 못합니다. 적당히 흔드는 쪽이 이깁니다.']);
   $('#rc-say').innerHTML=says.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
   $('#rc-score').textContent=win<0?'이번 판: 무승부':'이번 판: '+PL3[win][1]+' 승 ('+best.toLocaleString()+'걸음)';$('#rc-my').textContent=RC.pred?('내 예상: '+PL3.filter(function(x){return x[0]===RC.pred;})[0][1]+(win>=0&&PL3[win][0]===RC.pred?' — 맞혔어요!':' — 아쉬워요')):'';
-  $('#rc-res').hidden=false;}
+  $('#rc-res').hidden=false;SFX.play(win<0?'gameover':'win');}
 $('#rc-go').onclick=function(){if(!RC.run)rcStart();};
 $('#rc-10').onclick=function(){var btn=this,p=P('p9a'),res=PL3.map(function(){return [0,0,0];}),t=0;btn.disabled=true;btn.textContent='돌리는 중…';
   (function chunk(){for(var i=0;i<PL3.length;i++){var W=SD.run(p.puz,9,PL3[i][2],PZ.raceMax);if(W.E===0){res[i][0]++;res[i][2]+=W.steps;}if(W.stuck)res[i][1]++;}t++;
@@ -702,6 +704,7 @@ $('#rc-10').onclick=function(){var btn=this,p=P('p9a'),res=PL3.map(function(){re
 (function(){var p=P('p9a');RC.W=PL3.map(function(x){return SD.Walker(p.puz,9,x[2]);});rcDraw();RC.W=[];})();
 
 /* ── 용어·퀴즈 ── */
+SFX.bind();
 U.Gloss({
  '벌점':['벌점','이 페이지','같은 줄·같은 묶음에서 같은 숫자인 짝 하나당 1점. 정답만 0.'],
  '에너지':['에너지','물리·AI','답안마다 매기는 높이. 낮을수록 좋은 답. 여기서는 벌점의 합.'],
