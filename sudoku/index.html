@@ -303,6 +303,25 @@ p,li{line-height:1.8}
 .review{border:1px dashed var(--info);background:var(--info-soft);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14.5px}
 .review b{color:var(--info)}
 .calm{color:var(--muted);font-size:14px;margin:6px 0}
+.mathb .words{background:#fff;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:15px;line-height:1.8}
+.mathb .words b{color:var(--c-asst)}
+.mathb .pic{background:#fff;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7}
+.mathb .pic .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0}
+.mathb .cx{display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid #c9d2dc;border-radius:5px;font-weight:700;background:#fff}
+.mathb .cx.hit{background:var(--eye-soft);color:var(--eye);border-color:#efb7b4}
+.mathb .grp{display:inline-flex;gap:3px;padding:4px 6px;border:2px dashed #9fcfd1;border-radius:8px}
+.mathb .dot{width:14px;height:14px;border-radius:50%;background:#f2c230;border:1px solid #9a6f00;display:inline-block}
+.mathb .dot.last{background:#c9302c;border-color:#8a1c18}
+.mathb .bar{display:inline-block;height:14px;background:var(--eye);border-radius:3px;vertical-align:middle}
+.mathb .tbl2{width:100%;border-collapse:collapse;font-size:14px}
+.mathb .tbl2 td,.mathb .tbl2 th{border:1px solid #f0c3d8;padding:6px 8px;text-align:center}
+.mathb details.fold{margin-top:10px;background:#fff;border-radius:8px;padding:6px 12px}
+.mathb details.fold summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:14px}
+.mathb .mini10{display:flex;flex-wrap:wrap;gap:6px}
+.mathb .mini10 span.m{display:inline-flex;gap:2px;padding:3px 5px;border:1px solid var(--rule);border-radius:6px;background:#fff}
+.mathb .mini10 i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.mathb .mini10 i.g{background:#f2c230;border:1px solid #9a6f00}.mathb .mini10 i.s{background:#cfd6de;border:1px solid #6f7884}
+
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .cards3>div{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:12px}
 .cards3 svg{width:100%;height:auto;display:block;margin-bottom:6px}
@@ -442,14 +461,12 @@ p,li{line-height:1.8}
         <li><b>해법</b>: 틀린 짝의 개수를 세면 답안마다 점수가 하나씩 붙고, 한 자리를 고칠 때마다 점수가 내려갔는지 바로 보인다.</li></ol>
       <div class="easy"><b>쉽게 말하면</b> 받아쓰기를 "통과/탈락"이 아니라 "틀린 개수"로 채점하는 것.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
-      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 논문에 <b>E = Σ [ 짝의 두 숫자가 같으면 1 ]</b> 이런 식이 있던데… Σ는 뭐예요?</p></div>
-      <p><b>학교 수학으로 보면</b> Σ(시그마)는 "모두 더하기" 기호이고, 짝을 세는 것은 경우의 수입니다.</p>
-      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
-        <tr><td>E</td><td>에너지. 여기서는 벌점의 합</td></tr>
-        <tr><td>Σ</td><td>"시그마", 모든 짝에 대해 더한다</td></tr>
-        <tr><td>[ 같으면 1 ]</td><td>짝의 두 숫자가 같으면 1, 다르면 0</td></tr></table>
-      <div class="try"><b>숫자로 한 번 해 보기</b> 아래 "예시판"의 첫 가로줄은 4 4 1 3입니다. 가로줄에서 4가 둘 → 1점. 둘째 세로줄을 내려가 보면 4 · 3 · 1 · 4, 여기서도 4가 둘 → 1점. 다른 짝은 모두 숫자가 다르니 0점. <b>E = 1 + 1 = 2</b>.</div>
-      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 틀린 "짝"을 세는 거였네요. 한 자리가 틀리면 짝이 여러 개 같이 틀릴 수도 있겠어요!</p></div></div>
+      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 논문에는 <b>E = Σ …</b> 같은 식이 있던데, 이걸 꼭 알아야 해요?</p></div>
+      <div class="words"><b>말로 하면 한 줄입니다.</b> "같은 줄이나 같은 묶음에서 숫자가 같은 짝을 찾아, 몇 개인지 센다." 그 개수가 벌점(에너지)이에요. 덧셈만 할 줄 알면 충분합니다.</div>
+      <div class="pic"><div class="row">첫 가로줄 <span class="cx hit">4</span><span class="cx hit">4</span><span class="cx">1</span><span class="cx">3</span> → 4끼리 짝 <b>1개</b></div><div class="row">둘째 세로줄 <span class="cx hit">4</span><span class="cx">3</span><span class="cx">1</span><span class="cx hit">4</span> → 4끼리 짝 <b>1개</b></div><div class="row">나머지 짝은 모두 숫자가 다름 → <b>0개</b></div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 아래 "예시판"에서 빨갛게 표시된 같은 숫자 짝을 손가락으로 세어 보세요. 가로줄에서 1개, 세로줄에서 1개. 그래서 벌점은 <b>1 + 1 = 2</b>입니다.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 결국 "틀린 짝 세기"였네요. 식은 그걸 짧게 적어 둔 것뿐이고요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">E = Σ [ 짝의 두 숫자가 같으면 1 ]</div><table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr><tr><td>E</td><td>에너지. 여기서는 벌점의 합</td></tr><tr><td>Σ</td><td>"시그마", 모든 짝에 대해 더한다</td></tr><tr><td>[ 같으면 1 ]</td><td>짝의 두 숫자가 같으면 1, 다르면 0</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 경우의 수(짝 세기)와 합의 기호 Σ입니다.</p></details></div>
   </div>
   <div data-dlg="g2b"></div>
   <div class="panel">
@@ -461,7 +478,7 @@ p,li{line-height:1.8}
         <div class="insight" id="mg-i" aria-live="polite"></div></div>
     </div>
   </div>
-  <div class="review"><b>30초 복습 — 짝은 몇 개일까?</b> 4 × 4 판에서 한 자리는 같은 가로줄 3자리, 같은 세로줄 3자리, 같은 묶음의 대각선 1자리, 모두 7자리와 짝입니다. 16자리 × 7 ÷ 2(한 짝을 두 번 세지 않도록) = <b>56짝</b>. 9 × 9에서는 자리마다 20자리와 짝이라 81 × 20 ÷ 2 = <b>810짝</b>입니다.</div>
+  <div class="review"><b>30초 복습 — 짝은 몇 개일까?</b> 4 × 4 판에서 한 자리는 같은 가로줄 3자리, 같은 세로줄 3자리, 같은 묶음의 대각선 1자리, 모두 7자리와 짝입니다. 16자리가 각자 7자리와 짝을 지으면 112번인데, 한 짝을 양쪽에서 두 번 센 셈이라 절반인 <b>56짝</b>입니다. 9 × 9에서는 같은 방법으로 <b>810짝</b>이 나옵니다.</div>
   <div class="quiz" data-quiz="g2"></div>
 </div></section>
 
@@ -471,7 +488,7 @@ p,li{line-height:1.8}
   <div data-dlg="g3a"></div>
   <p>그릇은 이렇게 만듭니다. 순서대로 따라오세요.</p>
   <ol class="steps5">
-    <li><b>작은 판을 고릅니다.</b> 4 × 4 정답판에서 숫자 몇 개만 지웁니다. 빈자리가 2개면 숫자를 넣는 방법이 4 × 4 = 16가지, 이것이 <b>나올 수 있는 모든 답안</b>입니다.</li>
+    <li><b>작은 판을 고릅니다.</b> 4 × 4 정답판에서 숫자 몇 개만 지웁니다. 빈자리가 2개면 첫 빈자리에 1~4 네 가지, 둘째 빈자리에도 네 가지라 모두 16가지. 이것이 <b>나올 수 있는 모든 답안</b>입니다.</li>
     <li><b>답안마다 벌점을 셉니다.</b> 2단계의 방법 그대로입니다.</li>
     <li><b>벌점만큼 높이 쌓습니다.</b> 벌점 3인 답안은 블록 3개 높이, 벌점 0인 답안은 바닥에 그대로.</li>
     <li><b>줄을 세웁니다.</b> 정답을 한가운데에 두고, 정답과 한 자리만 다른 답안은 바로 옆, 두 자리 다른 답안은 그 바깥…처럼 <b>정답과 닮은 순서</b>로 세웁니다.</li>
@@ -493,7 +510,7 @@ p,li{line-height:1.8}
     <div style="display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap"><div class="sdk ro mini4" id="bw-mini"></div><div class="insight" id="bw-i" aria-live="polite" style="flex:1;min-width:220px"></div></div>
   </div>
   <p>그림의 <b>작은 웅덩이</b>(주황 고리)를 눈여겨보세요. 정답이 아닌데도, 어느 자리 하나를 바꿔 봐도 벌점이 줄지 않는 답안입니다. 그릇 바닥이 하나뿐이어도 벽에 이런 움푹한 곳이 있습니다. 6단계에서 공이 여기에 걸리는 장면을 보게 됩니다.</p>
-  <div class="review"><b>여기서는 단순하게 봤어요</b> 진짜 땅은 한 줄로 늘어선 모양이 아니라 아주 많은 방향으로 펼쳐져 있습니다. 위 그림은 "정답과 몇 자리가 다른가"라는 한 방향으로만 세워 본 것이고, 왼쪽·오른쪽은 보기 좋게 반씩 나눠 그렸습니다. 그리고 9 × 9에서 빈자리가 41개면 답안은 9<sup>41</sup> ≈ 1.3 × 10<sup>39</sup>가지라, 그릇 전체를 그려 보는 것은 불가능합니다. 그래서 AI는 그릇 전체를 보지 않고 <b>발밑만 보고 내려갑니다</b>(6단계).</div>
+  <div class="review"><b>여기서는 단순하게 봤어요</b> 진짜 땅은 한 줄로 늘어선 모양이 아니라 아주 많은 방향으로 펼쳐져 있습니다. 위 그림은 "정답과 몇 자리가 다른가"라는 한 방향으로만 세워 본 것이고, 왼쪽·오른쪽은 보기 좋게 반씩 나눠 그렸습니다. 그리고 9 × 9에서 빈자리가 41개면 답안 수는 13 뒤에 0이 38개 붙는 어마어마한 수(9<sup>41</sup>)라, 그릇 전체를 그려 보는 것은 불가능합니다. 그래서 AI는 그릇 전체를 보지 않고 <b>발밑만 보고 내려갑니다</b>(6단계).</div>
   <div class="quiz" data-quiz="g3"></div>
 </div></section>
 
@@ -520,13 +537,11 @@ p,li{line-height:1.8}
       <div class="easy"><b>쉽게 말하면</b> 정답을 외우게 하지 않고, <b>정답이 바닥에 오는 땅</b>을 만들어 준다. 그다음은 공이 알아서 굴러간다.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
       <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 에너지를 "가장 작게" 하면 왜 그게 정답이에요?</p></div>
-      <p><b>학교 수학으로 보면</b> 함수의 <b>최솟값</b> 찾기입니다. 이차함수 y = (x − 3)² + 1이 x = 3에서 가장 작아지는 것과 같은 이야기예요.</p>
-      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
-        <tr><td>E(답안) ≥ 0</td><td>벌점은 음수가 될 수 없다</td></tr>
-        <tr><td>E = 0</td><td>부딪힌 짝이 하나도 없다 = 규칙을 모두 지켰다</td></tr>
-        <tr><td>E가 가장 작은 답안</td><td>= 정답. 그래서 <b>최솟값 찾기 = 정답 찾기</b></td></tr></table>
-      <div class="try"><b>숫자로 한 번 해 보기</b> 2단계의 예시판(벌점 2)에서 첫 줄 둘째 자리의 4를 <b>2</b>로 바꿔 보세요. 가로줄의 4 짝과 세로줄의 4 짝이 한꺼번에 사라져 <b>E = 2 → 0</b>. 한 번에 바닥에 닿았습니다.</div>
-      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 한 자리만 바꿨는데 벌점 두 개가 같이 없어졌어요! 그럼 "가장 작게"가 곧 "다 맞게"네요.</p></div></div>
+      <div class="words"><b>말로 하면 두 가지예요.</b> ① 벌점은 틀린 짝의 개수라서 <b>0보다 작아질 수 없어요.</b> ② 벌점이 <b>0이 되는 건 틀린 짝이 하나도 없을 때뿐</b>이에요. 그러니 "가장 낮은 곳"을 찾으면 그곳이 곧 정답입니다.</div>
+      <div class="pic"><div class="row" style="gap:10px"><span style="width:64px">엉망판</span><span class="bar" style="width:192px"></span><b>24</b></div><div class="row" style="gap:10px"><span style="width:64px">예시판</span><span class="bar" style="width:16px"></span><b>2</b></div><div class="row" style="gap:10px"><span style="width:64px">정답판</span><span style="color:var(--gfp);font-weight:700">막대 없음 · 0 = 가장 낮은 곳</span></div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 예시판(벌점 2)에서 첫 줄 둘째 자리의 4를 <b>2</b>로 바꿔 보세요. 가로줄의 4 짝과 세로줄의 4 짝이 한꺼번에 사라져 <b>벌점 2 → 0</b>. 한 번에 바닥에 닿았습니다.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 0보다 낮은 데는 없으니까, 0에 닿으면 거기가 바닥이고 정답이네요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr><tr><td>E(답안) ≥ 0</td><td>벌점은 음수가 될 수 없다</td></tr><tr><td>E = 0</td><td>부딪힌 짝이 하나도 없다 = 규칙을 모두 지켰다</td></tr><tr><td>E가 가장 작은 답안</td><td>= 정답. 그래서 최솟값 찾기 = 정답 찾기</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 함수의 최솟값 찾기입니다. 이차함수 y = (x − 3)² + 1이 x = 3에서 가장 작아지는 것과 같은 이야기예요.</p></details></div>
   </div>
   <p>이렇게 "가장 좋은(가장 낮은) 곳 찾기"를 수학에서는 <b>최적화</b>라고 부릅니다. 에너지 모델은 스도쿠를 <b>최적화 문제</b>로 바꾸는 방법인 셈입니다. 최적화가 처음이라면 <a href="https://adminmrobo.github.io/optimization_3d_map/first_step_2.html#s51">최적화 첫걸음 ②의 5.1</a>에서 같은 그릇을 미분으로 볼 수 있습니다.</p>
   <div data-dlg="g4b"></div>
@@ -558,17 +573,15 @@ p,li{line-height:1.8}
         <li><b>해법</b>: 정답 예시만 보여 주고 벌점표를 배우게 하면, 규칙은 표 안에 저절로 나타납니다. 표를 열어 보면 AI가 무엇을 배웠는지 읽을 수 있습니다.</li></ol>
       <div class="easy"><b>쉽게 말하면</b> 자리 배치 사진을 많이 본 사람이 "같은 모둠에 같은 이름표는 안 오는구나"를 스스로 알아채는 것.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
-      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 아래 표의 빨간 숫자, 파란 숫자는 어떻게 계산해요?</p></div>
-      <p><b>학교 수학으로 보면</b> <b>확률</b>(어떤 일이 일어나는 비율)의 차이입니다.</p>
-      <div class="eqx">벌점 = 16 × ( 가짜 답에서 본 비율 − 정답에서 본 비율 )</div>
-      <table><tr><th>식 조각</th><th>뜻</th></tr>
-        <tr><td>가짜 답에서 본 비율</td><td>아무렇게나 채운 답에서 그 숫자 짝이 나온 비율(4 × 4면 어느 짝이든 1/16)</td></tr>
-        <tr><td>정답에서 본 비율</td><td>정답 예시에서 그 숫자 짝이 나온 비율</td></tr>
-        <tr><td>16 ×</td><td>보기 쉽게 키운 것</td></tr></table>
-      <div class="try"><b>숫자로 한 번 해 보기</b> 같은 가로줄의 두 자리를 보면, 정답에서 (1, 1)처럼 같은 숫자 짝은 한 번도 안 나옵니다(비율 0). 그래서 16 × (1/16 − 0) = <b>+1</b>. 다른 숫자 짝 (1, 2)는 정답 열두 번에 한 번꼴(1/12)이라 16 × (1/16 − 1/12) ≈ <b>−0.33</b>.</div>
-      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 같은 숫자 짝만 벌점이 올라가요. 아무도 안 알려 줬는데 규칙을 찾아냈네요!</p></div></div>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 아래 표의 빨간 숫자, 파란 숫자는 어떻게 정해져요?</p></div>
+      <div class="words"><b>세어서 비교할 뿐이에요.</b> 정답 예시들과, 아무렇게나 채운 가짜 답들에서 두 자리에 어떤 숫자 짝이 몇 번 나왔는지 셉니다. ① 정답에서 <b>덜</b> 나온 짝 → 벌점을 올린다(빨강, 벽). ② 정답에서 <b>더</b> 나온 짝 → 벌점을 내린다(파랑, 바닥).</div>
+      <div class="pic"><b>같은 가로줄의 두 자리</b>를 1,200장씩 세어 보면<table class="tbl2" style="margin-top:6px"><tr><th>숫자 짝</th><th>정답 예시에서</th><th>가짜 답에서</th><th>그래서</th></tr><tr><td>1과 1 (같은 숫자)</td><td>0번</td><td>약 75번</td><td style="color:#c9302c;font-weight:700">벽 ↑</td></tr><tr><td>1과 2 (다른 숫자)</td><td>약 100번</td><td>약 75번</td><td style="color:#1e55c8;font-weight:700">바닥 ↓</td></tr></table></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 같은 가로줄에 1과 1이 함께 있는 정답은 1,200장 중 한 장도 없습니다. 가짜 답에는 75번쯤 나오죠. 그래서 AI는 "이 두 자리에 같은 숫자 = 벽"이라고 적습니다. 아무도 규칙을 말해 주지 않았는데요.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 정답에 한 번도 안 나오는 짝에 벽을 세우니까, 규칙이 저절로 표에 나타나는 거군요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">벌점 = 16 × ( 가짜 답에서 본 비율 − 정답에서 본 비율 )</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>가짜 답에서 본 비율</td><td>아무렇게나 채운 답에서 그 숫자 짝이 나온 비율(4 × 4면 어느 짝이든 1/16)</td></tr><tr><td>정답에서 본 비율</td><td>정답 예시에서 그 숫자 짝이 나온 비율</td></tr><tr><td>16 ×</td><td>보기 쉽게 키운 것</td></tr></table><p style="font-size:14px;margin:6px 0 0">같은 숫자 짝: 16 × (1/16 − 0) = +1. 다른 숫자 짝: 16 × (1/16 − 1/12) ≈ −0.33. <b>학교 수학으로 보면</b> 확률(비율)의 차이입니다.</p></details></div>
   </div>
-  <p class="calm">여기서는 단순하게 봤어요. 논문은 이 비율 차이 대신 다른 계산법(의사우도)을 쓰고 [1], 9 × 9 판의 자리 짝 3,240개마다 숫자 짝 81개짜리 표를 가져 모두 약 26만 개의 숫자를 배웁니다(논문 표 1의 263K = 3,240 × 81 + 자리마다 9개씩 729).</p>
+  <p class="calm">여기서는 단순하게 봤어요. 논문은 개수 비교 대신 다른 계산법(의사우도)을 쓰고 [1], 9 × 9 판에서는 이런 표를 자리 짝마다 하나씩 가져 모두 <b>약 26만 개</b>의 숫자를 배웁니다.</p>
+  <details class="fold"><summary>26만 개는 어떻게 나왔나 (몰라도 됩니다)</summary><p>자리 81개에서 두 자리를 고르는 짝이 3,240개, 짝마다 숫자 짝 9 × 9 = 81개 항목의 표 → 3,240 × 81 = 262,440개. 자리마다 숫자 9개의 기본 점수 729개를 더하면 263,169개, 논문 표 1의 263K와 같습니다.</p></details>
   <div data-dlg="g5b"></div>
   <div class="panel">
     <div class="ptitle">벌점표 배우기 — 4 × 4 판의 자리 두 개를 골라, 정답 예시를 보여 주며 표를 채우기</div>
@@ -1203,8 +1216,8 @@ $('#bl-go').onclick=function(){blStart(false);};$('#bl-shake').onclick=function(
 var LN={pair:'row',L:null};var PAIRS={row:[0,1,'같은 가로줄의 두 자리'],box:[0,5,'같은 묶음의 대각선 두 자리'],free:[0,10,'아무 관계 없는 두 자리']};
 function lnReset(){var p=PAIRS[LN.pair];LN.L=SD.Learner(p[0],p[1],4);var g=new Array(16).fill(0);g[p[0]]='A';g[p[1]]='B';
   grid($('#ln-grid'),g.map(function(x){return x||'';}),4,{clue:g.map(function(x,i){return i===p[0]||i===p[1];}),fs:'18px'});lnDraw();}
-function lnDraw(){var W=LN.L.W(),n=LN.L.seen,h='<div class="h"></div>';for(var b=1;b<=4;b++)h+='<div class="h">B = '+b+'</div>';
-  var ds=0,os=0;for(var a=0;a<4;a++){h+='<div class="h">A = '+(a+1)+'</div>';for(b=0;b<4;b++){var v=W[a][b],t=Math.max(-1,Math.min(1,v)),col=t>0?'rgba(201,48,44,'+(0.12+0.7*t)+')':'rgba(30,85,200,'+(0.12+0.7*(-t))+')';
+function lnDraw(){var W=LN.L.W(),n=LN.L.seen,h='<div class="h"></div>';for(var b=1;b<=4;b++)h+='<div class="h">B가 '+b+'</div>';
+  var ds=0,os=0;for(var a=0;a<4;a++){h+='<div class="h">A가 '+(a+1)+'</div>';for(b=0;b<4;b++){var v=W[a][b],t=Math.max(-1,Math.min(1,v)),col=t>0?'rgba(201,48,44,'+(0.12+0.7*t)+')':'rgba(30,85,200,'+(0.12+0.7*(-t))+')';
       h+='<div style="background:'+(n?col:'#f6f8fa')+';color:'+(Math.abs(t)>0.6?'#fff':'#16212b')+'">'+(n?(v>=0?'+':'−')+Math.abs(v).toFixed(2):'?')+'</div>';if(a===b)ds+=v;else os+=v;}}
   $('#ln-heat').innerHTML=h;$('#ln-n').textContent=n.toLocaleString();$('#ln-d').textContent=n?(ds/4).toFixed(2):'—';$('#ln-o').textContent=n?(os/12).toFixed(2):'—';
   var rel=LN.pair!=='free',found=n>=200&&ds/4>0.6;$('#ln-r').textContent=!n?'—':n<200?'아직 흐릿함':rel?(found?'"같은 숫자 금지"':'아직 흐릿함'):'"서로 상관없음"';

@@ -13,6 +13,25 @@
 <!--@@CSS@@-->
 <style>
 /*@@PAGECSS@@*/
+.mathb .words{background:#fff;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:15px;line-height:1.8}
+.mathb .words b{color:var(--c-asst)}
+.mathb .pic{background:#fff;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7}
+.mathb .pic .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0}
+.mathb .cx{display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid #c9d2dc;border-radius:5px;font-weight:700;background:#fff}
+.mathb .cx.hit{background:var(--eye-soft);color:var(--eye);border-color:#efb7b4}
+.mathb .grp{display:inline-flex;gap:3px;padding:4px 6px;border:2px dashed #9fcfd1;border-radius:8px}
+.mathb .dot{width:14px;height:14px;border-radius:50%;background:#f2c230;border:1px solid #9a6f00;display:inline-block}
+.mathb .dot.last{background:#c9302c;border-color:#8a1c18}
+.mathb .bar{display:inline-block;height:14px;background:var(--eye);border-radius:3px;vertical-align:middle}
+.mathb .tbl2{width:100%;border-collapse:collapse;font-size:14px}
+.mathb .tbl2 td,.mathb .tbl2 th{border:1px solid #f0c3d8;padding:6px 8px;text-align:center}
+.mathb details.fold{margin-top:10px;background:#fff;border-radius:8px;padding:6px 12px}
+.mathb details.fold summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:14px}
+.mathb .mini10{display:flex;flex-wrap:wrap;gap:6px}
+.mathb .mini10 span.m{display:inline-flex;gap:2px;padding:3px 5px;border:1px solid var(--rule);border-radius:6px;background:#fff}
+.mathb .mini10 i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.mathb .mini10 i.g{background:#f2c230;border:1px solid #9a6f00}.mathb .mini10 i.s{background:#cfd6de;border:1px solid #6f7884}
+
 
 .stagebox{position:relative;container-type:inline-size;margin:10px 0}
 .stage{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:3px solid #16212b;background:#b98a52}
@@ -189,13 +208,11 @@
       <div class="easy"><b>쉽게 말하면</b> 미로를 출구에서부터 거꾸로 따라가면 길을 잃지 않는 것과 같다.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
       <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 공략글에 "1 + 4N개를 남겨라"라고 적혀 있던데, N은 뭐예요?</p></div>
-      <p><b>학교 수학으로 보면</b> <b>등차수열</b>(1, 5, 9, 13…처럼 같은 수만큼 커지는 수의 줄)과 <b>나머지</b>입니다.</p>
-      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
-        <tr><td>1 + 4N</td><td>N = 0, 1, 2, 3…을 넣으면 1, 5, 9, 13… 지는 자리 목록</td></tr>
-        <tr><td>(n − 1) ÷ 4의 나머지</td><td>0이면 지는 자리, 1·2·3이면 그만큼 가져가면 상대를 지는 자리에 세운다</td></tr>
-        <tr><td>4</td><td>내가 가져간 수 + 상대가 가져간 수를 언제나 4로 맞출 수 있다(1+3, 2+2, 3+1)</td></tr></table>
-      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 15개가 내 차례. 15 − 1 = 14, 14 ÷ 4 = 3 나머지 <b>2</b> → 2개를 가져가 13개를 넘긴다. 상대가 1개 가져가면 나는 3개(합 4), 3개 가져가면 나는 1개 → 상대 앞에는 다시 9개, 5개, 마지막엔 1개.</div>
-      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 상대가 몇 개를 가져가든 내가 "4가 되게" 채워 주면 되는 거였네요! 그럼 N은 "4개 묶음이 몇 개냐"였어요.</p></div></div>
+      <div class="words"><b>"4개씩 묶고 1개 남기기"라는 뜻이에요.</b> 상대가 1·2·3개 중 몇 개를 가져가든, 나는 합이 4가 되게(3·2·1개) 가져갈 수 있어요. 그래서 상대와 내가 한 번씩 두면 동전이 정확히 4개씩 줄어요. 상대 앞에 "4개 묶음 몇 개 + 1개"를 남겨 두면, 묶음이 다 없어진 뒤 마지막 1개는 상대 차례에 남습니다.</div>
+      <div class="pic"><div class="row">13개 = <span class="grp"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span> <span class="grp"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span> <span class="grp"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span> + <i class="dot last"></i></div><div class="row muted" style="font-size:13px">4개 묶음 3개 + 빨간 1개. 묶음의 수가 N(여기서는 3)입니다.</div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 15개가 내 차례. 4개씩 묶으면 묶음 3개에 3개가 남아요. 그중 1개는 상대 몫으로 두고 <b>2개</b>를 가져가면 → 13개(묶음 3개 + 1개). 이제 상대가 가져가는 만큼 4를 채워 주면 끝입니다.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> N은 "4개 묶음이 몇 개냐"였어요! 상대 몫과 내 몫을 합쳐 4로 맞추는 게 비결이고요.</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr><tr><td>1 + 4N</td><td>N = 0, 1, 2, 3…을 넣으면 1, 5, 9, 13… 지는 자리 목록</td></tr><tr><td>(n − 1) ÷ 4의 나머지</td><td>0이면 지는 자리, 1·2·3이면 그만큼 가져가면 상대를 지는 자리에 세운다</td></tr><tr><td>4</td><td>내가 가져간 수 + 상대가 가져간 수를 언제나 4로 맞출 수 있다(1+3, 2+2, 3+1)</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 등차수열(1, 5, 9, 13…처럼 같은 수만큼 커지는 수의 줄)과 나눗셈의 나머지입니다. 15개라면 15 − 1 = 14, 14 ÷ 4 = 3 나머지 2 → 2개.</p></details></div>
   </div>
   <div data-dlg="c3b"></div>
   <div class="panel">
@@ -223,7 +240,7 @@
   <ol class="steps5">
     <li><b>점수표를 만든다</b>: 동전 1~21개마다, 1·2·3개를 가져가는 수마다 <b>점수 자리</b>를 하나씩 둡니다. 처음엔 모두 0점.</li>
     <li><b>자기 자신과 둔다</b>: 대개는 점수가 가장 높은 수를 두지만, 열 번에 세 번쯤은 일부러 아무 수나 둬 봅니다(새 길 탐험).</li>
-    <li><b>점수를 고친다</b>: 마지막 동전을 가져가면 그 수는 −1점 쪽으로. 아니면 "상대가 그 자리에서 낼 수 있는 가장 좋은 점수의 반대" 쪽으로 반쯤 옮깁니다.</li>
+    <li><b>점수를 고친다</b>: 둔 수마다 점수를 목표 쪽으로 반씩 옮깁니다. 마지막 동전을 가져간 수는 나쁜 쪽(−1)으로, 상대를 지는 자리에 세운 수는 좋은 쪽(+1)으로.</li>
   </ol>
   <div class="why2">
     <div class="whyb"><h4>왜 따지지 않고 배우게 하나</h4>
@@ -233,14 +250,11 @@
       <div class="easy"><b>쉽게 말하면</b> 규칙집을 읽는 대신 수없이 져 보며 "이렇게 하면 지더라"를 몸으로 익히는 것.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
       <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> "점수를 반쯤 옮긴다"는 게 무슨 뜻이에요?</p></div>
-      <p><b>학교 수학으로 보면</b> 옛 점수와 목표 점수의 <b>가운데 지점</b> 구하기(두 수의 평균)입니다.</p>
-      <div class="eqx">새 점수 = 옛 점수 + 0.5 × ( 목표 − 옛 점수 )</div>
-      <table><tr><th>식 조각</th><th>뜻</th></tr>
-        <tr><td>목표</td><td>마지막 동전을 가져가는 수면 −1, 아니면 −(상대 자리의 가장 좋은 점수)</td></tr>
-        <tr><td>0.5</td><td>한 번에 얼마나 고칠지(학습률). 0.5면 딱 가운데로</td></tr>
-        <tr><td>−(상대 점수)</td><td>상대에게 좋은 것은 나에게 나쁘다</td></tr></table>
-      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 2개 앞에서 1개 가져가기, 옛 점수 0. 상대는 1개 앞에 서고, 상대의 가장 좋은 점수는 −1(마지막을 가져가야 하니까). 목표 = −(−1) = <b>+1</b>. 새 점수 = 0 + 0.5 × (1 − 0) = <b>0.5</b>. 한 판 더 그러면 0.5 + 0.5 × (1 − 0.5) = <b>0.75</b>. 점점 +1에 다가갑니다.</div>
-      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 한 번에 다 바꾸지 않고 반씩 다가가니까, 우연히 한 번 이긴 걸로 들뜨지 않네요!</p></div></div>
+      <div class="words"><b>지금 점수와 목표 점수의 딱 가운데로 옮긴다</b>는 뜻이에요. 목표는 이렇게 정해요. ① 마지막 동전을 가져가는 수 → 목표는 <b>−1</b>(진다). ② 상대를 지는 자리로 보내는 수 → 목표는 <b>+1</b> 쪽(좋은 수). ③ 상대를 이기는 자리로 보내는 수 → 상대에게 좋으니 나에게는 나쁜 점수.</div>
+      <div class="pic"><svg viewBox="0 0 320 54" style="width:100%;max-width:420px;display:block" aria-label="점수 수직선: 0에서 0.5, 0.75로 +1에 다가감"><line x1="16" y1="26" x2="304" y2="26" stroke="#5b6874" stroke-width="2"/><g font-size="12" text-anchor="middle" fill="#5b6874"><text x="16" y="48">−1</text><text x="160" y="48">0</text><text x="304" y="48">+1</text><text x="232" y="48">0.5</text><text x="268" y="48">0.75</text></g><g stroke="#5b6874"><line x1="16" y1="20" x2="16" y2="32"/><line x1="160" y1="20" x2="160" y2="32"/><line x1="304" y1="20" x2="304" y2="32"/></g><circle cx="160" cy="26" r="6" fill="#c9d2dc"/><circle cx="232" cy="26" r="6" fill="#f2c230"/><circle cx="268" cy="26" r="6" fill="#13733a"/><path d="M166,16 Q196,2 226,16" fill="none" stroke="#a35c00" stroke-width="2"/><path d="M238,16 Q250,6 262,16" fill="none" stroke="#a35c00" stroke-width="2"/><text x="196" y="10" font-size="11" text-anchor="middle" fill="#a35c00">반</text><text x="250" y="6" font-size="11" text-anchor="middle" fill="#a35c00">반</text></svg></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 2개 앞에서 1개를 가져가면, 상대는 1개 앞에 서서 반드시 집니다. 그래서 목표는 +1. 지금 점수 0에서 +1까지의 가운데 → <b>0.5</b>. 한 판 더 하면 0.5와 1의 가운데 → <b>0.75</b>. 판이 쌓일수록 +1에 다가갑니다.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 한 번에 다 바꾸지 않고 반씩 다가가니까, 우연히 한 번 이긴 걸로 들뜨지 않네요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">새 점수 = 옛 점수 + 0.5 × ( 목표 − 옛 점수 )</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>목표</td><td>마지막 동전을 가져가는 수면 −1, 아니면 −(상대 자리의 가장 좋은 점수)</td></tr><tr><td>0.5</td><td>한 번에 얼마나 고칠지(학습률). 0.5면 딱 가운데로</td></tr><tr><td>−(상대 점수)</td><td>상대에게 좋은 것은 나에게 나쁘다</td></tr></table><p style="font-size:14px;margin:6px 0 0">0 + 0.5 × (1 − 0) = 0.5 → 0.5 + 0.5 × (1 − 0.5) = 0.75. <b>학교 수학으로 보면</b> 두 수의 평균(가운데 지점) 구하기입니다.</p></details></div>
   </div>
   <div data-dlg="c4b"></div>
   <div class="panel">
@@ -281,13 +295,11 @@
       <div class="easy"><b>쉽게 말하면</b> 잃어버린 열쇠를 찾을 때 방 안을 가까운 곳부터 빙 둘러 빠짐없이 살피는 것.</div></div>
     <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
       <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 배치가 정말 10가지뿐이에요? 훨씬 많을 것 같은데요.</p></div>
-      <p><b>학교 수학으로 보면</b> <b>경우의 수</b>와 <b>조합</b>입니다.</p>
-      <table><tr><th>식 조각</th><th>뜻</th></tr>
-        <tr><td>₅C₂ = 10</td><td>다섯 자리 중 은화 2개가 놓일 자리를 고르는 방법의 수</td></tr>
-        <tr><td>4 × 2 = 8</td><td>한 번에 둘 수 있는 수: 이웃한 짝 4개 × 방향 2(왼쪽·오른쪽)</td></tr>
-        <tr><td>8 × 8 = 64</td><td>두 번 두는 길의 수. 하지만 도착하는 배치는 겹쳐서 10가지를 넘지 못한다</td></tr></table>
+      <div class="words"><b>달라지는 건 은화 두 개의 자리뿐이에요.</b> 금화 셋·은화 둘이라는 건 늘 그대로니까, "은화가 몇 번째와 몇 번째에 있나"만 세면 됩니다. 1번부터 차례로 짝을 지어 보면 10가지에서 끝나요.</div>
+      <div class="pic"><div class="mini10"><span class="m"><i class="s"></i><i class="s"></i><i class="g"></i><i class="g"></i><i class="g"></i></span><span class="m"><i class="s"></i><i class="g"></i><i class="s"></i><i class="g"></i><i class="g"></i></span><span class="m"><i class="s"></i><i class="g"></i><i class="g"></i><i class="s"></i><i class="g"></i></span><span class="m"><i class="s"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="s"></i></span><span class="m"><i class="g"></i><i class="s"></i><i class="s"></i><i class="g"></i><i class="g"></i></span><span class="m"><i class="g"></i><i class="s"></i><i class="g"></i><i class="s"></i><i class="g"></i></span><span class="m"><i class="g"></i><i class="s"></i><i class="g"></i><i class="g"></i><i class="s"></i></span><span class="m"><i class="g"></i><i class="g"></i><i class="s"></i><i class="s"></i><i class="g"></i></span><span class="m"><i class="g"></i><i class="g"></i><i class="s"></i><i class="g"></i><i class="s"></i></span><span class="m"><i class="g"></i><i class="g"></i><i class="g"></i><i class="s"></i><i class="s"></i></span></div><div class="muted" style="font-size:13px;margin-top:6px">은화(회색) 자리: 1·2, 1·3, 1·4, 1·5, 2·3, 2·4, 2·5, 3·4, 3·5, 4·5 — 모두 10가지</div></div>
       <div class="try"><b>숫자로 한 번 해 보기</b> 금은금은금에서 1·2번(금은)을 맨 오른쪽으로 → 금은금<b>금은</b>. 이제 3·4번(금금)을 맨 왼쪽으로 → <b>금금</b>금은은. 두 번 만에 끝!</div>
-      <div class="q"><img data-mood="asst_e19" alt=""><p><b>하루</b> 64가지 길이 있어도 도착지는 10곳뿐이라 금방 다 훑을 수 있는 거군요.</p></div></div>
+      <div class="q"><img data-mood="asst_e19" alt=""><p><b>하루</b> 둘 수 있는 길은 많아도 도착할 곳은 10곳뿐이라 금방 다 훑을 수 있는 거군요.</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>₅C₂ = 10</td><td>다섯 자리 중 은화 2개가 놓일 자리를 고르는 방법의 수(조합)</td></tr><tr><td>4 × 2 = 8</td><td>한 번에 둘 수 있는 수: 이웃한 짝 4개 × 방향 2(왼쪽·오른쪽)</td></tr><tr><td>8 × 8 = 64</td><td>두 번 두는 길의 수. 하지만 도착하는 배치는 겹쳐서 10가지를 넘지 못한다</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 경우의 수와 조합입니다.</p></details></div>
   </div>
   <div class="panel">
     <div class="ptitle">넓이 우선 탐색 — 금은금은금에서 몇 수 만에 어디까지 가나</div>
