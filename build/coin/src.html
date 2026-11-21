@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까?</title>
+<meta name="description" content="옛 PC 게임 대항해시대 4의 동전 미니게임 두 가지를 하루·시아·모아가 직접 해 보고, AI가 필승법을 찾는 세 가지 방법(뒤에서부터 따지기, 스스로 두며 배우기, 모든 수 찾기)을 따라가는 연구실 해설.">
+<meta property="og:title" content="대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까? (AI로 풀어보는 게임 시리즈 ②)">
+<meta property="og:description" content="동전 1개 남기기와 동전 옮기기. 뒤에서부터 따지고, 스스로 두며 배우고, 모든 수를 찾아봅니다.">
+<meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/coin/img/coin_cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!--@@CSS@@-->
+<style>
+/*@@PAGECSS@@*/
+.tcover{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--rule);background:linear-gradient(180deg,#fff8ec 0%,#ffffff 55%,#eef4fb 100%);container-type:inline-size}
+.tcover .row1{position:absolute;left:5%;top:12%;width:48%;display:flex;flex-wrap:wrap;gap:1.2cqw}
+.tcover .row2{position:absolute;left:5%;top:58%;width:48%;display:flex;gap:1.6cqw}
+.tcover .ppl{position:absolute;right:4%;top:8%;display:flex;gap:2%;width:36%;justify-content:flex-end}
+.tcover .ppl img{width:31%;image-rendering:pixelated}
+.tcover .bub{position:absolute;left:56%;top:44%;background:#fff;border:2px solid #16212b;border-radius:14px;padding:.6em 1em;font-weight:700;font-size:clamp(11px,2.1cqw,24px)}
+.tcover .ttl{position:absolute;left:56%;bottom:7%;font-weight:700;font-size:clamp(14px,3.3cqw,38px);color:#16212b;width:40%}
+.tcover .ttl small{display:block;font-size:.45em;color:var(--muted);font-weight:500}
+.coin{display:inline-grid;place-items:center;width:var(--cw,34px);height:var(--cw,34px);border-radius:50%;font-weight:700;font-size:calc(var(--cw,34px)*.38);flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);transition:transform .25s,opacity .25s}
+.coin.g{background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c230 55%,#b8860b);color:#6b4a00;border:2px solid #9a6f00}
+.coin.s{background:radial-gradient(circle at 35% 30%,#ffffff,#cfd6de 55%,#8f99a5);color:#3d4652;border:2px solid #6f7884}
+.coin.gone{opacity:.18;transform:scale(.7);box-shadow:none}
+.coin.hl{outline:3px solid var(--amber);outline-offset:2px}
+.coinrow{display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:#fff;border:1px solid var(--rule);border-radius:10px;min-height:70px;align-items:center}
+.wl{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;margin:10px 0}
+.wl div{border-radius:8px;padding:6px 2px;text-align:center;font-size:13px;border:1px solid var(--rule);background:#fff;font-variant-numeric:tabular-nums}
+.wl div b{display:block;font-size:17px}
+.wl .W{background:var(--gfp-soft);border-color:#a6d8b8;color:var(--gfp)}
+.wl .L{background:var(--eye-soft);border-color:#efb7b4;color:var(--eye)}
+.wl .now{outline:3px solid var(--amber);outline-offset:1px}
+.tree{display:flex;flex-direction:column;gap:8px;align-items:flex-start;margin:10px 0}
+.tree .br{display:flex;gap:8px;flex-wrap:wrap}
+.tree .node{border-radius:10px;padding:6px 12px;border:1px solid var(--rule);background:#fff;font-size:14px}
+.tree .node.W{border-color:#a6d8b8;background:var(--gfp-soft)}.tree .node.L{border-color:#efb7b4;background:var(--eye-soft)}
+.qtab{display:grid;grid-template-columns:52px repeat(3,1fr) 92px;gap:3px;max-width:520px;font-variant-numeric:tabular-nums;font-size:13px}
+.qtab div{border-radius:5px;padding:4px 2px;text-align:center}
+.qtab .h{color:var(--muted);font-weight:700;font-size:12px}
+.qtab .pick{outline:2px solid #16212b;outline-offset:-2px;font-weight:700}
+.lv{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;margin:10px 0}
+.lv .lab{font-size:13px;font-weight:700;color:var(--terrain);white-space:nowrap}
+.lv .sts{display:flex;flex-wrap:wrap;gap:8px}
+.st5{display:inline-flex;gap:3px;padding:5px 7px;border-radius:8px;border:1px solid var(--rule);background:#fff;--cw:20px}
+.st5 .coin{font-size:0}
+.st5.goal{border-color:var(--gfp);background:var(--gfp-soft)}
+.st5.path{outline:3px solid var(--amber);outline-offset:1px}
+.mvrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.mvrow .coin{cursor:pointer}
+.replay{font-size:14px;margin:6px 0;padding-left:0;list-style:none}
+.replay li{display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap}
+.replay .tagx{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--amber-soft);color:var(--amber);font-weight:700}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="섹션 바로가기"><div class="row">
+  <a class="logo" href="../index.html">AI로 풀어보는 <i>게임</i> · 코인 게임</a>
+  <div class="links">
+    <a href="../index.html">← 시리즈</a><a href="#c1">1 게임</a><a href="#c2">2 해 보기</a><a href="#c3">3 뒤에서부터</a><a href="#c4">4 스스로 배우기</a><a href="#c5">5 동전 옮기기</a><a href="#duel">대결</a><a href="#sum">정리</a><a href="#kg">색인</a><a href="#export">꾸러미</a>
+  </div>
+</div></nav>
+
+<!-- lab-cover : 새 표지(coin/img/coin_cover.webp)가 오면 이 블록을 그림으로 바꾼다 -->
+<div class="cover" id="cover" data-img="coin_cover"><div class="tcover" role="img" aria-label="금화 한 줄과 금·은 동전 다섯 개 옆에서 하루·시아·모아가 동전을 세는 임시 표지">
+  <div class="row1" id="cv-row1" style="--cw:4.2cqw"></div>
+  <div class="row2" id="cv-row2" style="--cw:6cqw"></div>
+  <div class="ppl"><img data-mood="asst_e09" alt=""><img data-mood="sia_e10" alt=""><img data-mood="moa_e19" alt=""></div>
+  <span class="bub">1개 남기면 지는 거죠?</span>
+  <div class="ttl">AI는 필승법을 어떻게 찾을까?<small>AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임</small></div>
+</div></div>
+<!-- /lab-cover -->
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow"><a href="../index.html">AI로 풀어보는 게임 시리즈</a> · ② 대항해시대 4 코인 게임</div>
+  <h1>대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까?</h1>
+  <p class="question">옛 PC 게임 「대항해시대 4」에는 항해사 한 명을 동료로 맞으려면 그와 동전 게임을 해서 이겨야 하는 장면이 있습니다 [1][4]. 공략글마다 "필승 공식"이 적혀 있지요. 그런데 그 공식은 어디서 나왔고, AI는 그 공식을 스스로 찾아낼 수 있을까요?</p>
+  <p class="lead">오늘도 하루·시아·모아가 플레이어입니다. 동전 게임 두 가지를 직접 해 본 뒤, AI가 필승법을 찾는 세 가지 방법을 차례로 따라갑니다. 상대 역은 필승 공식을 외우고 있는 주판봇이 맡습니다.</p>
+  <p class="byline">글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · 2026-11-21 · v1.0</p>
+  <div class="three"><b>처음 오신 분께 — 이 페이지를 3줄로</b><ol>
+    <li><b>무엇을</b>: 동전 1개 남기기 게임의 필승 공식 "상대 차례에 1, 5, 9, 13…개를 남겨라"를 AI가 찾는 길을 셋 봅니다. ① 끝에서부터 거꾸로 따지기 ② 스스로 수백 판 두며 배우기 ③ 둘 수 있는 모든 수를 찾아보기.</li>
+    <li><b>왜 중요한가</b>: 같은 답이라도 찾는 길이 다릅니다. 따지기는 정확하지만 게임이 크면 불가능하고, 배우기는 연습이 필요하고, 찾아보기는 작은 퍼즐에 강합니다. 바둑·체스 AI도 이 길들을 섞어 씁니다.</li>
+    <li><b>일상·현장에서는</b>: "지금 이 수가 끝에 어떤 결과로 이어지나"를 따지는 일은 협상, 경매, 재고 정리 순서 같은 결정에도 그대로 쓰입니다.</li></ol>
+    <p class="calm" style="margin:8px 0 0">코드나 수식을 몰라도 됩니다. 게임을 몰라도 규칙은 1단계에서 처음부터 설명합니다.</p>
+    <details class="fold"><summary>영어 약어 풀이</summary><p><b>AI</b> 인공지능 · <b>Q 학습</b> 수마다 점수(Q)를 매겨 가며 배우는 강화학습 방법 · <b>PK</b> 게임의 확장판 이름(파워업키트)</p></details>
+  </div>
+  <div class="kpis" aria-label="숫자 요약">
+    <div class="kpi r"><b>1·5·9·13…</b><span>차례가 오면 지는 동전 수<sup>①</sup></span></div>
+    <div class="kpi m"><b>4</b><span>내 몫 + 상대 몫을 맞출 합</span></div>
+    <div class="kpi a"><b>300판</b><span>스스로 두며 규칙을 거의 다 찾는 판 수<sup>②</sup></span></div>
+    <div class="kpi g"><b>2수</b><span>동전 옮기기의 가장 짧은 풀이<sup>①</sup></span></div>
+  </div>
+  <p class="muted" style="font-size:13px">① 이 페이지가 직접 따지고 찾아본 값입니다. ② 씨앗을 바꿔 10번 배워 본 결과, 300판이면 10번 중 8번 지는 자리를 모두 찾았습니다(4단계).</p>
+</div></header>
+
+<main>
+<section class="sec" id="cast" aria-labelledby="h-cast"><div class="wrap">
+  <h2 id="h-cast">오늘의 플레이어와 연구실 식구</h2>
+  <div class="cast" id="castgrid"></div>
+  <div class="secret"><button class="bt" id="secretbtn" type="button" aria-expanded="false">방청석 보기 (미공개 식구)</button><div class="row" id="secretrow" hidden></div></div>
+  <div data-dlg="hero"></div>
+</div></section>
+
+<!-- 단계 1 -->
+<section class="sec" id="c1" aria-labelledby="h-c1"><div class="wrap">
+  <h2 id="h-c1"><span class="hex">1</span>어떤 게임일까 — 동전 게임 두 가지 <span class="sub">하루의 차례 · 게임 설명</span></h2>
+  <div data-dlg="c1"></div>
+  <p>게임 속 주인공은 항구의 술집에서 항해사 페르난도 디아스를 만나 동료로 맞으려면 동전 게임에서 이겨야 합니다 [1][4]. 게임은 두 가지입니다.</p>
+  <div class="rules" style="grid-template-columns:1fr 1fr">
+    <div><b>① 동전 1개 남기기 (두 사람이 번갈아)</b>
+      <ol style="margin:6px 0 0;padding-left:20px"><li>탁자에 동전 여러 개(보통 13개나 17개쯤)가 놓입니다 [1][2].</li><li>번갈아 가며 한 번에 <b>1개, 2개, 3개</b> 중 하나를 가져갑니다.</li><li><b>자기 차례에 동전이 1개 남으면 집니다.</b> 마지막 동전을 가져가는 사람이 지는 셈입니다 [1][4].</li></ol></div>
+    <div><b>② 동전 옮기기 (혼자 푸는 퍼즐)</b>
+      <ol style="margin:6px 0 0;padding-left:20px"><li>금화와 은화가 <b>금-은-금-은-금</b>으로 한 줄로 놓여 있습니다.</li><li>이웃한 동전 <b>2개를 순서 그대로</b> 집어 줄의 <b>맨 왼쪽이나 맨 오른쪽 끝</b>으로 옮깁니다.</li><li>같은 색끼리 모이면(금금금은은 또는 은은금금금) 성공입니다 [3].</li></ol></div>
+  </div>
+  <div class="pair">
+    <div><div class="tl">일상으로 치면</div>①은 마지막 과자 한 조각을 먹는 사람이 설거지를 하는 내기와 같습니다. 서로 "마지막 한 조각"을 상대에게 넘기려고 머리를 씁니다. ②는 책장에서 책 두 권을 한꺼번에 뽑아 맨 끝에 꽂으며 색깔별로 정리하는 일입니다.</div>
+    <div><div class="tr">AI에서는</div>①은 상대가 있는 <b>두 사람 게임</b>이라 "상대가 가장 잘 둔다면?"을 따져야 합니다. ②는 상대가 없는 <b>혼자 푸는 퍼즐</b>이라 "목표까지 가장 짧은 길"을 찾으면 됩니다. 그래서 두 게임에 쓰는 AI 방법이 다릅니다.</div>
+  </div>
+  <p class="calm">게임 이야기는 규칙을 소개하려고 빌렸을 뿐, 게임 그림이나 게임 속 인물 그림은 쓰지 않았습니다. 게임에서 상대가 맡던 역은 이 페이지에서 주판봇이 맡습니다.</p>
+  <div class="quiz" data-quiz="c1"></div>
+</div></section>
+
+<!-- 단계 2 -->
+<section class="sec" id="c2" aria-labelledby="h-c2"><div class="wrap">
+  <h2 id="h-c2"><span class="hex">2</span>직접 해 보기 — 주판봇과 동전 1개 남기기 <span class="sub">모아의 도전</span></h2>
+  <div data-dlg="c2"></div>
+  <div class="panel game" id="play">
+    <div class="ptitle">동전 1개 남기기 — 한 번에 1~3개, 자기 차례에 1개가 남으면 집니다</div>
+    <div class="ctrl"><div class="group"><span class="glabel">시작 개수</span><span class="tabs" id="pl-n" role="group" aria-label="시작 개수"></span></div>
+      <div class="group"><span class="glabel">먼저 두는 쪽</span><span class="tabs" id="pl-first" role="group" aria-label="먼저 두는 쪽"></span></div>
+      <div class="group"><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
+    <div class="coinrow" id="pl-coins" aria-label="남은 동전"></div>
+    <div class="ctrl"><div class="group" id="pl-take"></div></div>
+    <div class="minis"><div class="mini a"><span>남은 동전</span><b id="pl-left">—</b></div><div class="mini m"><span>지금 차례</span><b id="pl-turn" style="font-size:16px">—</b></div><div class="mini g"><span>나의 전적</span><b id="pl-rec">0승 0패</b></div><div class="mini r"><span>하루의 귀띔</span><b id="pl-hint" style="font-size:15px">꺼짐</b></div></div>
+    <div id="pl-say"></div>
+    <div class="glog" id="pl-log" aria-live="polite"></div>
+  </div>
+  <p class="calm">몇 판 져도 괜찮아요. 처음엔 다들 주판봇에게 집니다. "하루의 귀띔"을 켜고 남은 개수를 잘 보세요.</p>
+  <div class="quiz" data-quiz="c2"></div>
+</div></section>
+
+<!-- 단계 3 -->
+<section class="sec" id="c3" aria-labelledby="h-c3"><div class="wrap">
+  <h2 id="h-c3"><span class="hex">3</span>뒤에서부터 따지기 — 게임 나무 <span class="sub">시아의 정리 · AI 방법 ①</span></h2>
+  <div data-dlg="c3a"></div>
+  <p>처음 13개부터 생각하면 갈래가 너무 많습니다. 시아는 거꾸로, <b>동전이 가장 적은 끝에서부터</b> 따집니다. 따지는 기준은 두 줄뿐입니다.</p>
+  <ol class="steps5">
+    <li><b>지는 자리</b>: 내가 무엇을 가져가든, 상대가 <b>이기는 자리</b>에 서게 되는 개수. (1개는 무조건 가져가야 하니 지는 자리.)</li>
+    <li><b>이기는 자리</b>: 상대를 <b>지는 자리</b>에 세우는 수가 <b>하나라도</b> 있는 개수.</li>
+  </ol>
+  <p>1개부터 차례로 따지면 2·3·4개는 각각 1·2·3개를 가져가 상대에게 1개를 남기니 이기는 자리, 5개는 1·2·3개 중 무엇을 가져가도 상대가 4·3·2개 앞에 서니 지는 자리… 이렇게 끝에서부터 한 줄로 이어 갑니다. 이것을 <b>뒤에서부터 따지기</b>(역진 귀납)라고 하고, 갈래를 나뭇가지처럼 그린 그림을 <b>게임 나무</b>라고 부릅니다.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 끝에서부터 따지나</h4>
+      <ol><li><b>문제 상황</b>: 13개에서 시작하면 두 사람이 번갈아 두는 길이 수천 갈래입니다.</li>
+        <li><b>앞 방법의 한계</b>: 처음부터 모든 길을 끝까지 따라가면 같은 개수를 몇 번이고 다시 따집니다.</li>
+        <li><b>해법</b>: 끝(1개)의 승패는 바로 압니다. 그 답을 적어 두고 2개, 3개…로 올라가면 개수마다 <b>딱 한 번씩만</b> 따지면 됩니다. 컴퓨터 과학에서는 이렇게 작은 답을 적어 두고 큰 답을 만드는 방법을 동적 계획법이라고 부릅니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 미로를 출구에서부터 거꾸로 따라가면 길을 잃지 않는 것과 같다.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 공략글에 "1 + 4N개를 남겨라"라고 적혀 있던데, N은 뭐예요?</p></div>
+      <p><b>학교 수학으로 보면</b> <b>등차수열</b>(1, 5, 9, 13…처럼 같은 수만큼 커지는 수의 줄)과 <b>나머지</b>입니다.</p>
+      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
+        <tr><td>1 + 4N</td><td>N = 0, 1, 2, 3…을 넣으면 1, 5, 9, 13… 지는 자리 목록</td></tr>
+        <tr><td>(n − 1) ÷ 4의 나머지</td><td>0이면 지는 자리, 1·2·3이면 그만큼 가져가면 상대를 지는 자리에 세운다</td></tr>
+        <tr><td>4</td><td>내가 가져간 수 + 상대가 가져간 수를 언제나 4로 맞출 수 있다(1+3, 2+2, 3+1)</td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 15개가 내 차례. 15 − 1 = 14, 14 ÷ 4 = 3 나머지 <b>2</b> → 2개를 가져가 13개를 넘긴다. 상대가 1개 가져가면 나는 3개(합 4), 3개 가져가면 나는 1개 → 상대 앞에는 다시 9개, 5개, 마지막엔 1개.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 상대가 몇 개를 가져가든 내가 "4가 되게" 채워 주면 되는 거였네요! 그럼 N은 "4개 묶음이 몇 개냐"였어요.</p></div></div>
+  </div>
+  <div data-dlg="c3b"></div>
+  <div class="panel">
+    <div class="ptitle">뒤에서부터 따지기 — 1개부터 하나씩 승패를 정해 가기</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="bt-next">하나 더 따지기</button><button class="bt" type="button" id="bt-all">끝까지(25개)</button><button class="bt" type="button" id="bt-reset">처음부터</button></div></div>
+    <div class="wl" id="bt-wl"></div>
+    <div class="legend"><span><i style="background:#13733a"></i>이기는 자리(지금 차례가 이길 수 있음)</span><span><i style="background:#c9302c"></i>지는 자리</span><span><i style="background:none;border:2px solid #a35c00"></i>방금 따진 개수</span></div>
+    <div class="tree" id="bt-tree"></div>
+    <div class="insight" id="bt-i" aria-live="polite"></div>
+  </div>
+  <div class="aicheck" id="aic">
+    <h4>AI 판단 코너 — "먼저 두면 무조건 이긴다"는 말, 맞을까?</h4>
+    <div id="aic-say"></div>
+    <div class="ctrl"><div class="group"><span class="glabel">시작 개수를 골라 판정해 보기</span><span class="tabs" id="aic-n"></span></div></div>
+    <div class="insight" id="aic-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c3"></div>
+</div></section>
+
+<!-- 단계 4 -->
+<section class="sec" id="c4" aria-labelledby="h-c4"><div class="wrap">
+  <h2 id="h-c4"><span class="hex">4</span>스스로 두며 배우기 — 강화학습 <span class="sub">모아의 질문 · AI 방법 ②</span></h2>
+  <div data-dlg="c4a"></div>
+  <p>3단계는 규칙을 다 아는 사람이 머리로 따진 방법입니다. 이번 AI는 <b>필승 공식을 전혀 모르는 채로</b> 자기 자신과 수백 판을 둡니다. 판이 끝날 때마다 "그 자리에서 그 수는 몇 점짜리였나"를 고쳐 적습니다. 이렇게 해 보고 결과로 배우는 방법을 <b>강화학습</b>이라고 부릅니다 [6].</p>
+  <ol class="steps5">
+    <li><b>점수표를 만든다</b>: 동전 1~21개마다, 1·2·3개를 가져가는 수마다 <b>점수 자리</b>를 하나씩 둡니다. 처음엔 모두 0점.</li>
+    <li><b>자기 자신과 둔다</b>: 대개는 점수가 가장 높은 수를 두지만, 열 번에 세 번쯤은 일부러 아무 수나 둬 봅니다(새 길 탐험).</li>
+    <li><b>점수를 고친다</b>: 마지막 동전을 가져가면 그 수는 −1점 쪽으로. 아니면 "상대가 그 자리에서 낼 수 있는 가장 좋은 점수의 반대" 쪽으로 반쯤 옮깁니다.</li>
+  </ol>
+  <div class="why2">
+    <div class="whyb"><h4>왜 따지지 않고 배우게 하나</h4>
+      <ol><li><b>문제 상황</b>: 동전 게임은 개수가 25개뿐이라 끝에서부터 다 따질 수 있습니다. 바둑처럼 자리 수가 어마어마한 게임은 끝까지 따지는 것이 불가능합니다.</li>
+        <li><b>앞 방법의 한계</b>: 뒤에서부터 따지기는 모든 자리를 한 번씩은 다 봐야 합니다.</li>
+        <li><b>해법</b>: 직접 두어 본 자리만 점수를 고치며 배웁니다. 자주 나오는 자리부터 점수가 정확해집니다. 공식을 몰라도 결과(이겼나 졌나)만 알려 주면 됩니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 규칙집을 읽는 대신 수없이 져 보며 "이렇게 하면 지더라"를 몸으로 익히는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> "점수를 반쯤 옮긴다"는 게 무슨 뜻이에요?</p></div>
+      <p><b>학교 수학으로 보면</b> 옛 점수와 목표 점수의 <b>가운데 지점</b> 구하기(두 수의 평균)입니다.</p>
+      <div class="eqx">새 점수 = 옛 점수 + 0.5 × ( 목표 − 옛 점수 )</div>
+      <table><tr><th>식 조각</th><th>뜻</th></tr>
+        <tr><td>목표</td><td>마지막 동전을 가져가는 수면 −1, 아니면 −(상대 자리의 가장 좋은 점수)</td></tr>
+        <tr><td>0.5</td><td>한 번에 얼마나 고칠지(학습률). 0.5면 딱 가운데로</td></tr>
+        <tr><td>−(상대 점수)</td><td>상대에게 좋은 것은 나에게 나쁘다</td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 동전 2개 앞에서 1개 가져가기, 옛 점수 0. 상대는 1개 앞에 서고, 상대의 가장 좋은 점수는 −1(마지막을 가져가야 하니까). 목표 = −(−1) = <b>+1</b>. 새 점수 = 0 + 0.5 × (1 − 0) = <b>0.5</b>. 한 판 더 그러면 0.5 + 0.5 × (1 − 0.5) = <b>0.75</b>. 점점 +1에 다가갑니다.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 한 번에 다 바꾸지 않고 반씩 다가가니까, 우연히 한 번 이긴 걸로 들뜨지 않네요!</p></div></div>
+  </div>
+  <div data-dlg="c4b"></div>
+  <div class="panel">
+    <div class="ptitle">스스로 두며 배우기 — 동전 1~21개 점수표(진할수록 확신)</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="ql-1">1판</button><button class="bt" type="button" id="ql-10">10판</button><button class="bt" type="button" id="ql-100">100판</button><button class="bt" type="button" id="ql-1000">1000판</button><button class="bt" type="button" id="ql-0">처음부터</button></div></div>
+    <div class="qtab" id="ql-tab"></div>
+    <p class="calm" style="margin-top:6px"><span style="color:#13733a">초록</span> = 좋은 수(+), <span style="color:#c9302c">빨강</span> = 나쁜 수(−), 굵은 테두리 = 지금 AI가 고를 수. 오른쪽 끝 = 그 자리에서 가장 좋은 점수가 0보다 작으면 "지는 자리"로 표시.</p>
+    <div class="minis"><div class="mini a"><span>스스로 둔 판</span><b id="ql-g">0</b></div><div class="mini r"><span>AI가 찾은 지는 자리</span><b id="ql-f" style="font-size:15px">—</b></div><div class="mini g"><span>정답(1+4N)과 일치</span><b id="ql-ok">—</b></div><div class="mini m"><span>주판봇 상대 100판</span><b id="ql-m">—</b></div></div>
+    <div class="ctrl"><div class="group"><button class="bt" type="button" id="ql-match">지금 실력으로 주판봇과 100판</button></div></div>
+    <div class="insight" id="ql-i" aria-live="polite"></div>
+  </div>
+  <p class="calm">여기서는 단순하게 봤어요. 실제 강화학습은 보통 훨씬 큰 게임에서, 점수표 대신 신경망으로 점수를 어림합니다.</p>
+  <div class="quiz" data-quiz="c4"></div>
+</div></section>
+
+<!-- 단계 5 -->
+<section class="sec" id="c5" aria-labelledby="h-c5"><div class="wrap">
+  <h2 id="h-c5"><span class="hex">5</span>동전 옮기기 — 모든 수 찾기 <span class="sub">하루의 차례 · AI 방법 ③</span></h2>
+  <div data-dlg="c5a"></div>
+  <div class="panel game" id="mv">
+    <div class="ptitle">직접 해 보기 — 동전을 누르면 그 동전과 오른쪽 이웃 2개가 집힙니다</div>
+    <div class="mvrow" id="mv-row" style="--cw:52px"></div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="mv-L">← 맨 왼쪽으로</button><button class="bt primary" type="button" id="mv-R">맨 오른쪽으로 →</button><button class="bt" type="button" id="mv-reset">처음부터</button></div></div>
+    <div class="minis"><div class="mini a"><span>옮긴 횟수</span><b id="mv-k">0</b></div><div class="mini m"><span>집은 동전</span><b id="mv-sel" style="font-size:16px">없음</b></div><div class="mini g"><span>상태</span><b id="mv-st" style="font-size:16px">—</b></div><div class="mini r"><span>가장 짧은 풀이</span><b>2수</b></div></div>
+    <div id="mv-say"></div>
+  </div>
+  <p>이번엔 상대가 없습니다. 그래서 AI는 상대 걱정 없이 <b>지금 배치에서 둘 수 있는 수를 모두 한 번씩 둬 보고</b>, 거기서 또 모두 둬 보는 식으로 퍼져 나갑니다. 가까운 곳부터 넓게 훑는다고 해서 <b>넓이 우선 탐색</b>이라고 부릅니다. 처음으로 목표에 닿은 길이 곧 가장 짧은 길입니다.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 모든 수를 찾아보나</h4>
+      <ol><li><b>문제 상황</b>: 손으로 이리저리 옮기다 보면 같은 배치로 되돌아오거나, 아무것도 바뀌지 않는 수를 두기도 합니다.</li>
+        <li><b>앞 방법의 한계</b>: 공략글의 풀이는 "되는 길"이지 "가장 짧은 길"이라는 보장이 없습니다.</li>
+        <li><b>해법</b>: 동전 5개의 배치는 모두 10가지뿐입니다. 전부 훑어도 금방 끝나고, 가까운 곳부터 훑으니 처음 닿은 길이 가장 짧다고 확신할 수 있습니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 잃어버린 열쇠를 찾을 때 방 안을 가까운 곳부터 빙 둘러 빠짐없이 살피는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 배치가 정말 10가지뿐이에요? 훨씬 많을 것 같은데요.</p></div>
+      <p><b>학교 수학으로 보면</b> <b>경우의 수</b>와 <b>조합</b>입니다.</p>
+      <table><tr><th>식 조각</th><th>뜻</th></tr>
+        <tr><td>₅C₂ = 10</td><td>다섯 자리 중 은화 2개가 놓일 자리를 고르는 방법의 수</td></tr>
+        <tr><td>4 × 2 = 8</td><td>한 번에 둘 수 있는 수: 이웃한 짝 4개 × 방향 2(왼쪽·오른쪽)</td></tr>
+        <tr><td>8 × 8 = 64</td><td>두 번 두는 길의 수. 하지만 도착하는 배치는 겹쳐서 10가지를 넘지 못한다</td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 금은금은금에서 1·2번(금은)을 맨 오른쪽으로 → 금은금<b>금은</b>. 이제 3·4번(금금)을 맨 왼쪽으로 → <b>금금</b>금은은. 두 번 만에 끝!</div>
+      <div class="q"><img data-mood="asst_e19" alt=""><p><b>하루</b> 64가지 길이 있어도 도착지는 10곳뿐이라 금방 다 훑을 수 있는 거군요.</p></div></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">넓이 우선 탐색 — 금은금은금에서 몇 수 만에 어디까지 가나</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="bf-go">한 수씩 넓히기</button><button class="bt" type="button" id="bf-reset">처음부터</button></div><div class="group"><span class="glabel">목표</span><span class="tabs" id="bf-goal"></span></div></div>
+    <div class="lv" id="bf-lv"></div>
+    <div class="insight" id="bf-i" aria-live="polite"></div>
+  </div>
+  <div class="aicheck" id="gchk">
+    <h4>AI 판단 코너 2 — 공략글의 풀이를 검산하기</h4>
+    <div id="gchk-say"></div>
+    <div class="ctrl"><div class="group"><span class="tabs" id="gchk-pick"></span></div></div>
+    <ul class="replay" id="gchk-list"></ul>
+    <div class="insight" id="gchk-i" aria-live="polite"></div>
+  </div>
+  <p class="calm">여기서는 단순하게 봤어요. 공략글들의 단계를 이 페이지의 규칙("이웃한 2개를 순서 그대로 맨 끝으로")으로 따라가 보면 적힌 배치와 맞아서 이 규칙으로 보았습니다. 게임 화면 자체와는 대조하지 못했습니다.</p>
+  <div class="quiz" data-quiz="c5"></div>
+</div></section>
+
+<!-- 대결 -->
+<section class="sec" id="duel" aria-labelledby="h-duel"><div class="wrap">
+  <h2 id="h-duel">대결 — 연습량이 다른 세 AI, 주판봇을 이겨라</h2>
+  <div data-dlg="duel"></div>
+  <p class="lead">세 플레이어가 각자 4단계의 방법으로 AI를 길렀습니다. 다른 것은 <b>스스로 둔 판 수</b> 하나뿐입니다. 길러 낸 AI가 필승 공식을 외운 주판봇과 100판을 둡니다. 공평하게 하려고 늘 AI가 먼저 두고, 시작 개수는 먼저 두는 쪽이 이길 수 있는 개수(1 + 4N이 아닌 6~21개)에서만 고릅니다.</p>
+  <div class="race" id="dl-lanes"></div>
+  <div class="panel">
+    <div class="ctrl"><div class="group"><span class="glabel">먼저 맞혀 보기 — 70판 넘게 이길 AI는?</span><span class="tabs" id="dl-pred"></span></div>
+      <div class="group"><button class="bt primary" type="button" id="dl-go">AI 기르고 대결 시작</button></div></div>
+    <div id="dl-res" hidden><div id="dl-say"></div><div class="score"><span id="dl-score"></span><span id="dl-my"></span></div></div>
+  </div>
+  <p>이 페이지의 검산(씨앗을 바꿔 10번씩)에서는 10판만 둔 AI가 주판봇을 상대로 평균 16판, 100판 둔 AI가 90판, 300판 이상 둔 AI는 100판을 모두 이겼습니다. <b>연습이 쌓이면 AI도 "상대 차례에 1 + 4N개"를 스스로 찾아냅니다.</b></p>
+  <div class="quiz" data-quiz="duel"></div>
+</div></section>
+
+<!-- 정리 -->
+<section class="sec" id="sum" aria-labelledby="h-sum"><div class="wrap">
+  <h2 id="h-sum">정리 — 같은 필승법, 세 가지 길</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th></th><th>① 뒤에서부터 따지기</th><th>② 스스로 두며 배우기</th><th>③ 모든 수 찾기</th></tr></thead><tbody>
+    <tr><td>어울리는 게임</td><td>두 사람 게임, 자리 수가 적을 때</td><td>자리 수가 너무 많아 다 따질 수 없을 때</td><td>혼자 푸는 퍼즐, 배치 수가 적을 때</td></tr>
+    <tr><td>미리 알아야 할 것</td><td>규칙과 끝의 승패</td><td>규칙과 "이겼나 졌나"만</td><td>규칙과 목표 배치</td></tr>
+    <tr><td>얻는 것</td><td>모든 자리의 정확한 승패</td><td>자주 나온 자리일수록 정확한 점수</td><td>가장 짧은 풀이</td></tr>
+    <tr><td>오늘의 결과</td><td>지는 자리 1, 5, 9, 13, 17, 21, 25</td><td>300판이면 대개 같은 목록을 찾음</td><td>금은금은금 → 2수</td></tr>
+    <tr><td>①편 스도쿠와 비교</td><td colspan="3">스도쿠의 AI는 답안마다 <b>높이(에너지)</b>를 매기고 내려갔습니다. 오늘의 AI는 자리마다 <b>승패·점수</b>를 매기거나, 배치마다 <b>거리</b>를 잽니다. 모두 "자리마다 숫자 하나를 붙이고, 그 숫자가 가리키는 쪽으로 간다"는 점은 같습니다.</td></tr>
+  </tbody></table></div>
+  <div class="paper"><b>이 게임의 수학 [5]</b> — 동전 1개 남기기는 "님(Nim)"이라 불리는 가져가기 게임 가족입니다. 1901년 수학자 부턴이 님의 필승법을 수학으로 완전히 정리했고, 오늘의 1 + 4N 공식은 그 가족 중 가장 단순한 경우(한 무더기, 최대 3개)입니다.</div>
+  <h3>용어 대응 카드</h3>
+  <div class="gloss">
+    <div><b>이기는 자리 · 지는 자리</b> = 지금 차례인 사람이 이길 수 있는 개수 · 무엇을 해도 지는 개수.</div>
+    <div><b>게임 나무</b> = 둘 수 있는 수를 나뭇가지처럼 펼친 그림.</div>
+    <div><b>뒤에서부터 따지기(역진 귀납)</b> = 끝의 승패부터 거꾸로 올라가며 정하기.</div>
+    <div><b>동적 계획법</b> = 작은 답을 적어 두고 큰 답을 만드는 방법.</div>
+    <div><b>강화학습</b> = 해 보고 결과(보상)로 배우는 방법. 오늘은 Q 학습.</div>
+    <div><b>탐험</b> = 가끔 일부러 아무 수나 둬서 새 길을 알아보는 것.</div>
+    <div><b>넓이 우선 탐색</b> = 가까운 배치부터 빠짐없이 훑어 가장 짧은 길을 찾는 방법.</div>
+  </div>
+  <div class="next"><a href="../sudoku/index.html"><b>← ① 스도쿠</b><br>답안마다 높이를 매기고 굴러 내려가기</a><a href="../index.html"><b>시리즈 목차</b><br>다음 게임(준비 중) — 미로</a><a href="https://adminmrobo.github.io/optimization_3d_map/index.html"><b>좌표축 위의 그릇 →</b><br>최적화를 3D 지도로</a></div>
+</div></section>
+
+<section class="sec" id="outro" aria-labelledby="h-outro"><div class="wrap">
+  <h2 id="h-outro">아웃트로</h2>
+  <div data-dlg="outro"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <h3>출처</h3>
+  <table><thead><tr><th>#</th><th>자료</th><th>이 페이지에서 쓴 곳</th></tr></thead><tbody>
+    <tr><td>[1]</td><td>다음 카페 「대항해시대 IV」, 「대항해시대4 파워업키드 미니게임 공략(물 옮기기 제외)」 (2026-11-21 확인)</td><td>1·2단계 — 동전 1개 남기기 규칙, 1 + 4N, 합 4 맞추기, 시작 개수</td></tr>
+    <tr><td>[2]</td><td>껨가이드, 「대항해 시대4 PK - 마리아 리 공략」 (ggemguide.com, 2026-11-21 확인)</td><td>3단계 AI 판단 코너 — 먼저 두는 쪽과 시작 개수 13·17·21</td></tr>
+    <tr><td>[3]</td><td>삶 가운데 남긴 기록, 「대항해시대4 HD 티알 와만 챠스카 공략」 (blog.aacii.net/84, 2026-11-21 확인)</td><td>1·5단계 — 동전 옮기기 단계와 목표 배치, 검산</td></tr>
+    <tr><td>[4]</td><td>Baidu Baike, "Uncharted Waters IV" (2026-11-21 확인)</td><td>머리말·1단계 — KOEI의 1999년 게임, 항해사 등용 미니게임</td></tr>
+    <tr><td>[5]</td><td>Bouton, C. L. (1901). Nim, a game with a complete mathematical theory. Annals of Mathematics, 3(1/4), 35–39.</td><td>정리 — 님 게임의 필승법</td></tr>
+    <tr><td>[6]</td><td>Sutton, R. S., Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press.</td><td>4단계 — 강화학습·Q 학습</td></tr>
+  </tbody></table>
+  <h3>예시값·설명용 모형인 것</h3>
+  <ul><li>4단계와 대결의 숫자(판 수, 승률)는 이 페이지의 단순한 Q 학습(학습률 0.5, 탐험 30%, 동전 2~21개에서 무작위 시작)으로 얻은 값입니다(검산: 저장소의 code/check_coin.js).</li>
+    <li>동전 옮기기는 공략글의 단계와 맞는 규칙으로 보았고, 실제 게임 화면과는 대조하지 못했습니다.</li>
+    <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다.</li>
+    <li>표지는 임시 그림입니다. 새 표지는 연구실 시리즈 화풍(16비트 픽셀아트)으로 준비 중입니다.</li></ul>
+  <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
+  <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
+</div></footer>
+
+<script>
+/*@@SPRITES@@*/
+/*@@COMMON@@*/
+/*@@ENGINE@@*/
+(function(){
+'use strict';
+var $=U.$,$$=U.$$;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var T=CG.table(25);
+
+/* ── 대사 ── */
+var DLG={
+ hero:[["doc","doc_e08","오늘은 옛날 PC 게임 이야기를 해 볼까요. 항해사를 동료로 맞으려면 동전 게임에서 이겨야 했던 게임이 있었어요."],
+  ["moa","moa_e19","동전 게임이요? 그거 운 아니에요?"],
+  ["sia","sia_e09","공략글에 \"필승 공식\"이 있대요. 운이면 공식이 있을 리 없죠."],
+  ["asst","asst_e12","그럼 공식을 먼저 볼까요, 아니면 일단 져 볼까요? 저는 일단 해 보고 싶어요!"]],
+ c1:[["doc","doc_e07","두 게임은 겉은 비슷해 보여도 성격이 달라요. 하나는 상대가 있고, 하나는 혼자 풉니다. 이 차이가 AI 방법을 가릅니다."],
+  ["asst","asst_e10","①은 주판봇이랑, ②는 저 혼자! 규칙 확인했어요."]],
+ c2:[["robo","robo_e16","덤벼라! 나는 공략글을 통째로 외웠다. 한 번도 안 질 거다!"],
+  ["moa","moa_e12","13개에서 시작해요. 제가 먼저 둘게요!"],
+  ["fly","fly_e09","먼저 두는 게 늘 좋은지는 몰라. 시작 개수와 차례를 바꿔 가며 몇 판 해 봐."]],
+ c3a:[["doc","doc_e09","13개에서 출발하는 모든 길을 다 따라가 볼까요? 아니면 끝에서부터 거꾸로 올라가 볼까요?"],
+  ["sia","sia_e07","끝에서부터요. 1개 남은 사람은 무조건 지니까, 거기서 시작하면 확실해요."]],
+ c3b:[["robo","robo_e16","25개까지 다 따질 필요 있나? 그냥 외워!"],
+  ["fly","fly_e08","외운 공식이 왜 맞는지는 따져 봐야 알지. \"하나 더 따지기\"를 다섯 번만 눌러 봐."]],
+ aic:[["robo","robo_e01","선공이 무조건 유리하지! 먼저 두면 이긴다!"],
+  ["doc","doc_e10","AI가 내놓은 결론은 근거로 확인합시다. 시작 개수를 바꿔 가며 표로 판정해 보세요."]],
+ c4a:[["moa","moa_e09","그런데 AI는 공식을 처음부터 알고 있어요? 시아 언니처럼 따져요?"],
+  ["doc","doc_e07","이번 AI는 몰라요. 스스로 수백 판을 두면서 \"이 수는 몇 점짜리\"를 적어 갑니다. 공식은 맨 마지막에 표에서 저절로 보여요."]],
+ c4b:[["asst","asst_e19","1판씩 눌러 볼게요. 점수가 어떻게 바뀌나 보고 싶어요!"],
+  ["robo","robo_e16","무작위로 두는 놈이 나를 이길 리 없다!"],
+  ["fly","fly_e07","10판일 때와 1000판일 때, 오른쪽 끝 \"지는 자리\" 목록을 비교해 봐."]],
+ c5a:[["asst","asst_e12","②는 제 차례! 금은금은금을 금금금은은으로… 공략글엔 다섯 번 옮기라던데요?"],
+  ["sia","sia_e09","다섯 번이 가장 짧은 걸까요? 모든 수를 찾아보면 알 수 있어요."]],
+ gchk:[["moa","moa_e09","공략글이 틀렸을 수도 있어요?"],
+  ["doc","doc_e10","틀렸다고 단정하기 전에 한 단계씩 다시 둬 봅시다. 수마다 배치가 정말 바뀌는지 보세요."]],
+ duel:[["doc","doc_e08","세 분 모두 같은 방법으로 AI를 길렀어요. 다른 건 연습량뿐입니다."],
+  ["asst","asst_e10","저는 10판만 시켰어요. 빨리 끝내고 싶어서요."],
+  ["sia","sia_e10","저는 100판. 적당히요."],
+  ["moa","moa_e19","저는 1000판! 많이 하면 무조건 세지겠죠?"]],
+ outro:[["doc","doc_e16","오늘의 세 줄입니다.<br>① 두 사람 게임은 끝에서부터 따지면 지는 자리 1, 5, 9, 13…이 나온다.<br>② 공식을 몰라도 스스로 수백 판 두며 점수를 고치면 같은 목록을 찾는다.<br>③ 혼자 푸는 퍼즐은 모든 수를 가까운 곳부터 찾아보면 가장 짧은 길(2수)이 보인다."],
+  ["asst","asst_e16","공략글의 다섯 수도 맞는 길이었는데, 더 짧은 길이 있었네요."],
+  ["sia","sia_e16","끝에서부터 따지니까 공식이 왜 맞는지까지 보였어요."],
+  ["moa","moa_e19","1000판 둔 AI가 주판봇을 이겼어요! 다음 게임도 있죠?"],
+  ["robo","robo_e14","외우기만 한 나보다 연습한 AI가 더 잘 아는군…"],
+  ["fly","fly_e16","공략글도, 주판봇의 확신도, 근거로 확인. 그게 오늘의 숙제야."]]
+};
+U.dialogues(DLG);
+var CAST=[["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","동전 옮기기 담당. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","끝에서부터 따지는 정리 담당."],["moa","moa_e13","인턴 모아 · 플레이어 3","주판봇에게 도전! \"왜요?\" 담당."],["fly","fly_e13","초파리 연구원","\"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","게임 속 상대 역. 공식을 통째로 외웠어요."]];
+$('#castgrid').innerHTML=CAST.map(function(c){return '<div class="castc" style="--cc:var(--c-'+c[0]+')"><img src="'+U.spr(c[1])+'" alt="" aria-hidden="true"><div><b>'+c[2]+'</b><p>'+c[3]+'</p></div></div>';}).join('');
+$('#secretrow').innerHTML=['x1','x2','x3'].map(function(x,i){return U.say(x,x+'_hint',['(동전 짤랑)','(…끄덕)','(짝짝짝)'][i]);}).join('');
+$('#secretbtn').onclick=function(){var r=$('#secretrow');r.hidden=!r.hidden;this.setAttribute('aria-expanded',String(!r.hidden));this.textContent=r.hidden?'방청석 보기 (미공개 식구)':'방청석 닫기';};
+U.fillImgs();
+function tabs(host,list,cur,on){host.innerHTML='';list.forEach(function(it){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=it[1];b.setAttribute('aria-pressed',String(it[0]===cur));b.onclick=function(){$$('button',host).forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');on(it[0]);};host.appendChild(b);});}
+function coins(str,cls){return str.split('').map(function(c,i){return '<span class="coin '+(c==='G'?'g':'s')+(cls&&cls[i]?' '+cls[i]:'')+'">'+(c==='G'?'금':'은')+'</span>';}).join('');}
+/* 표지 */
+(function(){var h='';for(var i=0;i<13;i++)h+='<span class="coin g">'+'</span>';$('#cv-row1').innerHTML=h;$('#cv-row2').innerHTML=coins('GSGSG');})();
+
+/* ── 단계 2: 직접 해 보기 ── */
+var PL={start:13,first:'me',n:13,turn:'me',over:false,w:0,l:0,log:[]};
+function plNew(){PL.n=PL.start==='rand'?10+Math.floor(Math.random()*16):PL.start;PL.turn=PL.first;PL.over=false;PL.log=['동전 '+PL.n+'개로 시작. '+(PL.turn==='me'?'내가':'주판봇이')+' 먼저 둡니다.'];plDraw();if(PL.turn==='robo')setTimeout(plRobo,reduce?0:700);}
+function plDraw(){var h='',tot=PL.total||PL.n;for(var i=0;i<PL.n;i++)h+='<span class="coin g"></span>';$('#pl-coins').innerHTML=h||'<span class="muted">동전이 없습니다</span>';
+  $('#pl-left').textContent=PL.n;$('#pl-turn').textContent=PL.over?'끝':PL.turn==='me'?'나':'주판봇';$('#pl-rec').textContent=PL.w+'승 '+PL.l+'패';
+  var tip=$('#pl-tip').checked;$('#pl-hint').textContent=!tip?'꺼짐':PL.over?'—':PL.turn!=='me'?'주판봇 차례':(PL.n-1)%4===0?'지는 자리… 버티기':((PL.n-1)%4)+'개 가져가기';
+  var tk=$('#pl-take');tk.innerHTML='';[1,2,3].forEach(function(a){var b=document.createElement('button');b.type='button';b.className='bt primary';b.textContent=a+'개 가져가기';b.disabled=PL.over||PL.turn!=='me'||a>PL.n;b.onclick=function(){plTake(a,'me');};tk.appendChild(b);});
+  $('#pl-log').innerHTML=PL.log.slice(-6).map(function(t){return '<div>'+t+'</div>';}).join('');}
+function plTake(a,who){PL.n-=a;PL.log.push((who==='me'?'나':'주판봇')+': '+a+'개 → 남은 동전 '+PL.n+'개');
+  if(PL.n===0){PL.over=true;var meLost=who==='me';if(meLost)PL.l++;else PL.w++;
+    $('#pl-say').innerHTML=meLost?U.say('robo','robo_e16','마지막 동전을 가져갔으니 네가 졌다! 공식대로라면 당연하지.')+U.say('moa','moa_e20','으앗, 1개 남은 게 제 차례였어요…'):U.say('robo','robo_e20','내, 내가 마지막을 가져가다니… 공식을 외웠는데!')+U.say('moa','moa_e19','이겼다! 주판봇 차례에 1개를 남겼어요!');plDraw();return;}
+  if(PL.n===1){PL.log.push((who==='me'?'주판봇':'나')+' 차례에 1개가 남았습니다.');}
+  PL.turn=who==='me'?'robo':'me';plDraw();if(PL.turn==='robo')setTimeout(plRobo,reduce?0:700);}
+function plRobo(){if(PL.over)return;plTake(CG.perfect(PL.n),'robo');}
+tabs($('#pl-n'),[[13,'13'],[17,'17'],[21,'21'],['rand','무작위']],13,function(v){PL.start=v;plNew();});
+tabs($('#pl-first'),[['me','나'],['robo','주판봇']],'me',function(v){PL.first=v;plNew();});
+$('#pl-new').onclick=plNew;$('#pl-tip').onchange=plDraw;
+$('#pl-say').innerHTML=U.say('asst','asst_e07','개수를 골라 시작하세요. 귀띔을 켜면 몇 개를 가져가면 좋을지 알려 줄게요.');plNew();
+
+/* ── 단계 3: 뒤에서부터 따지기 ── */
+var BT={k:0};
+function btDraw(){var h='';for(var n=1;n<=25;n++){var on=n<=BT.k;h+='<div class="'+(on?(T.win[n]?'W':'L'):'')+(n===BT.k?' now':'')+'"><b>'+n+'</b>'+(on?(T.win[n]?T.best[n]+'개 →':'지는'):'?')+'</div>';}$('#bt-wl').innerHTML=h;
+  var n=BT.k;if(!n){$('#bt-tree').innerHTML='';U.ins($('#bt-i'),[['m','"하나 더 따지기"를 누르면 동전 1개부터 승패를 정해 갑니다.']]);return;}
+  var br=CG.legal(n).map(function(a){var r=n-a,cls=r===0?'L':(T.win[r]?'W':'L');return '<span class="node '+(r===0?'L':cls)+'">'+a+'개 가져가기 → '+(r===0?'내가 마지막을 가져감 (짐)':'상대가 '+r+'개 앞: 상대가 '+(T.win[r]?'<b>이김</b>':'<b>짐</b>'))+'</span>';}).join('');
+  $('#bt-tree').innerHTML='<span class="node '+(T.win[n]?'W':'L')+'"><b>동전 '+n+'개, 내 차례</b></span><div class="br">'+br+'</div>';
+  U.ins($('#bt-i'),T.win[n]?[['g','<b>'+n+'개는 이기는 자리</b>: '+T.best[n]+'개를 가져가면 상대가 '+(n-T.best[n])+'개, 곧 지는 자리 앞에 섭니다. 그런 수가 하나라도 있으면 이깁니다.']]:[['r','<b>'+n+'개는 지는 자리</b>: 무엇을 가져가도 상대가 이기는 자리에 서거나, 내가 마지막을 가져갑니다.'],n>=5?['m','지금까지의 지는 자리: '+T.win.map(function(w,i){return w===false&&i<=n?i:null;}).filter(function(x){return x;}).join(', ')+' — 4씩 커집니다.']:['m','1개면 그 한 개를 가져가야 하니 무조건 집니다.']]);}
+$('#bt-next').onclick=function(){if(BT.k<25)BT.k++;btDraw();};$('#bt-all').onclick=function(){BT.k=25;btDraw();};$('#bt-reset').onclick=function(){BT.k=0;btDraw();};btDraw();
+/* AI 판단 코너 */
+$('#aic-say').innerHTML=DLG.aic.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+tabs($('#aic-n'),[[13,'13개'],[14,'14개'],[15,'15개'],[16,'16개'],[17,'17개'],[21,'21개']],0,function(n){
+  U.ins($('#aic-i'),T.win[n]?[['g','<b>'+n+'개</b>: 먼저 두는 쪽이 '+T.best[n]+'개를 가져가 상대에게 '+(n-T.best[n])+'개를 넘기면 끝까지 이깁니다. 이 경우엔 선공이 유리합니다.']]:[['r','<b>'+n+'개</b>: 1 + 4N이라 먼저 두는 쪽이 <b>지는 자리</b>입니다. 상대가 공식대로 두면 선공은 무조건 집니다. 공략글에도 선공일 때 13·17·21개면 이길 수 없다고 적혀 있습니다 [2].'],['m','결론: "선공이 무조건 유리"는 틀렸습니다. 시작 개수에 따라 다릅니다.']]);});
+U.ins($('#aic-i'),[['m','개수를 하나 골라 보세요.']]);
+
+/* ── 단계 4: 스스로 두며 배우기 ── */
+var QL={L:CG.Learner()};
+function qcol(v){var t=Math.max(-1,Math.min(1,v));return t>=0?'rgba(19,115,58,'+(0.08+0.6*t)+')':'rgba(201,48,44,'+(0.08+0.6*(-t))+')';}
+function qlDraw(){var L=QL.L,h='<div class="h">동전</div><div class="h">1개</div><div class="h">2개</div><div class="h">3개</div><div class="h">판정</div>';
+  for(var n=1;n<=21;n++){var best=L.best(n),as=CG.legal(n);h+='<div class="h">'+n+'</div>';
+    for(var a=1;a<=3;a++){if(a>n){h+='<div style="background:#f6f8fa;color:#b0b8c1">—</div>';continue;}var v=L.Q[n][a],pk=L.games&&Math.abs(v-best)<1e-9;h+='<div class="'+(pk?'pick':'')+'" style="background:'+(L.games?qcol(v):'#f6f8fa')+'">'+(L.games?(v>=0?'+':'−')+Math.abs(v).toFixed(2):'0')+'</div>';}
+    h+='<div style="font-weight:700;color:'+(!L.games?'#b0b8c1':best<0?'#c9302c':'#13733a')+'">'+(!L.games?'?':best<0?'지는 자리':'이김')+'</div>';}
+  $('#ql-tab').innerHTML=h;var f=L.found(),ok=f.join()==='1,5,9,13,17,21';
+  $('#ql-g').textContent=L.games.toLocaleString();$('#ql-f').textContent=L.games?f.join(', ')||'없음':'—';$('#ql-ok').textContent=L.games?(ok?'모두 일치!':'아직'):'—';
+  U.ins($('#ql-i'),!L.games?[['m','아직 한 판도 두지 않아 모든 점수가 0입니다. AI는 1+4N을 모릅니다.']]:L.games<50?[['m',L.games+'판: 끝에 가까운 작은 개수(1~4개)부터 점수가 생깁니다. 마지막 결과가 그 근처에서 먼저 나오기 때문이에요.']]:ok?[['g','지는 자리 1, 5, 9, 13, 17, 21을 모두 찾았습니다. 아무도 공식을 알려 주지 않았는데, 굵은 테두리(AI가 고를 수)도 상대에게 1+4N개를 남기는 수입니다.']]:[['a','일부만 찾았습니다. 큰 개수일수록 늦게 정확해집니다. 판을 더 둬 보세요.']]);}
+function qlTrain(k){QL.L.train(k);qlDraw();}
+$('#ql-1').onclick=function(){qlTrain(1);};$('#ql-10').onclick=function(){qlTrain(10);};$('#ql-100').onclick=function(){qlTrain(100);};$('#ql-1000').onclick=function(){qlTrain(1000);};
+$('#ql-0').onclick=function(){QL.L=CG.Learner();$('#ql-m').textContent='—';qlDraw();};
+$('#ql-match').onclick=function(){var w=CG.match(QL.L,100);$('#ql-m').textContent=w+'승 / 100';};qlDraw();
+
+/* ── 단계 5: 동전 옮기기 ── */
+var MV={s:'GSGSG',sel:-1,k:0,hist:[]};
+function mvDraw(){var cls={};if(MV.sel>=0){cls[MV.sel]='hl';cls[MV.sel+1]='hl';}$('#mv-row').innerHTML=coins(MV.s,cls);
+  $$('#mv-row .coin').forEach(function(c,i){c.setAttribute('role','button');c.setAttribute('tabindex','0');c.onclick=function(){MV.sel=Math.min(i,3);mvDraw();};c.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();c.onclick();}};});
+  var done=CG.solved(MV.s);$('#mv-k').textContent=MV.k;$('#mv-sel').textContent=MV.sel<0?'없음':(MV.sel+1)+'·'+(MV.sel+2)+'번';$('#mv-st').textContent=done?'성공!':'정리 중';
+  $('#mv-say').innerHTML=done?U.say('asst',MV.k<=2?'asst_e19':'asst_e16',MV.k<=2?MV.k+'번 만에 성공! 이게 가장 짧은 풀이예요.':MV.k+'번 만에 성공! 그런데 2번이면 되는 길이 있대요. 다시 해 볼까요?'):U.say('asst','asst_e09',MV.sel<0?'동전 하나를 누르면 그 동전과 오른쪽 이웃이 함께 집혀요.':'집은 두 개를 맨 왼쪽이나 맨 오른쪽으로 보내 보세요.');}
+function mvGo(d){if(MV.sel<0||CG.solved(MV.s))return;var t=CG.apply(MV.s,MV.sel+1,d);MV.k++;MV.s=t;MV.sel=-1;mvDraw();}
+$('#mv-L').onclick=function(){mvGo('L');};$('#mv-R').onclick=function(){mvGo('R');};$('#mv-reset').onclick=function(){MV={s:'GSGSG',sel:-1,k:0};mvDraw();};mvDraw();
+/* 넓이 우선 탐색 */
+var BF={d:0,goal:'GGGSS'},BFS=CG.bfs('GSGSG');
+function bfDraw(){var path=BFS.path(BF.goal).map(function(p){return p.to;}),h='';
+  for(var d=0;d<=Math.min(BF.d,BFS.levels.length-1);d++){h+='<div class="lab">'+(d?d+'수 뒤':'출발')+'<br><span class="muted" style="font-weight:500">'+BFS.levels[d].length+'가지</span></div><div class="sts">'+BFS.levels[d].map(function(s){return '<span class="st5'+(CG.solved(s)?' goal':'')+(BF.d>=2&&(path.indexOf(s)>=0||(d===0)&&BF.d>=2)?' path':'')+'">'+coins(s)+'</span>';}).join('')+'</div>';}
+  $('#bf-lv').innerHTML=h;
+  var found=BF.d>=BFS.dist[BF.goal];
+  U.ins($('#bf-i'),BF.d===0?[['m','출발 배치 하나. "한 수씩 넓히기"를 누르면 한 수로 갈 수 있는 배치를 모두 펼칩니다.']]:BF.d===1?[['m','한 수로 둘 수 있는 수는 8가지지만, 도착한 배치는 2가지뿐입니다. 여러 수가 같은 배치로 모이거든요. 아직 목표는 없습니다.']]:
+    [['g','2수 뒤 목표(초록) 등장! 가장 짧은 풀이: '+BFS.path(BF.goal).map(function(p){return p.m.i+'·'+(p.m.i+1)+'번을 '+(p.m.d==='L'?'맨 왼쪽':'맨 오른쪽')+'으로';}).join(' → ')+'.'],['m','2수 뒤에 나머지 7가지 배치가 모두 나와, 동전 5개의 배치 10가지를 다 훑었습니다. 3수 이상은 볼 필요가 없습니다.']]);}
+$('#bf-go').onclick=function(){if(BF.d<2)BF.d++;bfDraw();};$('#bf-reset').onclick=function(){BF.d=0;bfDraw();};
+tabs($('#bf-goal'),[['GGGSS','금금금은은'],['SSGGG','은은금금금']],'GGGSS',function(g){BF.goal=g;bfDraw();});bfDraw();
+/* 공략글 검산 */
+$('#gchk-say').innerHTML=DLG.gchk.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+var GUIDES={a:{name:'다섯 수 풀이(검색 요약)',steps:[[1,'R'],[1,'L'],[2,'R'],[3,'L'],[1,'R']]},b:{name:'공략글 [3]의 1~3단계',steps:[[4,'L'],[4,'L'],[3,'L']]}};
+function gchk(k){var G=GUIDES[k],s='GSGSG',h='<li><span class="muted">출발</span><span class="st5">'+coins(s)+'</span></li>',waste=0;
+  G.steps.forEach(function(st,i){var t=CG.apply(s,st[0],st[1]),same=t===s;if(same)waste++;h+='<li><b>'+(i+1)+'.</b> '+st[0]+'·'+(st[0]+1)+'번 → '+(st[1]==='L'?'맨 왼쪽':'맨 오른쪽')+' <span class="st5'+(CG.solved(t)?' goal':'')+'">'+coins(t)+'</span>'+(same?'<span class="tagx">배치가 그대로 — 헛수</span>':'')+'</li>';s=t;});
+  $('#gchk-list').innerHTML=h;
+  U.ins($('#gchk-i'),k==='a'?[['g','다섯 수 끝에 금금금은은에 닿습니다. 길은 맞습니다.'],['a','다만 2수째는 이미 맨 왼쪽에 있는 1·2번을 다시 맨 왼쪽으로 보내 배치가 바뀌지 않는 헛수입니다. 그리고 4수째에 이미 은은금금금(같은 색끼리 모임)이 됩니다. 목표를 금금금은은으로 정했다면 실제로 움직인 수는 4수, 가장 짧은 길은 2수입니다.']]:
+    [['g','1·2단계의 배치는 공략글에 적힌 백-금-금-백-금, 백-금-백-금-금(공략글은 은화를 "백"으로 적음)과 똑같이 나옵니다. 그래서 이 페이지의 규칙이 맞다고 보았습니다.'],['a','3단계는 배치가 바뀌지 않는 헛수이고, 공략글의 4·5단계는 적힌 배치가 앞 단계와 이어지지 않아 오타로 보입니다. 공략글이 틀렸다기보다, 되는 길을 적었을 뿐 가장 짧은 길은 아닌 셈입니다.']]);}
+tabs($('#gchk-pick'),[['a','다섯 수 풀이 검산'],['b','공략글 [3] 검산']],'a',gchk);gchk('a');
+
+/* ── 대결 ── */
+var DL=[['asst','하루',10,'#c42a6e'],['sia','시아',100,'#5a5a6e'],['moa','모아',1000,'#93651a']],DP=null;
+$('#dl-lanes').innerHTML=DL.map(function(x,i){return '<div class="lane" style="--cc:var(--c-'+x[0]+')"><div class="head"><img id="dl-img'+i+'" data-mood="'+x[0]+'_e13" alt=""><div><b>'+x[1]+'의 AI</b><br><span class="muted">스스로 둔 판: '+x[2].toLocaleString()+'</span></div></div><div class="st" id="dl-s'+i+'">대기 중</div><div class="resbar"><div class="bar"><i id="dl-b'+i+'" style="background:'+x[3]+';width:0"></i></div></div></div>';}).join('');U.fillImgs();
+tabs($('#dl-pred'),DL.map(function(x){return [x[0],x[1]];}),null,function(v){DP=v;});
+$('#dl-go').onclick=function(){var btn=this;btn.disabled=true;var res=[];
+  DL.forEach(function(x,i){var L=CG.Learner();L.train(x[2]);var w=CG.match(L,100);res.push(w);var f=L.found();
+    $('#dl-s'+i).innerHTML='주판봇 상대 <b>'+w+'승</b> / 100<br><span class="muted">찾은 지는 자리: '+(f.join(', ')||'없음')+'</span>';$('#dl-b'+i).style.width=w+'%';
+    U.setMood($('#dl-img'+i),x[0]+(w>=95?(x[0]==='asst'?'_e19':'_e16'):w>=70?'_e01':(x[0]==='asst'?'_e24':'_e20')));});
+  var mx=Math.max.apply(null,res),win=res.indexOf(mx);
+  $('#dl-say').innerHTML=[U.say('asst',res[0]<70?'asst_e20':'asst_e16',res[0]<70?'10판으로는 주판봇에게 '+res[0]+'판밖에 못 이겼어요. 아직 작은 개수만 알더라고요.':'10판인데도 '+res[0]+'판! 운이 좋았나 봐요.'),
+    U.say('sia','sia_e10','100판으로 '+res[1]+'판. 큰 개수에서 가끔 헷갈렸어요.',true),
+    U.say('moa',res[2]>=95?'moa_e19':'moa_e20','1000판 둔 제 AI는 '+res[2]+'판! '+(res[2]>=95?'주판봇이랑 똑같이 공식대로 둬요.':'')),
+    U.say('doc','doc_e10','판정: 연습이 쌓일수록 강해집니다. 스스로 둔 AI가 아무도 알려 주지 않은 1 + 4N을 찾아냈어요.',true)].join('');
+  var ok=DP?res[DL.map(function(x){return x[0];}).indexOf(DP)]>70:null;
+  $('#dl-score').textContent='하루 '+res[0]+' · 시아 '+res[1]+' · 모아 '+res[2]+' (100판 중 이긴 판)';$('#dl-my').textContent=DP?('내 예상: '+DL.filter(function(x){return x[0]===DP;})[0][1]+(ok?' — 70판 넘게 이겼어요!':' — 70판을 넘지 못했어요')):'';
+  $('#dl-res').hidden=false;btn.disabled=false;btn.textContent='새로 기르고 다시 대결';};
+
+/* ── 용어·퀴즈 ── */
+U.Gloss({
+ '이기는 자리':['이기는 자리','게임 이론','지금 차례인 사람이 잘 두면 반드시 이기는 동전 수.'],
+ '지는 자리':['지는 자리','게임 이론','지금 차례인 사람이 무엇을 해도 (상대가 잘 두면) 지는 동전 수. 이 게임에서는 1 + 4N.'],
+ '게임 나무':['게임 나무','AI','둘 수 있는 수를 나뭇가지처럼 펼친 그림.'],
+ '뒤에서부터 따지기':['뒤에서부터 따지기 (역진 귀납)','게임 이론','끝의 승패부터 거꾸로 올라가며 정하는 방법.'],
+ '동적 계획법':['동적 계획법','컴퓨터 과학','작은 문제의 답을 적어 두고 큰 문제의 답을 만드는 방법.'],
+ '강화학습':['강화학습','AI','해 보고 받은 결과(보상)로 행동을 고쳐 가며 배우는 방법.'],
+ '학습률':['학습률','AI','한 번에 점수를 얼마나 고칠지 정하는 수.'],
+ '탐험':['탐험','AI','가끔 일부러 아무 수나 둬서 새 길을 알아보는 것.'],
+ '넓이 우선 탐색':['넓이 우선 탐색 (BFS)','AI','가까운 배치부터 빠짐없이 훑는 탐색. 처음 닿은 길이 가장 짧다.'],
+ '등차수열':['등차수열','수학','같은 수만큼 커지는 수의 줄. 1, 5, 9, 13…은 공차 4.']
+},['이기는 자리','지는 자리','게임 나무','뒤에서부터 따지기','동적 계획법','강화학습','탐험','넓이 우선 탐색']);
+U.Study({quiz:{
+ c1:[{q:'동전 1개 남기기에서 지는 사람은?',o:['첫 수를 둔 사람','마지막 동전을 가져가는 사람','동전을 가장 많이 가져간 사람'],a:1,why:'자기 차례에 1개가 남으면 그 동전을 가져가야 하니 집니다.',hint:'규칙 ③.'},
+     {q:'동전 옮기기에서 한 번에 할 수 있는 것은?',o:['동전 1개를 아무 데나','이웃한 2개를 순서 그대로 맨 왼쪽이나 맨 오른쪽 끝으로','동전 두 개의 자리를 맞바꾸기'],a:1,why:'두 개를 순서 그대로 줄의 끝으로 옮깁니다.',hint:'규칙 ②.'}],
+ c2:[{q:'동전 10개가 내 차례일 때 가져갈 개수는?',o:['1개','2개','3개'],a:0,why:'10 − 1 = 9, 9 ÷ 4의 나머지 1 → 1개 가져가 상대에게 9개(1 + 4 × 2)를 남깁니다.',hint:'상대에게 1, 5, 9…개를 남기세요.'},
+     {q:'상대가 3개를 가져갔다. 공식대로라면 나는?',o:['3개','1개','2개'],a:1,why:'두 사람 몫의 합을 4로 맞춥니다: 3 + 1 = 4.',hint:'합이 4.'}],
+ c3:[{q:'뒤에서부터 따지기에서 "이기는 자리"의 조건은?',o:['모든 수가 상대를 지는 자리에 세운다','상대를 지는 자리에 세우는 수가 하나라도 있다','동전이 짝수 개다'],a:1,why:'좋은 수가 하나만 있어도 그 수를 두면 됩니다.',hint:'두 줄 기준 ②.'},
+     {q:'동전 17개에서 먼저 두면?',o:['반드시 이긴다','상대가 공식대로 두면 반드시 진다','운에 달렸다'],a:1,why:'17 = 1 + 4 × 4, 지는 자리에서 차례가 온 것입니다.',hint:'AI 판단 코너.'}],
+ c4:[{q:'스스로 두며 배우는 AI에게 미리 알려 준 것은?',o:['1 + 4N 공식','규칙과 이겼는지 졌는지','주판봇의 수'],a:1,why:'공식은 알려 주지 않았습니다. 결과만 보고 점수를 고쳐 공식에 도달했습니다.',hint:'왜 따지지 않고 배우게 하나 상자.'},
+     {q:'열 번에 세 번쯤 일부러 아무 수나 두는 이유는?',o:['일부러 지려고','안 가 본 수의 점수도 알아보려고(탐험)','빨리 끝내려고'],a:1,why:'늘 지금 좋아 보이는 수만 두면 더 좋은 수를 영영 모를 수 있습니다.',hint:'①편의 흔들기와 비슷한 역할.'}],
+ c5:[{q:'넓이 우선 탐색이 찾은 길이 가장 짧다고 확신할 수 있는 이유는?',o:['운이 좋아서','가까운 배치부터 빠짐없이 훑어 처음 닿은 길이기 때문','공략글과 같아서'],a:1,why:'1수 거리를 다 본 뒤 2수 거리를 보니, 목표를 처음 만난 거리가 가장 짧습니다.',hint:'한 수씩 넓히기.'},
+     {q:'공략글의 다섯 수 풀이에 대한 바른 판정은?',o:['틀린 풀이다','목표에 닿지만 헛수가 섞여 가장 짧지는 않다','가장 짧은 풀이다'],a:1,why:'목표엔 닿지만 2수째는 배치가 그대로인 헛수이고, 4수째에 이미 은은금금금이 됩니다. 가장 짧은 길은 2수입니다.',hint:'AI 판단 코너 2.'}],
+ duel:[{q:'대결에서 1000판 둔 AI가 가장 잘한 이유는?',o:['처음부터 공식을 알아서','많이 둘수록 큰 개수의 점수까지 정확해져서','주판봇이 일부러 져 줘서'],a:1,why:'점수는 끝에 가까운 작은 개수부터 정확해지고, 판이 쌓일수록 큰 개수까지 퍼집니다.',hint:'4단계의 10판·1000판 비교.'}]
+}});
+U.start();
+})();
+</script>
+</body>
+</html>

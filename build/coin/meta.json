@@ -1,0 +1,43 @@
+{
+ "title": "AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까?",
+ "series": "AI로 풀어보는 게임 시리즈",
+ "number": "2",
+ "creator": [
+  {
+   "name": "안상선",
+   "role": "author",
+   "affiliation": "(주)M-Robo"
+  }
+ ],
+ "contributor": [
+  {
+   "name": "AI 보조 제작",
+   "role": "assistant"
+  }
+ ],
+ "date": "2026-11-21",
+ "version": "1.0",
+ "language": [
+  "ko"
+ ],
+ "license": "",
+ "url": "https://adminmrobo.github.io/ai_game_lab/coin/",
+ "about": [
+  "lab:concept/one-plus-4n",
+  "lab:method/backward-induction",
+  "lab:method/q-learning-selfplay",
+  "lab:method/breadth-first-search"
+ ],
+ "basedOn": [
+  "daum_uw4_minigame",
+  "ggemguide_uw4_maria",
+  "aacii_uw4_tial",
+  "baike_uw4",
+  "bouton1901nim",
+  "sutton2018rl"
+ ],
+ "educationalLevel": "입문",
+ "learningResourceType": "interactive explainer",
+ "registry": "KG_00_registry 0.2",
+ "suggestedCitation": "안상선 (2026). AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까? v1.0."
+}

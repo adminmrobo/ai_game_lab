@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI로 풀어보는 게임 시리즈 — 연구실 식구들과 게임으로 배우는 AI</title>
-<meta name="description" content="하루·시아·모아가 플레이어로 나서서 게임을 직접 풀어 보고, AI가 같은 게임을 어떻게 푸는지 따라가는 연구실 해설 시리즈. ① 스도쿠 — 에너지 모델.">
+<meta name="description" content="하루·시아·모아가 플레이어로 나서서 게임을 직접 풀어 보고, AI가 같은 게임을 어떻게 푸는지 따라가는 연구실 해설 시리즈. ① 스도쿠 — 에너지 모델, ② 대항해시대 4 코인 게임 — 게임 나무·강화학습·탐색.">
 <meta property="og:title" content="AI로 풀어보는 게임 시리즈">
 <meta property="og:description" content="게임을 직접 풀어 보고, AI는 같은 게임을 어떻게 푸는지 따라가 봅니다.">
 <meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/sudoku/img/sdk_cover.webp">
@@ -269,7 +269,7 @@ footer td,footer th{border:1px solid var(--rule);padding:6px 8px;text-align:left
 <body>
 <nav class="top" aria-label="바로가기"><div class="row">
   <a class="logo" href="#top">AI로 풀어보는 <i>게임</i></a>
-  <div class="links"><a href="#games">게임 목록</a><a href="sudoku/index.html">① 스도쿠</a></div>
+  <div class="links"><a href="#games">게임 목록</a><a href="sudoku/index.html">① 스도쿠</a><a href="coin/index.html">② 코인 게임</a></div>
 </div></nav>
 <header class="hero" id="top"><div class="wrap">
   <div class="eyebrow">연구실 해설 시리즈</div>
@@ -286,9 +286,12 @@ footer td,footer th{border:1px solid var(--rule);padding:6px 8px;text-align:left
     <a class="game" href="sudoku/index.html">
       <div class="thumb"><svg viewBox="0 0 320 150" aria-hidden="true"><g stroke="#16212b" fill="#fff"><rect x="10" y="10" width="120" height="120" stroke-width="3"/></g><g stroke="#c9d2dc"><path d="M50 10v120M90 10v120M10 50h120M10 90h120" stroke-width="1.5"/></g><g font-size="22" font-weight="700" text-anchor="middle" fill="#16212b"><text x="30" y="38">5</text><text x="110" y="78">3</text><text x="70" y="118">9</text></g><path d="M150,30 C200,32 210,130 245,130 C280,130 290,32 315,30" fill="none" stroke="#0f7f86" stroke-width="5"/><circle cx="196" cy="80" r="9" fill="#c42a6e"/><circle cx="245" cy="130" r="6" fill="#13733a"/></svg></div>
       <div class="body"><div class="no">① 스도쿠</div><h3>AI는 스도쿠를 어떻게 풀까?</h3><p>틀린 정도를 벌점 하나로 세면 정답은 그릇의 바닥이 됩니다. 직접 풀고, 그릇을 만들고, 공을 굴려 보세요.</p><div class="tags">#에너지모델 #최적화 #학습과추론 #세플레이어레이스</div></div></a>
+    <a class="game" href="coin/index.html">
+      <div class="thumb"><svg viewBox="0 0 320 150" aria-hidden="true"><g><circle cx="40" cy="45" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/><circle cx="80" cy="45" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/><circle cx="120" cy="45" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/><circle cx="160" cy="45" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3" opacity=".3"/><circle cx="200" cy="45" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3" opacity=".3"/></g><g><circle cx="70" cy="110" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/><circle cx="110" cy="110" r="16" fill="#cfd6de" stroke="#6f7884" stroke-width="3"/><circle cx="150" cy="110" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/><circle cx="190" cy="110" r="16" fill="#cfd6de" stroke="#6f7884" stroke-width="3"/><circle cx="230" cy="110" r="16" fill="#f2c230" stroke="#9a6f00" stroke-width="3"/></g><text x="270" y="52" font-size="22" font-weight="700" fill="#c9302c">1+4N</text></svg></div>
+      <div class="body"><div class="no">② 대항해시대 4 코인 게임</div><h3>AI는 필승법을 어떻게 찾을까?</h3><p>동전 1개 남기기와 동전 옮기기. 끝에서부터 따지고, 스스로 수백 판 두며 배우고, 모든 수를 찾아봅니다.</p><div class="tags">#게임나무 #강화학습 #넓이우선탐색 #필승법</div></div></a>
     <div class="game soon">
       <div class="thumb"><span class="badge">준비 중</span><svg viewBox="0 0 320 150" aria-hidden="true"><g fill="none" stroke="#16212b" stroke-width="4"><path d="M70 15h180v120H70zM70 45h60v30M160 15v60h60M100 105h120M250 75h-40v30"/></g><circle cx="85" cy="30" r="7" fill="#c42a6e"/><circle cx="235" cy="120" r="7" fill="#13733a"/></svg></div>
-      <div class="body"><div class="no">② 미로</div><h3>AI는 미로를 어떻게 빠져나갈까?</h3><p>같은 에너지 모델이 미로도 풉니다. 다음 편에서 만나요.</p></div></div>
+      <div class="body"><div class="no">③ 미로</div><h3>AI는 미로를 어떻게 빠져나갈까?</h3><p>스도쿠를 푼 에너지 모델이 미로도 풉니다. 다음 편에서 만나요.</p></div></div>
   </div>
 </div></section>
 </main>

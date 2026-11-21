@@ -8,26 +8,31 @@
 | 편 | 게임 | 주제 | 페이지 |
 |---|---|---|---|
 | ① | 스도쿠 | AI는 스도쿠를 어떻게 풀까? — 에너지 모델(그릇 만들기·공 굴리기) | [sudoku/](https://adminmrobo.github.io/ai_game_lab/sudoku/) |
-| ② | 미로 | 준비 중 | — |
+| ② | 대항해시대 4 코인 게임 | AI는 필승법을 어떻게 찾을까? — 뒤에서부터 따지기(게임 나무)·스스로 두며 배우기(Q 학습)·모든 수 찾기(넓이 우선 탐색) | [coin/](https://adminmrobo.github.io/ai_game_lab/coin/) |
+| ③ | 미로 | 준비 중 | — |
 
 ## 폴더
 ```
 index.html              시리즈 목차 (빌드 결과)
 sudoku/index.html       ① 스도쿠 (빌드 결과)
-build/                  공통: common.css · common.js · sprites.js(캐릭터 96px) · kgx.js(지식 색인) · backbone.json · build.js
+coin/index.html         ② 코인 게임 (빌드 결과)
+build/                  공통: common.css · page.css(해설 상자) · common.js · sprites.js(캐릭터 96px) · kgx.js(지식 색인) · backbone.json · build.js
 build/series/           시리즈 목차 원본
 build/sudoku/           ① 원본: src.html · sudoku.js(엔진) · puzzles.json · kg_defs.py
-code/check_sudoku.js    ① 검산
+build/coin/             ② 원본: src.html · coin.js(엔진) · kg_defs.py
+code/check_*.js         편별 검산
 COVER_PROMPTS_*.md      픽셀아트 표지·장면 지시문
 ```
 
 ## 빌드와 검산
 ```
 python3 build/sudoku/kg_defs.py   # ① 지식 색인·참고문헌·서지
+python3 build/coin/kg_defs.py     # ②
 node build/build.js               # 목차와 모든 게임 페이지
 node code/check_sudoku.js         # ① 정답 유일성, 짝 수, 그릇 모양, 벌점표 학습, 레이스 40판
+node code/check_coin.js           # ② 지는 자리 1+4N, Q 학습 판 수별 결과, 동전 옮기기 최단 2수, 공략글 검산
 ```
-새 게임을 더할 때는 `build/<게임>/`에 원본을 두고 `build/build.js`의 게임 목록과 `build/series/index.src.html`의 카드를 함께 고칩니다.
+새 게임을 더할 때는 `build/<게임>/`에 원본을 두고 `build/build.js`의 `GAMES` 목록과 `build/series/index.src.html`의 카드를 함께 고칩니다.
 
 ## ① 스도쿠 — 구성
 | 단계 | 내용 | 직접 해 보기 |
@@ -44,5 +49,20 @@ node code/check_sudoku.js         # ① 정답 유일성, 짝 수, 그릇 모양
 
 검산(씨앗 고정 40판): 하루 40판 모두 작은 웅덩이에 갇힘 · 시아 40/40 성공(평균 959걸음) · 모아 0/40
 
+## ② 대항해시대 4 코인 게임 — 구성
+| 단계 | 내용 | 직접 해 보기 |
+|---|---|---|
+| 1 | 동전 게임 두 가지(동전 1개 남기기·동전 옮기기) | — |
+| 2 | 주판봇과 동전 1개 남기기 | 시작 개수·선공 고르기, 하루의 귀띔 |
+| 3 | 뒤에서부터 따지기(게임 나무) | 1~25개 승패 표, AI 판단 코너(선공이 무조건 유리?) |
+| 4 | 스스로 두며 배우기(Q 학습) | 점수표 1~1000판, 주판봇과 100판 |
+| 5 | 동전 옮기기 — 모든 수 찾기(넓이 우선 탐색) | 직접 옮기기, 수별 배치, 공략글 검산 |
+| 대결 | 하루 10판 · 시아 100판 · 모아 1000판으로 기른 AI 대 주판봇 | 예측, 대결 |
+
+검산: 지는 자리 1, 5, 9, 13, 17, 21, 25 · 주판봇 상대 평균 승리(씨앗 10개) 10판 16 / 100판 90 / 300판 이상 100 · 동전 옮기기 배치 10가지, 최단 2수 · 검색 요약의 다섯 수 풀이는 2수째 헛수, 4수째에 이미 은은금금금.
+
+원작 게임 그림·인물 그림은 쓰지 않았습니다(규칙만 설명). 픽셀아트 지시문: `COVER_PROMPTS_ai_game_coin.md`
+
 ## 고친 내역
+- v1.1 (2026-11-21): ② 대항해시대 4 코인 게임 추가, 목차 ③ 미로(준비 중)로 이동, ① 정리 끝에 ② 링크. 공통 해설 상자 스타일을 build/page.css로 분리.
 - v1.0 (2026-11-21): 시리즈 목차와 ① 스도쿠 첫 공개. 표지는 임시(HTML), 픽셀아트 표지는 준비 중.

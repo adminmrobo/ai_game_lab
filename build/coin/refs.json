@@ -1,0 +1,227 @@
+[
+ {
+  "id": "daum_uw4_minigame",
+  "type": "webpage",
+  "title": "대항해시대4 파워업키드 미니게임 공략(물 옮기기 제외)",
+  "author": [
+   {
+    "literal": "다음 카페 대항해시대 IV"
+   }
+  ],
+  "URL": "https://m.cafe.daum.net/eogkdtleo/FK42/14",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/daum_uw4_minigame",
+   "role": "primary",
+   "supports": [
+    "lab:concept/one-plus-4n"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-21"
+  }
+ },
+ {
+  "id": "ggemguide_uw4_maria",
+  "type": "webpage",
+  "title": "대항해 시대4 PK - 마리아 리 공략",
+  "author": [
+   {
+    "literal": "껨가이드"
+   }
+  ],
+  "URL": "http://ggemguide.com/guide_pc_view.htm?no=1224&page=108&uid=1353",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/ggemguide_uw4_maria",
+   "role": "primary",
+   "supports": [
+    "lab:concept/winning-losing-position"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-21"
+  }
+ },
+ {
+  "id": "aacii_uw4_tial",
+  "type": "webpage",
+  "title": "대항해시대4 HD 티알 와만 챠스카 공략",
+  "author": [
+   {
+    "literal": "삶 가운데 남긴 기록"
+   }
+  ],
+  "URL": "https://blog.aacii.net/84",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/aacii_uw4_tial",
+   "role": "primary",
+   "supports": [
+    "lab:concept/coin-sliding-puzzle"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "본문 확인 2026-11-21"
+  }
+ },
+ {
+  "id": "baike_uw4",
+  "type": "webpage",
+  "title": "Uncharted Waters IV",
+  "author": [
+   {
+    "literal": "Baidu Baike"
+   }
+  ],
+  "URL": "https://baike.baidu.com/en/item/Uncharted%20Waters%20IV/1482551",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/baike_uw4",
+   "role": "background",
+   "supports": [
+    "lab:concept/take-away-game"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-21"
+  }
+ },
+ {
+  "id": "bouton1901nim",
+  "type": "article-journal",
+  "title": "Nim, a game with a complete mathematical theory",
+  "author": [
+   {
+    "family": "Bouton",
+    "given": "Charles L."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     1901
+    ]
+   ]
+  },
+  "container-title": "Annals of Mathematics",
+  "volume": "3",
+  "issue": "1/4",
+  "page": "35-39",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/bouton1901nim",
+   "role": "background",
+   "supports": [
+    "lab:concept/take-away-game"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true,
+    "pages": false
+   },
+   "checkedBy": "서지 기억값, 원문 대조 필요"
+  }
+ },
+ {
+  "id": "sutton2018rl",
+  "type": "book",
+  "title": "Reinforcement Learning: An Introduction",
+  "author": [
+   {
+    "family": "Sutton",
+    "given": "Richard S."
+   },
+   {
+    "family": "Barto",
+    "given": "Andrew G."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2018
+    ]
+   ]
+  },
+  "edition": "2",
+  "publisher": "MIT Press",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/sutton2018rl",
+   "role": "background",
+   "supports": [
+    "lab:method/q-learning-selfplay"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값"
+  }
+ }
+]
