@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI로 풀어보는 게임 시리즈 — 연구실 식구들과 게임으로 배우는 AI</title>
+<meta name="description" content="하루·시아·모아가 플레이어로 나서서 게임을 직접 풀어 보고, AI가 같은 게임을 어떻게 푸는지 따라가는 연구실 해설 시리즈. ① 스도쿠 — 에너지 모델.">
+<meta property="og:title" content="AI로 풀어보는 게임 시리즈">
+<meta property="og:description" content="게임을 직접 풀어 보고, AI는 같은 게임을 어떻게 푸는지 따라가 봅니다.">
+<meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/sudoku/img/sdk_cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!--@@CSS@@-->
+<style>
+.games{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0}
+@media(max-width:760px){.games{grid-template-columns:1fr}}
+.game{display:block;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--text)}
+.game .thumb{aspect-ratio:16/9;display:grid;place-items:center;background:linear-gradient(180deg,#f3f8ff,#fff 60%,#eef7f3);border-bottom:1px solid var(--rule);position:relative}
+.game .thumb svg{width:70%;height:auto}
+.game .body{padding:14px 16px}
+.game .no{font-size:12.5px;font-weight:700;color:var(--terrain)}
+.game h3{margin:2px 0 6px}
+.game p{margin:0;font-size:14.5px;color:var(--muted)}
+.game .tags{margin-top:8px;font-size:12.5px;color:var(--info)}
+.game.soon{opacity:.6;pointer-events:none}
+.game.soon .badge{position:absolute;right:10px;top:10px;background:#fff;border:1px solid var(--rule);border-radius:999px;padding:2px 10px;font-size:12.5px}
+.players{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+.players div{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:8px 12px}
+.players img{width:52px;height:52px}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="바로가기"><div class="row">
+  <a class="logo" href="#top">AI로 풀어보는 <i>게임</i></a>
+  <div class="links"><a href="#games">게임 목록</a><a href="sudoku/index.html">① 스도쿠</a></div>
+</div></nav>
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow">연구실 해설 시리즈</div>
+  <h1>AI로 풀어보는 게임 시리즈</h1>
+  <p class="question">사람은 게임을 어떻게 풀고, AI는 같은 게임을 어떻게 풀까요?</p>
+  <p class="lead">편마다 게임 하나를 골라 연구실 식구들이 먼저 직접 풀어 봅니다. 그다음 AI가 같은 게임을 푸는 방법을 한 단계씩 따라가고, 마지막에는 플레이어끼리 겨루어 봅니다. 코드나 수식을 몰라도 됩니다.</p>
+  <div class="players" id="players"></div>
+  <p class="byline">글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a></p>
+</div></header>
+<main>
+<section class="sec" id="games" aria-labelledby="h-games"><div class="wrap">
+  <h2 id="h-games">게임 목록</h2>
+  <div class="games">
+    <a class="game" href="sudoku/index.html">
+      <div class="thumb"><svg viewBox="0 0 320 150" aria-hidden="true"><g stroke="#16212b" fill="#fff"><rect x="10" y="10" width="120" height="120" stroke-width="3"/></g><g stroke="#c9d2dc"><path d="M50 10v120M90 10v120M10 50h120M10 90h120" stroke-width="1.5"/></g><g font-size="22" font-weight="700" text-anchor="middle" fill="#16212b"><text x="30" y="38">5</text><text x="110" y="78">3</text><text x="70" y="118">9</text></g><path d="M150,30 C200,32 210,130 245,130 C280,130 290,32 315,30" fill="none" stroke="#0f7f86" stroke-width="5"/><circle cx="196" cy="80" r="9" fill="#c42a6e"/><circle cx="245" cy="130" r="6" fill="#13733a"/></svg></div>
+      <div class="body"><div class="no">① 스도쿠</div><h3>AI는 스도쿠를 어떻게 풀까?</h3><p>틀린 정도를 벌점 하나로 세면 정답은 그릇의 바닥이 됩니다. 직접 풀고, 그릇을 만들고, 공을 굴려 보세요.</p><div class="tags">#에너지모델 #최적화 #학습과추론 #세플레이어레이스</div></div></a>
+    <div class="game soon">
+      <div class="thumb"><span class="badge">준비 중</span><svg viewBox="0 0 320 150" aria-hidden="true"><g fill="none" stroke="#16212b" stroke-width="4"><path d="M70 15h180v120H70zM70 45h60v30M160 15v60h60M100 105h120M250 75h-40v30"/></g><circle cx="85" cy="30" r="7" fill="#c42a6e"/><circle cx="235" cy="120" r="7" fill="#13733a"/></svg></div>
+      <div class="body"><div class="no">② 미로</div><h3>AI는 미로를 어떻게 빠져나갈까?</h3><p>같은 에너지 모델이 미로도 풉니다. 다음 편에서 만나요.</p></div></div>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
+  <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="https://adminmrobo.github.io/optimization_3d_map/index.html">좌표축 위의 그릇</a></p>
+</div></footer>
+<script>
+/*@@SPRITES@@*/
+/*@@COMMON@@*/
+(function(){var P=[['asst_e19','조수 하루','플레이어 1'],['sia_e07','인턴 시아','플레이어 2'],['moa_e19','인턴 모아','플레이어 3'],['doc_e08','박사','진행·판정']];
+document.getElementById('players').innerHTML=P.map(function(p){return '<div><img src="'+U.spr(p[0])+'" alt=""><span><b>'+p[1]+'</b><br><span class="muted" style="font-size:13px">'+p[2]+'</span></span></div>';}).join('');})();
+</script>
+</body>
+</html>

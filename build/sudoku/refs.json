@@ -1,0 +1,108 @@
+[
+ {
+  "id": "hoover2026cram",
+  "type": "article",
+  "title": "Classical Energies Learn to Reason 1,000x Faster than Looped Models",
+  "author": [
+   {
+    "family": "Hoover",
+    "given": "Benjamin"
+   },
+   {
+    "family": "Blayney",
+    "given": "Hugh"
+   },
+   {
+    "family": "Whittington",
+    "given": "James C. R."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2026
+    ]
+   ]
+  },
+  "number": "arXiv:2611.17309",
+  "URL": "https://arxiv.org/abs/2611.17309",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/hoover2026cram",
+   "role": "primary",
+   "supports": [
+    "lab:concept/energy-based-model",
+    "lab:method/contrastive-energy-learning",
+    "lab:method/energy-descent",
+    "lab:concept/pairwise-penalty-table",
+    "lab:concept/stopping-threshold"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true,
+    "url": true
+   },
+   "checkedBy": "arXiv 초록·HTML 본문 확인 2026-11-21"
+  }
+ },
+ {
+  "id": "hopfield1985neural",
+  "type": "article-journal",
+  "title": "\"Neural\" Computation of Decisions in Optimization Problems",
+  "author": [
+   {
+    "family": "Hopfield",
+    "given": "J. J."
+   },
+   {
+    "family": "Tank",
+    "given": "D. W."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     1985
+    ]
+   ]
+  },
+  "container-title": "Biological Cybernetics",
+  "volume": "52",
+  "issue": "3",
+  "page": "141-152",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     21
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/hopfield1985neural",
+   "role": "background",
+   "supports": [
+    "lab:concept/energy-based-model"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true,
+    "pages": false
+   },
+   "checkedBy": "서지 기억값, 쪽수 원문 대조 필요"
+  }
+ }
+]

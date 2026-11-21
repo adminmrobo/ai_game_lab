@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI로 풀어보는 게임 시리즈 ① 스도쿠 — AI는 스도쿠를 어떻게 풀까?</title>
+<meta name="description" content="연구실 식구 하루·시아·모아가 스도쿠를 직접 풀어 보고, AI가 스도쿠를 '그릇 모양'으로 바꿔 공을 굴리듯 푸는 에너지 모델을 따라가는 연구실 해설. 직접 해 보기, 그릇 만들기, 벌점표 배우기, 세 플레이어 레이스.">
+<meta property="og:title" content="AI는 스도쿠를 어떻게 풀까? — AI로 풀어보는 게임 시리즈 ①">
+<meta property="og:description" content="틀린 정도를 벌점 하나로 세면 정답은 그릇의 바닥이 됩니다. 직접 풀고, 그릇을 만들고, 공을 굴려 보세요.">
+<meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/sudoku/img/sdk_cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!--@@CSS@@-->
+<style>
+:root{--c-haru:var(--c-asst)}
+.sub{font-size:13px;color:var(--muted);font-weight:500;margin-left:6px}
+.sec{padding-top:88px}
+@media(max-width:760px){.sec{padding-top:64px}}
+p,li{line-height:1.8}
+/* 임시 표지 */
+.tcover{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--rule);background:linear-gradient(180deg,#f3f8ff 0%,#ffffff 58%,#eef7f3 100%);container-type:inline-size}
+.tcover .board{position:absolute;left:5%;top:7%;width:34%;aspect-ratio:1}
+.tcover svg.bowl{position:absolute;left:44%;top:42%;width:52%;height:36%}
+.tcover .ppl{position:absolute;right:3%;top:5%;display:flex;gap:2%;width:30%;justify-content:flex-end}
+.tcover .ppl img{width:30%;image-rendering:pixelated}
+.tcover .bub{position:absolute;left:44%;top:27%;background:#fff;border:2px solid #16212b;border-radius:14px;padding:.6em 1em;font-weight:700;font-size:clamp(11px,2.2cqw,24px)}
+.tcover .ttl{position:absolute;left:44%;bottom:6%;font-weight:700;font-size:clamp(14px,3.6cqw,40px);color:#16212b}
+.tcover .ttl small{display:block;font-size:.45em;color:var(--muted);font-weight:500}
+/* 스도쿠 판 */
+.sdk{display:grid;border:2.5px solid #16212b;border-radius:6px;background:#fff;user-select:none;aspect-ratio:1;max-width:100%}
+.sdk .c{display:grid;place-items:center;border-right:1px solid #c9d2dc;border-bottom:1px solid #c9d2dc;font-weight:700;font-variant-numeric:tabular-nums;color:var(--info);cursor:pointer;position:relative;font-size:var(--fs,22px);min-width:0;min-height:0}
+.sdk .c.br{border-right:2.5px solid #16212b}.sdk .c.bb{border-bottom:2.5px solid #16212b}
+.sdk .c.lc{border-right:none}.sdk .c.lr{border-bottom:none}
+.sdk .c.clue{color:#16212b;cursor:default;background:#f6f8fa}
+.sdk .c.bad{background:var(--eye-soft);color:var(--eye)}
+.sdk .c.sel{outline:3px solid var(--amber);outline-offset:-3px;z-index:1}
+.sdk .c.peer{background:#fbf6ea}
+.sdk .c.mv{box-shadow:inset 0 0 0 3px var(--gfp)}
+.sdk .c.win{background:var(--gfp-soft);color:var(--gfp)}
+.sdk.ro .c{cursor:default}
+.playwrap{display:grid;grid-template-columns:minmax(0,420px) 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.playwrap{grid-template-columns:1fr}}
+.pad{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.pad .bt{min-width:44px;font-size:18px;font-weight:700}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.rules>div{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
+.rules b{display:block;color:var(--terrain);font-size:15px}
+@media(max-width:760px){.rules{grid-template-columns:1fr}}
+.mini4{width:132px}
+.why2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+@media(max-width:860px){.why2{grid-template-columns:1fr}}
+.why2>div{border-radius:12px;padding:20px;border:1px solid var(--rule)}
+.why2 .whyb{background:#f4fbfb;border-color:#b8dfe0}
+.why2 .whyb h4{margin:0 0 8px;color:var(--terrain)}
+.why2 .mathb{background:#fdf2f7;border-color:#f0c3d8}
+.why2 .mathb h4{margin:0 0 8px;color:var(--c-asst)}
+.why2 ol{padding-left:20px;margin:6px 0}
+.why2 .easy{background:#fff;border-radius:8px;padding:8px 12px;margin-top:10px;font-size:14.5px}
+.mathb .q{display:flex;gap:10px;align-items:flex-start;margin:6px 0 10px}
+.mathb .q img{width:48px;height:48px;flex:none;border-radius:8px;background:#fff;border:2px solid var(--c-asst)}
+.mathb table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0;background:#fff}
+.mathb td,.mathb th{border:1px solid #f0c3d8;padding:6px 8px;text-align:left;vertical-align:top}
+.mathb .eqx{background:#fff;border-radius:8px;padding:8px 12px;font-weight:700;text-align:center;margin:8px 0}
+.mathb .try{background:#fff;border-left:3px solid var(--c-asst);padding:8px 12px;margin:8px 0;font-size:14.5px}
+.review{border:1px dashed var(--info);background:var(--info-soft);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14.5px}
+.review b{color:var(--info)}
+.calm{color:var(--muted);font-size:14px;margin:6px 0}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.cards3>div{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:12px}
+.cards3 svg{width:100%;height:auto;display:block;margin-bottom:6px}
+.cards3 b{display:block}
+@media(max-width:760px){.cards3{grid-template-columns:1fr}}
+.aicheck{border:2px solid var(--c-robo);border-radius:12px;padding:14px;margin:16px 0;background:#f2fafa}
+.aicheck h4{margin:0 0 6px;color:var(--c-robo)}
+.heat{display:grid;grid-template-columns:44px repeat(4,1fr);gap:4px;max-width:420px;font-variant-numeric:tabular-nums}
+.heat div{border-radius:6px;padding:8px 4px;text-align:center;font-size:14px}
+.heat .h{background:none;color:var(--muted);font-size:12.5px;font-weight:700}
+.pairpick{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+@media(max-width:640px){.pairpick{grid-template-columns:1fr}}
+.race{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+@media(max-width:760px){.race{grid-template-columns:1fr}}
+.race .lane{background:#fff;border:1px solid var(--rule);border-top:3px solid var(--cc);border-radius:10px;padding:10px}
+.race .head{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.race .head img{width:52px;height:52px}
+.race .head b{color:var(--cc)}
+.race .st{font-size:13.5px;margin-top:6px}
+.steps5{counter-reset:s;list-style:none;padding:0;margin:12px 0}
+.steps5 li{counter-increment:s;position:relative;padding:8px 12px 8px 46px;margin:6px 0;background:#fff;border:1px solid var(--rule);border-radius:10px}
+.steps5 li::before{content:counter(s);position:absolute;left:10px;top:8px;width:26px;height:26px;border-radius:50%;background:var(--terrain);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+.paper{border-left:4px solid var(--stain);background:var(--stain-soft);border-radius:10px;padding:12px 16px;margin:14px 0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs .bt[aria-pressed="true"]{background:var(--terrain);color:#fff;border-color:var(--terrain)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="섹션 바로가기"><div class="row">
+  <a class="logo" href="../index.html">AI로 풀어보는 <i>게임</i> · 스도쿠</a>
+  <div class="links">
+    <a href="../index.html">← 시리즈</a><a href="#g1">1 게임</a><a href="#g2">2 벌점</a><a href="#g3">3 그릇</a><a href="#g4">4 왜 에너지</a><a href="#g5">5 배우기</a><a href="#g6">6 굴리기</a><a href="#race">레이스</a><a href="#sum">정리</a><a href="#kg">색인</a><a href="#export">꾸러미</a>
+  </div>
+</div></nav>
+
+<!-- lab-cover : 새 표지(img/sdk_cover.webp)가 오면 이 블록을 그림으로 바꾼다 -->
+<div class="cover" id="cover" data-img="sdk_cover"><div class="tcover" role="img" aria-label="스도쿠 판 옆에서 하루·시아·모아가 그릇 바닥으로 굴러가는 공을 바라보는 임시 표지">
+  <div class="board sdk ro" id="cv-board"></div>
+  <span class="bub">공을 굴리면 답이 나온다고요?</span>
+  <div class="ppl"><img data-mood="asst_e19" alt=""><img data-mood="sia_e09" alt=""><img data-mood="moa_e04" alt=""></div>
+  <svg class="bowl" viewBox="0 0 400 160" aria-hidden="true"><path d="M10,20 C90,22 120,150 200,150 C280,150 310,22 390,20" fill="none" stroke="#0f7f86" stroke-width="5"/><circle cx="118" cy="88" r="12" fill="#c42a6e"/><path d="M128,98 q20,26 44,40" fill="none" stroke="#c42a6e" stroke-width="3" stroke-dasharray="6 6"/><text x="200" y="140" text-anchor="middle" font-size="16" font-weight="700" fill="#13733a">정답 = 바닥</text></svg>
+  <div class="ttl">AI는 스도쿠를 어떻게 풀까?<small>AI로 풀어보는 게임 시리즈 ①</small></div>
+</div></div>
+<!-- /lab-cover -->
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow"><a href="../index.html">AI로 풀어보는 게임 시리즈</a> · ① 스도쿠</div>
+  <h1>AI는 스도쿠를 어떻게 풀까?</h1>
+  <p class="question">숫자를 규칙대로 채우는 게임, 스도쿠. 사람은 빈자리를 하나씩 따져 가며 풉니다. 그런데 2026년 11월에 나온 한 AI는 이 게임을 <b>그릇 모양</b>으로 바꿔 놓고, <b>공을 굴리듯</b> 풀었습니다 [1].</p>
+  <p class="lead">오늘은 연구실 인턴들과 조수가 플레이어입니다. 하루·시아·모아가 먼저 직접 풀어 보고, 그다음 AI가 같은 판을 어떻게 다루는지 한 단계씩 따라갑니다. 마지막에는 세 사람이 각자 공을 굴려 누가 먼저 정답에 닿는지 레이스를 합니다.</p>
+  <p class="byline">글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · 2026-11-21 · v1.0</p>
+  <div class="three"><b>처음 오신 분께 — 이 페이지를 3줄로</b><ol>
+    <li><b>무엇을</b>: 스도쿠 답안이 규칙을 얼마나 어겼는지 <b>벌점 하나</b>로 셉니다. 그러면 모든 답안에 높낮이가 생기고, 정답은 벌점 0인 <b>가장 낮은 바닥</b>이 됩니다.</li>
+    <li><b>왜 중요한가</b>: "정답 맞히기"가 "낮은 곳으로 내려가기" 하나로 바뀝니다. 공이 골짜기로 굴러가듯 AI도 벌점을 줄여 가며 답에 닿고, 0이 되면 스스로 멈춥니다.</li>
+    <li><b>일상·현장에서는</b>: 시간표 짜기, 근무표 짜기, 창고 자리 배치처럼 "여러 규칙을 한꺼번에 지키는 배치"를 찾는 일이 모두 같은 모양입니다.</li></ol>
+    <p class="calm" style="margin:8px 0 0">코드나 수식을 몰라도 됩니다. 식이 나오는 곳에는 조수 하루가 대신 질문합니다.</p>
+    <details class="fold"><summary>영어 약어 풀이</summary><p><b>AI</b> 인공지능 · <b>GPU</b> 그래픽 처리 장치(계산을 아주 빠르게 하는 칩) · <b>CRAM</b> 이 페이지가 소개하는 논문이 자기 모델에 붙인 이름 [1]</p></details>
+  </div>
+  <div class="kpis" aria-label="숫자 요약">
+    <div class="kpi g"><b>81</b><span>9×9 스도쿠의 자리 수</span></div>
+    <div class="kpi m"><b>810</b><span>같은 숫자가 오면 안 되는 자리 짝<sup>①</sup></span></div>
+    <div class="kpi a"><b>0</b><span>정답의 벌점 = 그릇의 바닥</span></div>
+    <div class="kpi r"><b>0.042초</b><span>논문 보고 학습 시간(GPU 한 대)<sup>②</sup></span></div>
+  </div>
+  <p class="muted" style="font-size:13px">① 이 페이지가 직접 센 값입니다(9×9 판에서 자리마다 같은 줄·같은 묶음 상대가 20개, 81 × 20 ÷ 2 = 810). ② 논문 저자들이 보고한 값입니다 [1].</p>
+</div></header>
+
+<main>
+<section class="sec" id="cast" aria-labelledby="h-cast"><div class="wrap">
+  <h2 id="h-cast">오늘의 플레이어와 연구실 식구</h2>
+  <div class="cast" id="castgrid"></div>
+  <div class="secret"><button class="bt" id="secretbtn" type="button" aria-expanded="false">방청석 보기 (미공개 식구)</button><div class="row" id="secretrow" hidden></div></div>
+  <div data-dlg="hero"></div>
+</div></section>
+
+<!-- 단계 1 -->
+<section class="sec" id="g1" aria-labelledby="h-g1"><div class="wrap">
+  <h2 id="h-g1"><span class="hex">1</span>스도쿠는 어떤 게임일까 <span class="sub">하루의 차례 · 게임 설명</span></h2>
+  <div data-dlg="g1a"></div>
+  <p>스도쿠는 9 × 9 판에 1부터 9까지 숫자를 채우는 게임입니다. 지켜야 할 규칙은 세 가지뿐입니다.</p>
+  <div class="rules">
+    <div><b>① 가로줄</b>가로 한 줄에 1~9가 한 번씩만 들어갑니다.</div>
+    <div><b>② 세로줄</b>세로 한 줄에도 1~9가 한 번씩만 들어갑니다.</div>
+    <div><b>③ 굵은 선 묶음</b>굵은 선으로 묶인 작은 네모(3 × 3 묶음) 안에도 1~9가 한 번씩만 들어갑니다.</div>
+  </div>
+  <p>처음부터 적혀 있는 숫자는 <b>힌트</b>라서 바꿀 수 없습니다. 잘 만든 문제는 정답이 딱 하나뿐입니다. 처음이라면 1~4만 쓰는 <b>4 × 4 연습판</b>(굵은 선 묶음은 2 × 2)부터 해 보세요. 규칙은 똑같습니다.</p>
+  <div class="pair">
+    <div><div class="tl">일상으로 치면</div>반 친구 9명의 이름표를 자리마다 붙이는데, 같은 가로줄·같은 세로줄·같은 모둠에 같은 이름표가 두 번 오면 안 되는 자리 배치표와 같습니다.</div>
+    <div><div class="tr">게임에서는</div>숫자는 크기가 아니라 <b>이름표</b>일 뿐입니다. 더하거나 곱할 일이 없어요. 그래서 스도쿠는 계산 문제가 아니라 <b>규칙을 지키는 배치</b>를 찾는 문제입니다.</div>
+  </div>
+  <div data-dlg="g1b"></div>
+  <div class="panel game" id="play">
+    <div class="ptitle">직접 해 보기 — 자리를 누르고 아래 숫자를 고르세요 (키보드 숫자·화살표도 됩니다)</div>
+    <div class="ctrl"><div class="tabs" id="pl-tabs" role="group" aria-label="판 고르기"></div></div>
+    <div class="playwrap">
+      <div><div class="sdk" id="pl-grid" aria-label="스도쿠 판"></div>
+        <div class="pad" id="pl-pad"></div>
+        <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-hint">하루의 힌트</button><button class="bt" type="button" id="pl-check">다 채웠나 확인</button><button class="bt" type="button" id="pl-reset">처음부터</button></div></div>
+      </div>
+      <div>
+        <div class="minis" style="grid-template-columns:repeat(2,1fr)"><div class="mini a"><span>남은 빈자리</span><b id="pl-left">—</b></div><div class="mini r"><span>부딪힌 짝(벌점)</span><b id="pl-e">—</b></div><div class="mini m"><span>쓴 힌트</span><b id="pl-h">0</b></div><div class="mini g"><span>상태</span><b id="pl-s" style="font-size:16px">—</b></div></div>
+        <div id="pl-say"></div>
+        <p class="calm">빨갛게 변한 자리는 같은 줄이나 같은 묶음에 같은 숫자가 있다는 뜻입니다. 오른쪽 "부딪힌 짝" 숫자를 기억해 두세요. 2단계에서 이 숫자가 주인공이 됩니다.</p>
+      </div>
+    </div>
+  </div>
+  <p class="calm">처음엔 다들 4 × 4에서도 한두 번 막힙니다. 막히면 "하루의 힌트"를 눌러도 괜찮아요.</p>
+  <div class="quiz" data-quiz="g1"></div>
+</div></section>
+
+<!-- 단계 2 -->
+<section class="sec" id="g2" aria-labelledby="h-g2"><div class="wrap">
+  <h2 id="h-g2"><span class="hex">2</span>틀린 정도를 숫자 하나로 — 벌점 세기 <span class="sub">시아의 정리</span></h2>
+  <div data-dlg="g2a"></div>
+  <p>답안을 "맞음 / 틀림" 둘로만 나누면, 틀린 답안끼리는 어느 쪽이 정답에 더 가까운지 알 수 없습니다. 그래서 시아는 <b>틀린 정도를 세는 방법</b>을 정했습니다.</p>
+  <ol>
+    <li>같은 줄이나 같은 묶음에 있는 두 자리를 <b>짝</b>이라고 부릅니다.</li>
+    <li>짝인 두 자리에 <b>같은 숫자</b>가 있으면 벌점 1점.</li>
+    <li>판 전체의 짝을 다 살펴 벌점을 더합니다. 이 합이 그 답안의 <b>벌점</b>입니다.</li>
+  </ol>
+  <p>규칙을 하나도 안 어긴 답안, 곧 <b>정답만 벌점이 0</b>입니다. 어긴 곳이 많을수록 벌점이 커집니다.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 벌점으로 바꾸나</h4>
+      <ol><li><b>문제 상황</b>: 답안이 정답인지 아닌지만 알면, 고친 답안이 더 나아졌는지 알 수 없다.</li>
+        <li><b>앞 방법의 한계</b>: "맞음/틀림" 두 가지 표시는 조금 틀린 답과 엉망인 답을 똑같이 본다.</li>
+        <li><b>해법</b>: 틀린 짝의 개수를 세면 답안마다 점수가 하나씩 붙고, 한 자리를 고칠 때마다 점수가 내려갔는지 바로 보인다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 받아쓰기를 "통과/탈락"이 아니라 "틀린 개수"로 채점하는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 논문에 <b>E = Σ [ 짝의 두 숫자가 같으면 1 ]</b> 이런 식이 있던데… Σ는 뭐예요?</p></div>
+      <p><b>학교 수학으로 보면</b> Σ(시그마)는 "모두 더하기" 기호이고, 짝을 세는 것은 경우의 수입니다.</p>
+      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
+        <tr><td>E</td><td>에너지. 여기서는 벌점의 합</td></tr>
+        <tr><td>Σ</td><td>"시그마", 모든 짝에 대해 더한다</td></tr>
+        <tr><td>[ 같으면 1 ]</td><td>짝의 두 숫자가 같으면 1, 다르면 0</td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 아래 "예시판"의 첫 가로줄은 4 4 1 3입니다. 가로줄에서 4가 둘 → 1점. 둘째 세로줄을 내려가 보면 4 · 3 · 1 · 4, 여기서도 4가 둘 → 1점. 다른 짝은 모두 숫자가 다르니 0점. <b>E = 1 + 1 = 2</b>.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 틀린 "짝"을 세는 거였네요. 한 자리가 틀리면 짝이 여러 개 같이 틀릴 수도 있겠어요!</p></div></div>
+  </div>
+  <div data-dlg="g2b"></div>
+  <div class="panel">
+    <div class="ptitle">벌점 돋보기 — 자리를 누를 때마다 숫자가 1 → 2 → 3 → 4로 바뀝니다</div>
+    <div class="ctrl"><div class="tabs" id="mg-preset" role="group" aria-label="판 고르기"></div></div>
+    <div class="pairpick">
+      <div style="position:relative;width:min(300px,80vw)"><div class="sdk" id="mg-grid"></div><svg id="mg-lines" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+      <div><div class="minis" style="grid-template-columns:repeat(2,1fr)"><div class="mini r"><span>벌점 E</span><b id="mg-e">—</b></div><div class="mini m"><span>살펴본 짝</span><b>56</b></div></div>
+        <div class="insight" id="mg-i" aria-live="polite"></div></div>
+    </div>
+  </div>
+  <div class="review"><b>30초 복습 — 짝은 몇 개일까?</b> 4 × 4 판에서 한 자리는 같은 가로줄 3자리, 같은 세로줄 3자리, 같은 묶음의 대각선 1자리, 모두 7자리와 짝입니다. 16자리 × 7 ÷ 2(한 짝을 두 번 세지 않도록) = <b>56짝</b>. 9 × 9에서는 자리마다 20자리와 짝이라 81 × 20 ÷ 2 = <b>810짝</b>입니다.</div>
+  <div class="quiz" data-quiz="g2"></div>
+</div></section>
+
+<!-- 단계 3 -->
+<section class="sec" id="g3" aria-labelledby="h-g3"><div class="wrap">
+  <h2 id="h-g3"><span class="hex">3</span>스도쿠를 그릇 모양으로 만들기 <span class="sub">모아의 질문</span></h2>
+  <div data-dlg="g3a"></div>
+  <p>그릇은 이렇게 만듭니다. 순서대로 따라오세요.</p>
+  <ol class="steps5">
+    <li><b>작은 판을 고릅니다.</b> 4 × 4 정답판에서 숫자 몇 개만 지웁니다. 빈자리가 2개면 숫자를 넣는 방법이 4 × 4 = 16가지, 이것이 <b>나올 수 있는 모든 답안</b>입니다.</li>
+    <li><b>답안마다 벌점을 셉니다.</b> 2단계의 방법 그대로입니다.</li>
+    <li><b>벌점만큼 높이 쌓습니다.</b> 벌점 3인 답안은 블록 3개 높이, 벌점 0인 답안은 바닥에 그대로.</li>
+    <li><b>줄을 세웁니다.</b> 정답을 한가운데에 두고, 정답과 한 자리만 다른 답안은 바로 옆, 두 자리 다른 답안은 그 바깥…처럼 <b>정답과 닮은 순서</b>로 세웁니다.</li>
+    <li><b>옆에서 봅니다.</b> 가운데만 푹 꺼지고 바깥으로 갈수록 높아지는 모양, 바로 <b>그릇</b>입니다. 정답은 그릇의 바닥에 있습니다.</li>
+  </ol>
+  <div class="pair">
+    <div><div class="tl">일상으로 치면</div>운동장에 답안지를 줄 세우고, 틀린 만큼 블록을 쌓아 올립니다. 정답과 많이 다른 답안일수록 탑이 높아서, 정답 자리만 움푹한 운동장이 됩니다.</div>
+    <div><div class="tr">스도쿠에서는</div>정답과 다른 자리가 늘수록 부딪히는 짝도 늘어납니다. 아래 판에서 셈하면 평균 벌점이 0 → 2.33 → 4.46 → 6.38 → … 처럼 한 자리 멀어질 때마다 약 2점씩 올라갑니다.</div>
+  </div>
+  <div data-dlg="g3b"></div>
+  <div class="panel">
+    <div class="ptitle">그릇 만들기 — 4 × 4 판의 모든 답안을 정답과 닮은 순서로 세우기</div>
+    <div class="ctrl"><div class="group"><label class="glabel" for="bw-k">빈자리 수</label><input type="range" id="bw-k" min="2" max="6" step="1" value="4"><span class="val" id="bw-kv">4개</span></div>
+      <div class="group"><button class="bt" type="button" id="bw-pick">아무 답안 하나 뽑기</button><button class="bt" type="button" id="bw-dip">작은 웅덩이 하나 보기</button></div></div>
+    <div class="cwrap tall"><canvas id="bw-cv" aria-label="답안마다 벌점을 높이로 세운 그릇 모양 그림"></canvas></div>
+    <div class="legend"><span><i style="background:#13733a"></i>정답(바닥)</span><span><i style="background:#1e55c8"></i>답안 하나(점)</span><span><i style="background:#0f7f86"></i>같은 거리 답안의 평균 높이</span><span><i style="background:none;border:2px solid #a35c00"></i>작은 웅덩이</span></div>
+    <div class="minis"><div class="mini a"><span>모든 답안</span><b id="bw-n">—</b></div><div class="mini g"><span>벌점 0인 답안</span><b id="bw-z">—</b></div><div class="mini r"><span>가장 높은 벌점</span><b id="bw-max">—</b></div><div class="mini m"><span>작은 웅덩이</span><b id="bw-dips">—</b></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap"><div class="sdk ro mini4" id="bw-mini"></div><div class="insight" id="bw-i" aria-live="polite" style="flex:1;min-width:220px"></div></div>
+  </div>
+  <p>그림의 <b>작은 웅덩이</b>(주황 고리)를 눈여겨보세요. 정답이 아닌데도, 어느 자리 하나를 바꿔 봐도 벌점이 줄지 않는 답안입니다. 그릇 바닥이 하나뿐이어도 벽에 이런 움푹한 곳이 있습니다. 6단계에서 공이 여기에 걸리는 장면을 보게 됩니다.</p>
+  <div class="review"><b>여기서는 단순하게 봤어요</b> 진짜 땅은 한 줄로 늘어선 모양이 아니라 아주 많은 방향으로 펼쳐져 있습니다. 위 그림은 "정답과 몇 자리가 다른가"라는 한 방향으로만 세워 본 것이고, 왼쪽·오른쪽은 보기 좋게 반씩 나눠 그렸습니다. 그리고 9 × 9에서 빈자리가 41개면 답안은 9<sup>41</sup> ≈ 1.3 × 10<sup>39</sup>가지라, 그릇 전체를 그려 보는 것은 불가능합니다. 그래서 AI는 그릇 전체를 보지 않고 <b>발밑만 보고 내려갑니다</b>(6단계).</div>
+  <div class="quiz" data-quiz="g3"></div>
+</div></section>
+
+<!-- 단계 4 -->
+<section class="sec" id="g4" aria-labelledby="h-g4"><div class="wrap">
+  <h2 id="h-g4"><span class="hex">4</span>왜 굳이 "에너지"라고 부를까 — 에너지 모델을 쓰는 이유 <span class="sub">모아의 두 번째 질문</span></h2>
+  <div data-dlg="g4a"></div>
+  <p>자연의 움직임은 복잡해 보여도 공통으로 흐르는 버릇이 하나 있습니다. <b>에너지가 줄어드는 쪽으로 움직이다가, 더 줄일 수 없으면 멈춘다</b>는 것입니다.</p>
+  <div class="cards3">
+    <div><svg viewBox="0 0 200 90" aria-hidden="true"><path d="M5,15 C60,15 70,80 100,80 C130,80 140,15 195,15" fill="none" stroke="#0f7f86" stroke-width="4"/><circle cx="40" cy="24" r="8" fill="#c42a6e"/><circle cx="100" cy="72" r="8" fill="#13733a"/><path d="M50,32 q22,30 40,38" fill="none" stroke="#5b6874" stroke-dasharray="4 4" stroke-width="2"/></svg><b>공과 골짜기</b>언덕에 놓은 공은 굴러 내려가 골짜기 바닥에서 멈춥니다. 높을수록 큰 위치 에너지가 가장 작은 곳입니다.</div>
+    <div><svg viewBox="0 0 200 90" aria-hidden="true"><ellipse cx="55" cy="45" rx="38" ry="22" fill="#e6eefb" stroke="#1e55c8" stroke-width="3"/><path d="M100,45 h16" stroke="#5b6874" stroke-width="2"/><path d="M112,40 l6,5 l-6,5" fill="none" stroke="#5b6874" stroke-width="2"/><circle cx="155" cy="45" r="30" fill="#e6eefb" stroke="#1e55c8" stroke-width="3"/></svg><b>비눗방울</b>찌그러진 비눗방울도 곧 동그래집니다. 같은 공기를 담으면서 겉넓이(표면 에너지)가 가장 작은 모양이 공 모양입니다.</div>
+    <div><svg viewBox="0 0 200 90" aria-hidden="true"><path d="M10,45 l10,-14 l12,28 l12,-28 l12,28 l12,-28 l12,28 l12,-28 l12,28 l10,-14" fill="none" stroke="#a35c00" stroke-width="3"/><rect x="138" y="30" width="24" height="30" rx="4" fill="#fdf3e1" stroke="#a35c00" stroke-width="3"/><path d="M175,45 h-10" stroke="#5b6874" stroke-width="2"/><path d="M170,40 l-6,5 l6,5" fill="none" stroke="#5b6874" stroke-width="2"/></svg><b>늘어난 용수철</b>잡아당긴 용수철은 늘어난 만큼 에너지를 품고 있다가, 놓으면 에너지가 가장 작은 원래 길이로 돌아갑니다.</div>
+  </div>
+  <p>과학자들은 이 버릇을 거꾸로 이용했습니다. <b>원하는 답이 가장 낮은 곳에 오도록 '에너지'를 설계해 주면, 답 찾기가 저절로 내려가기가 된다</b>는 생각입니다. 1985년 홉필드와 탱크는 이렇게 에너지를 낮추는 신경망으로 어려운 배치 문제를 풀자고 제안했습니다 [2]. 이번 논문의 AI는 그 에너지를 사람이 짜 주는 대신 <b>정답 예시로부터 배우게</b> 했습니다 [1].</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 이 모델(에너지 모델)을 쓰나</h4>
+      <ol><li><b>문제 상황</b>: 스도쿠는 규칙이 서로 얽혀 있습니다. 한 자리를 바꾸면 가로줄·세로줄·묶음 세 곳이 함께 흔들립니다.</li>
+        <li><b>앞 방법의 한계</b>: 문제를 보고 답을 통째로 그려 내도록 같은 계산을 여러 번 되풀이하는 AI(반복형 모델)는 연습량이 많이 들고 학습이 느리며, 속에서 무엇을 배웠는지 보기 어렵다고 논문은 지적합니다 [1].</li>
+        <li><b>해법</b>: 답안마다 에너지 하나를 매기고 정답이 바닥에 오게 합니다. 그러면 좋은 점이 넷 생깁니다 [1].
+          <br>① <b>할 일이 하나</b> — 에너지를 낮추기만 하면 됩니다.
+          <br>② <b>끝났는지 스스로 안다</b> — 에너지가 멈춤선 아래로 내려오면 멈춥니다.
+          <br>③ <b>쉬운 문제는 금방, 어려운 문제는 오래</b> — 내려갈 길이 길면 걸음이 늘어납니다.
+          <br>④ <b>속이 보인다</b> — 벌점표를 열어 보면 무엇을 배웠는지 읽힙니다(5단계).</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 정답을 외우게 하지 않고, <b>정답이 바닥에 오는 땅</b>을 만들어 준다. 그다음은 공이 알아서 굴러간다.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 에너지를 "가장 작게" 하면 왜 그게 정답이에요?</p></div>
+      <p><b>학교 수학으로 보면</b> 함수의 <b>최솟값</b> 찾기입니다. 이차함수 y = (x − 3)² + 1이 x = 3에서 가장 작아지는 것과 같은 이야기예요.</p>
+      <table><tr><th>식 조각</th><th>읽는 법과 뜻</th></tr>
+        <tr><td>E(답안) ≥ 0</td><td>벌점은 음수가 될 수 없다</td></tr>
+        <tr><td>E = 0</td><td>부딪힌 짝이 하나도 없다 = 규칙을 모두 지켰다</td></tr>
+        <tr><td>E가 가장 작은 답안</td><td>= 정답. 그래서 <b>최솟값 찾기 = 정답 찾기</b></td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 2단계의 예시판(벌점 2)에서 첫 줄 둘째 자리의 4를 <b>2</b>로 바꿔 보세요. 가로줄의 4 짝과 세로줄의 4 짝이 한꺼번에 사라져 <b>E = 2 → 0</b>. 한 번에 바닥에 닿았습니다.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 한 자리만 바꿨는데 벌점 두 개가 같이 없어졌어요! 그럼 "가장 작게"가 곧 "다 맞게"네요.</p></div></div>
+  </div>
+  <p>이렇게 "가장 좋은(가장 낮은) 곳 찾기"를 수학에서는 <b>최적화</b>라고 부릅니다. 에너지 모델은 스도쿠를 <b>최적화 문제</b>로 바꾸는 방법인 셈입니다. 최적화가 처음이라면 <a href="https://adminmrobo.github.io/optimization_3d_map/first_step_2.html#s51">최적화 첫걸음 ②의 5.1</a>에서 같은 그릇을 미분으로 볼 수 있습니다.</p>
+  <div data-dlg="g4b"></div>
+  <div class="panel">
+    <div class="ptitle">공 놓아 보기 — 바닥 말고도 작은 웅덩이가 있는 땅</div>
+    <div class="ctrl"><div class="group"><label class="glabel" for="bl-x">공을 놓을 곳</label><input type="range" id="bl-x" min="-6" max="6" step="0.1" value="-5.4"><span class="val" id="bl-xv">−5.4</span></div>
+      <div class="group"><button class="bt primary" type="button" id="bl-go">그냥 굴리기</button><button class="bt" type="button" id="bl-shake">흔들며 굴리기</button></div></div>
+    <div class="cwrap"><canvas id="bl-cv" aria-label="골짜기와 작은 웅덩이가 있는 에너지 곡선 위의 공"></canvas></div>
+    <div class="minis"><div class="mini a"><span>공의 위치</span><b id="bl-p">—</b></div><div class="mini r"><span>지금 에너지</span><b id="bl-e">—</b></div><div class="mini g"><span>바닥의 에너지</span><b>0.00</b></div><div class="mini m"><span>상태</span><b id="bl-s" style="font-size:16px">—</b></div></div>
+    <div class="insight" id="bl-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="g4"></div>
+</div></section>
+
+<!-- 단계 5 -->
+<section class="sec" id="g5" aria-labelledby="h-g5"><div class="wrap">
+  <h2 id="h-g5"><span class="hex">5</span>그릇 빚기 — AI가 벌점표를 스스로 배운다 <span class="sub">시아의 정리 · 학습</span></h2>
+  <div data-dlg="g5a"></div>
+  <p>지금까지는 사람이 규칙을 알려 주고 벌점을 셌습니다. 논문의 AI는 규칙을 모르는 채로 출발합니다. 대신 <b>자리 두 개마다 "이 숫자 짝은 벌점 몇 점"이라는 표</b>(벌점표)를 하나씩 갖고, 정답 예시를 보며 그 표를 채웁니다 [1]. 채우는 방법은 두 가지 동작뿐입니다.</p>
+  <ol>
+    <li><b>정답 예시에서 본 숫자 짝은 벌점을 내린다</b> — 바닥을 더 깊게 판다.</li>
+    <li><b>아무렇게나 채운 가짜 답에서 본 숫자 짝은 벌점을 올린다</b> — 벽을 더 높게 세운다.</li>
+  </ol>
+  <p>이 두 동작을 되풀이하는 것이 <b>학습</b>, 곧 <b>그릇 빚기</b>입니다. 논문은 이것을 "정답의 에너지는 낮추고 가짜 답의 에너지는 올린다"고 적었습니다 [1].</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 규칙을 직접 알려 주지 않나</h4>
+      <ol><li><b>문제 상황</b>: 스도쿠는 규칙이 짧지만, 세상의 많은 배치 문제는 규칙을 다 적기 어렵습니다(현장의 근무표, 미로, 일정표).</li>
+        <li><b>앞 방법의 한계</b>: 사람이 벌점을 일일이 정하면, 규칙을 모르는 문제에는 쓸 수 없습니다.</li>
+        <li><b>해법</b>: 정답 예시만 보여 주고 벌점표를 배우게 하면, 규칙은 표 안에 저절로 나타납니다. 표를 열어 보면 AI가 무엇을 배웠는지 읽을 수 있습니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 자리 배치 사진을 많이 본 사람이 "같은 모둠에 같은 이름표는 안 오는구나"를 스스로 알아채는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 아래 표의 빨간 숫자, 파란 숫자는 어떻게 계산해요?</p></div>
+      <p><b>학교 수학으로 보면</b> <b>확률</b>(어떤 일이 일어나는 비율)의 차이입니다.</p>
+      <div class="eqx">벌점 = 16 × ( 가짜 답에서 본 비율 − 정답에서 본 비율 )</div>
+      <table><tr><th>식 조각</th><th>뜻</th></tr>
+        <tr><td>가짜 답에서 본 비율</td><td>아무렇게나 채운 답에서 그 숫자 짝이 나온 비율(4 × 4면 어느 짝이든 1/16)</td></tr>
+        <tr><td>정답에서 본 비율</td><td>정답 예시에서 그 숫자 짝이 나온 비율</td></tr>
+        <tr><td>16 ×</td><td>보기 쉽게 키운 것</td></tr></table>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 같은 가로줄의 두 자리를 보면, 정답에서 (1, 1)처럼 같은 숫자 짝은 한 번도 안 나옵니다(비율 0). 그래서 16 × (1/16 − 0) = <b>+1</b>. 다른 숫자 짝 (1, 2)는 정답 열두 번에 한 번꼴(1/12)이라 16 × (1/16 − 1/12) ≈ <b>−0.33</b>.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 같은 숫자 짝만 벌점이 올라가요. 아무도 안 알려 줬는데 규칙을 찾아냈네요!</p></div></div>
+  </div>
+  <p class="calm">여기서는 단순하게 봤어요. 논문은 이 비율 차이 대신 다른 계산법(의사우도)을 쓰고 [1], 9 × 9 판의 자리 짝 3,240개마다 숫자 짝 81개짜리 표를 가져 모두 약 26만 개의 숫자를 배웁니다(논문 표 1의 263K = 3,240 × 81 + 자리마다 9개씩 729).</p>
+  <div data-dlg="g5b"></div>
+  <div class="panel">
+    <div class="ptitle">벌점표 배우기 — 4 × 4 판의 자리 두 개를 골라, 정답 예시를 보여 주며 표를 채우기</div>
+    <div class="ctrl"><div class="tabs" id="ln-pair" role="group" aria-label="자리 짝 고르기"></div></div>
+    <div class="pairpick">
+      <div class="sdk ro" id="ln-grid" style="width:150px"></div>
+      <div><div class="heat" id="ln-heat" aria-label="숫자 짝 벌점표"></div>
+        <p class="calm" style="margin-top:6px">가로 = 첫째 자리의 숫자, 세로 = 둘째 자리의 숫자. <span style="color:#c9302c">빨강</span> = 벌점이 높음(벽), <span style="color:#1e55c8">파랑</span> = 벌점이 낮음(바닥).</p></div>
+    </div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="ln-1">정답 예시 1장</button><button class="bt" type="button" id="ln-50">50장</button><button class="bt" type="button" id="ln-500">500장</button><button class="bt" type="button" id="ln-0">처음부터</button></div></div>
+    <div class="minis"><div class="mini a"><span>본 정답 예시</span><b id="ln-n">0</b></div><div class="mini r"><span>같은 숫자 짝의 평균 벌점</span><b id="ln-d">—</b></div><div class="mini g"><span>다른 숫자 짝의 평균 벌점</span><b id="ln-o">—</b></div><div class="mini m"><span>표가 알아낸 것</span><b id="ln-r" style="font-size:15px">—</b></div></div>
+    <div class="insight" id="ln-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="g5"></div>
+</div></section>
+
+<!-- 단계 6 -->
+<section class="sec" id="g6" aria-labelledby="h-g6"><div class="wrap">
+  <h2 id="h-g6"><span class="hex">6</span>공 굴리기 — 벌점을 줄이며 정답으로 <span class="sub">하루의 차례 · 추론</span></h2>
+  <div data-dlg="g6a"></div>
+  <p>그릇이 생겼으니 이제 답을 찾을 차례입니다. AI가 답을 찾는 동작을 <b>추론</b>이라고 부릅니다. 논문의 AI는 이렇게 굴러 내려갑니다 [1].</p>
+  <ol class="steps5">
+    <li><b>힌트 숫자는 그대로 둡니다</b>(고정).</li>
+    <li><b>빈자리는 아무 숫자로 채웁니다.</b> 그릇 벽 어딘가에 공을 놓는 셈입니다.</li>
+    <li><b>벌점이 가장 많은 자리를 골라, 벌점이 줄어드는 숫자로 바꿉니다.</b> 내리막 한 걸음입니다.</li>
+    <li><b>어느 자리를 바꿔도 벌점이 줄지 않으면</b> 작은 웅덩이에 빠진 것입니다. 그래서 <b>가끔은 일부러 아무 숫자로 흔듭니다</b>.</li>
+    <li><b>벌점이 멈춤선에 닿으면 멈춥니다.</b> 끝났는지 스스로 압니다.</li>
+  </ol>
+  <p class="calm">여기서는 단순하게 봤어요. 이 페이지는 2단계의 규칙 벌점을 쓰므로 멈춤선이 0입니다. 논문은 배운 에너지를 쓰기 때문에 정답 예시들의 에너지로 멈춤선을 정하고, 한 판을 네 갈래로 동시에 굴립니다. 논문은 사람이 정한 몇 가지 값만으로 만든 에너지도 모든 시험 문제를 풀었다고 보고했는데 [1], 이 페이지의 규칙 벌점이 바로 그런 종류입니다.</p>
+  <div data-dlg="g6b"></div>
+  <div class="panel">
+    <div class="ptitle">공 굴리기 — 빈자리를 고쳐 가며 벌점이 0이 될 때까지</div>
+    <div class="ctrl"><div class="tabs" id="rl-tabs" role="group" aria-label="판 고르기"></div>
+      <div class="group"><label class="glabel" for="rl-sh">흔들기</label><input type="range" id="rl-sh" min="0" max="1" step="0.05" value="0.45"><span class="val" id="rl-shv">0.45</span></div>
+      <div class="group"><button class="bt primary" type="button" id="rl-go">굴리기 ▶</button><button class="bt" type="button" id="rl-one">한 걸음</button><button class="bt" type="button" id="rl-new">새 출발점</button></div></div>
+    <div class="playwrap">
+      <div class="sdk ro" id="rl-grid"></div>
+      <div><div class="cwrap"><canvas id="rl-cv" aria-label="걸음마다 벌점이 줄어드는 곡선"></canvas></div>
+        <div class="minis" style="grid-template-columns:repeat(2,1fr)"><div class="mini a"><span>걸음</span><b id="rl-k">0</b></div><div class="mini r"><span>지금 벌점</span><b id="rl-e">—</b></div><div class="mini m"><span>흔든 걸음</span><b id="rl-s">0</b></div><div class="mini g"><span>상태</span><b id="rl-st" style="font-size:16px">—</b></div></div></div>
+    </div>
+    <p class="calm">초록 테두리 = 방금 바꾼 자리, 빨강 = 아직 부딪힌 자리. 흔들기 0.45는 걸음 100번 중 약 45번은 벌점과 상관없이 아무 숫자로 바꿔 본다는 뜻입니다.</p>
+    <div class="insight" id="rl-i" aria-live="polite"></div>
+  </div>
+  <div class="aicheck" id="aic">
+    <h4>AI 판단 코너 — "다 풀었다"는 말, 믿어도 될까?</h4>
+    <div id="aic-say"></div>
+    <div class="playwrap" style="grid-template-columns:minmax(0,300px) 1fr">
+      <div class="sdk ro" id="aic-grid"></div>
+      <div><p>주판봇이 9 × 9 쉬움 판을 "다 풀었다"며 가져왔습니다. 빈자리는 하나도 없습니다. 확인할 것은 두 가지입니다.</p>
+        <div class="ctrl"><div class="group"><button class="bt" type="button" id="aic-1">① 벌점 재 보기</button><button class="bt" type="button" id="aic-2">② 힌트 숫자 그대로인지 보기</button></div></div>
+        <div class="insight" id="aic-i" aria-live="polite"></div></div>
+    </div>
+  </div>
+  <div class="quiz" data-quiz="g6"></div>
+</div></section>
+
+<!-- 대결: 레이스 -->
+<section class="sec" id="race" aria-labelledby="h-race"><div class="wrap">
+  <h2 id="h-race">레이스 — 하루·시아·모아, 누가 먼저 바닥에 닿을까?</h2>
+  <div data-dlg="race"></div>
+  <p class="lead">같은 9 × 9 쉬움 판(힌트 40개)을 세 사람이 각자 아무 숫자로 채운 데서 출발합니다. 다른 것은 <b>흔들기</b> 하나뿐입니다. 4,000걸음 안에 벌점 0에 닿으면 성공입니다.</p>
+  <div class="race" id="rc-lanes"></div>
+  <div class="panel">
+    <div class="ctrl"><div class="group"><span class="glabel">먼저 맞혀 보기</span><span id="rc-pred"></span></div>
+      <div class="group"><button class="bt primary" type="button" id="rc-go">레이스 시작</button><button class="bt" type="button" id="rc-10">10판씩 돌려 보기</button></div></div>
+    <div class="cwrap"><canvas id="rc-cv" aria-label="세 플레이어의 걸음별 벌점 곡선"></canvas></div>
+    <div class="legend"><span><i style="background:#c42a6e"></i>하루 (흔들기 0)</span><span><i style="background:#5a5a6e"></i>시아 (흔들기 0.45)</span><span><i style="background:#93651a"></i>모아 (흔들기 0.9)</span></div>
+    <div id="rc-res" hidden>
+      <div id="rc-say"></div>
+      <div class="tblwrap" id="rc-tblw" hidden><table class="cmp"><thead><tr><th>플레이어</th><th>흔들기</th><th>성공</th><th>작은 웅덩이에 갇힘</th><th>성공한 판의 평균 걸음</th></tr></thead><tbody id="rc-tbl"></tbody></table></div>
+      <div class="score"><span id="rc-score"></span><span id="rc-my"></span></div>
+    </div>
+  </div>
+  <p>이 페이지의 검산(씨앗을 고정한 40판)에서는 하루가 40판 모두 작은 웅덩이에 갇혔고, 시아는 40판 모두 평균 959걸음에 성공, 모아는 한 판도 성공하지 못했습니다. <b>흔들기는 작은 웅덩이를 빠져나오게 해 주지만, 너무 세면 바닥 근처에서도 다시 튀어 나갑니다.</b> 논문의 AI도 흔들기의 세기(온도)를 배워서 정합니다 [1].</p>
+  <div class="quiz" data-quiz="race"></div>
+</div></section>
+
+<!-- 정리 -->
+<section class="sec" id="sum" aria-labelledby="h-sum"><div class="wrap">
+  <h2 id="h-sum">정리 — 게임의 말, AI의 말, 최적화의 말</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th>오늘 게임에서</th><th>AI에서는</th><th>최적화에서는</th><th>단계</th></tr></thead><tbody>
+    <tr><td>부딪힌 짝의 수(벌점)</td><td>에너지</td><td>목표 함수·손실</td><td>2</td></tr>
+    <tr><td>정답</td><td>에너지가 가장 낮은 곳</td><td>최솟값</td><td>3·4</td></tr>
+    <tr><td>정답 예시로 벌점표 채우기</td><td>학습(그릇 빚기)</td><td>가중치 정하기</td><td>5</td></tr>
+    <tr><td>벌점이 줄도록 빈자리 바꾸기</td><td>추론(공 굴리기)</td><td>내리막 찾기</td><td>6</td></tr>
+    <tr><td>가끔 아무 숫자로 흔들기</td><td>무작위성(온도)</td><td>작은 웅덩이(국소 최솟값) 탈출</td><td>6·레이스</td></tr>
+    <tr><td>벌점 0에서 멈추기</td><td>멈춤선</td><td>조기 멈춤</td><td>6</td></tr>
+  </tbody></table></div>
+  <div class="paper"><b>논문이 보고한 숫자 [1]</b> — 이 AI(CRAM)는 아주 어려운 스도쿠 모음(Sudoku-Extreme) 시험 문제의 99.996%를 풀었고, 학습은 GPU 한 대로 0.042초 걸렸습니다. 비교한 반복형 모델보다 학습이 1,000배 이상 빨랐고, 같은 정확도에서 추론 계산은 282배 이상 적었다고 합니다. <b>다만</b> 저자들 스스로 스도쿠·미로는 너무 쉽게 풀리는 시험이라, 이것만으로 방법이 더 큰 문제까지 잘 될지 판단하기는 어렵다고 적었습니다. 위 숫자는 모두 저자 보고치입니다.</div>
+  <h3>용어 대응 카드</h3>
+  <div class="gloss">
+    <div><b>벌점(에너지)</b> = 같은 줄·같은 묶음에서 같은 숫자인 짝의 수. 정답만 0.</div>
+    <div><b>그릇</b> = 모든 답안을 벌점 높이로 세운 땅. 정답이 바닥.</div>
+    <div><b>최적화</b> = 가장 좋은(여기서는 가장 낮은) 곳을 찾는 일.</div>
+    <div><b>학습</b> = 정답 예시의 에너지는 낮추고 가짜 답의 에너지는 올려 그릇을 빚는 일.</div>
+    <div><b>추론</b> = 만든 그릇에서 공을 굴려 답을 찾는 일.</div>
+    <div><b>작은 웅덩이</b> = 정답이 아닌데 한 자리만 바꿔서는 벌점이 줄지 않는 곳.</div>
+    <div><b>흔들기</b> = 가끔 아무 숫자로 바꿔 작은 웅덩이에서 빠져나오는 것.</div>
+    <div><b>멈춤선</b> = 이 아래로 내려오면 "다 풀었다"고 멈추는 에너지 높이.</div>
+  </div>
+  <div class="next"><a href="https://adminmrobo.github.io/optimization_3d_map/first_step_2.html#s51e"><b>최적화 첫걸음 ② 5.1 「한 걸음 더」 →</b><br>같은 이야기를 가중치 그릇과 나란히 보기</a><a href="https://adminmrobo.github.io/optimization_3d_map/index.html"><b>좌표축 위의 그릇 →</b><br>오차 지형을 3D 지도로</a><a href="../index.html"><b>시리즈 목차 · 다음 게임(준비 중) — 미로</b><br>같은 논문이 미로도 같은 방법으로 풀었습니다 [1]</a></div>
+</div></section>
+
+<section class="sec" id="outro" aria-labelledby="h-outro"><div class="wrap">
+  <h2 id="h-outro">아웃트로</h2>
+  <div data-dlg="outro"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <h3>출처</h3>
+  <table><thead><tr><th>#</th><th>자료</th><th>이 페이지에서 쓴 곳</th></tr></thead><tbody>
+    <tr><td>[1]</td><td>Hoover, B., Blayney, H., Whittington, J. C. R. (2026). Classical Energies Learn to Reason 1,000x Faster than Looped Models. arXiv:2611.17309 (Prefrontal).</td><td>전체 — 에너지 모델(CRAM)의 학습·추론 방법, 벌점표의 크기, 멈춤선, 보고 수치와 저자 경고</td></tr>
+    <tr><td>[2]</td><td>Hopfield, J. J., Tank, D. W. (1985). "Neural" Computation of Decisions in Optimization Problems. Biological Cybernetics, 52(3), 141–152.</td><td>4단계 — 에너지를 낮추는 신경망으로 최적화 문제를 푼다는 생각의 출발점</td></tr>
+  </tbody></table>
+  <h3>예시값·설명용 모형인 것</h3>
+  <ul><li>4 × 4 연습판, 9 × 9 쉬움(힌트 40개)·보통(힌트 36개) 판은 이 페이지가 만든 문제입니다(정답이 하나뿐인지 검산함).</li>
+    <li>벌점은 사람이 정한 규칙 벌점(같은 숫자 짝 1점)이고, 5단계의 벌점표 배우기는 비율 차이로 단순화한 계산입니다. 논문의 실제 학습 방법과 다릅니다.</li>
+    <li>4단계의 공과 곡선은 설명용 그림이고, 6단계·레이스의 숫자는 이 페이지의 단순한 내리막 규칙으로 얻은 값입니다(검산: 저장소의 code/check_sudoku.js, 씨앗 고정 40판).</li>
+    <li>표지는 임시 그림입니다. 새 표지는 연구실 시리즈 화풍(16비트 픽셀아트)으로 준비 중입니다.</li></ul>
+  <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
+  <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a> · <a href="https://adminmrobo.github.io/optimization_3d_map/index.html">좌표축 위의 그릇</a></p>
+</div></footer>
+
+<script>
+/*@@SPRITES@@*/
+/*@@COMMON@@*/
+/*@@SUDOKU@@*/
+var PZ=/*@@PUZZLES@@*/null;
+(function(){
+'use strict';
+var $=U.$,$$=U.$$,cssv=U.cssv;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── 대사 ── */
+var DLG={
+ hero:[["asst","asst_e19","박사님! 오늘은 게임하는 날이라면서요? 스도쿠 가져왔어요!"],
+  ["doc","doc_e08","네, 오늘은 세 분이 플레이어예요. 먼저 직접 풀어 보고, 그다음 AI가 같은 판을 어떻게 푸는지 따라가 봅시다."],
+  ["moa","moa_e09","AI는 정답을 그냥 외워서 푸는 거 아니에요?"],
+  ["sia","sia_e07","그게 궁금해서 오늘 이 게임을 골랐어요. 규칙부터 정리할게요."]],
+ g1a:[["doc","doc_e09","숫자를 채우는 게임인데, 덧셈 한 번 없이 풀 수 있어요. 왜 그럴까요?"],
+  ["asst","asst_e12","제가 먼저 해 볼게요! 규칙만 알면 된다는 거죠?"]],
+ g1b:[["robo","robo_e16","1부터 9까지 순서대로 쭉 채우면 끝이지!"],
+  ["fly","fly_e08","순서대로 채우면 세로줄에서 바로 부딪혀. 같은 줄에 같은 숫자가 생기면 빨갛게 표시되니 직접 눌러 봐."]],
+ g2a:[["doc","doc_e07","받아쓰기를 채점할 때 \"틀린 개수\"를 세죠. 스도쿠 답안에도 그런 점수를 매길 수 있을까요?"],
+  ["sia","sia_e10","네. 부딪힌 짝 하나에 1점, 이렇게 정하면 답안마다 점수가 하나씩 붙어요."]],
+ g2b:[["moa","moa_e19","제가 일부러 엉망으로 채워 볼래요!"],
+  ["fly","fly_e07","같은 숫자인 짝은 선으로 이어 보여 줄게. 선 개수가 곧 벌점이야."]],
+ g3a:[["moa","moa_e09","벌점이 점수라는 건 알겠어요. 그런데 그게 왜 \"그릇\"이에요?"],
+  ["doc","doc_e08","좋은 질문이에요. 모든 답안을 한자리에 모아 벌점만큼 쌓아 보면 바로 보입니다."]],
+ g3b:[["sia","sia_e07","빈자리를 하나 늘릴 때마다 답안이 4배씩 늘어나요. 2개면 16, 6개면 4,096."],
+  ["robo","robo_e16","답안이 그렇게 많아지면 그릇이 망가지겠지!"],
+  ["fly","fly_e09","슬라이더를 끝까지 올려 봐. 그래도 바닥(벌점 0)이 몇 개인지 세어 보자."]],
+ g4a:[["moa","moa_e04","벌점이면 벌점이지, 왜 갑자기 \"에너지\"예요? 과학 시간 같아요."],
+  ["doc","doc_e07","맞아요, 과학에서 빌려 온 말이에요. 자연을 설명하는 가장 짧은 문장 하나를 그대로 쓰려고요."]],
+ g4b:[["asst","asst_e12","공을 굴려 볼게요! 왼쪽 끝에 놓으면 바닥까지 가겠죠?"],
+  ["robo","robo_e16","내리막이면 무조건 바닥까지 간다!"],
+  ["fly","fly_e08","중간에 움푹한 데가 있어. \"그냥 굴리기\"와 \"흔들며 굴리기\"를 둘 다 눌러 봐."]],
+ g5a:[["sia","sia_e09","그런데 AI는 스도쿠 규칙을 처음부터 알고 있나요?"],
+  ["doc","doc_e07","몰라요. 정답 예시만 보고 그릇을 빚습니다. 예시를 많이 볼수록 그릇 모양이 또렷해져요."]],
+ g5b:[["asst","asst_e19","정답 예시를 한 장씩 보여 줄게요!"],
+  ["robo","robo_e16","규칙을 그냥 알려 주면 되지, 왜 예시를 보여 줘?"],
+  ["fly","fly_e07","규칙을 모르는 문제도 많으니까. 상관없는 짝을 골라서 표가 어떻게 되는지도 꼭 봐."]],
+ g6a:[["asst","asst_e12","이제 그릇이 생겼으니 굴려 봐요!"],
+  ["doc","doc_e08","그릇 전체는 너무 커서 볼 수 없어요. 그래서 AI는 발밑의 벌점만 보고 한 걸음씩 내려갑니다."]],
+ g6b:[["sia","sia_e10","흔들기를 0으로 두면 어떻게 되는지 먼저 볼게요."],
+  ["robo","robo_e16","흔들기는 시간 낭비! 내리막만 가면 된다!"],
+  ["fly","fly_e09","0에서 멈춘 자리의 벌점을 봐. 0이 아니면 작은 웅덩이야."]],
+ aic:[["robo","robo_e01","다 채웠다! 빈자리 0개! 정답이다!"],
+  ["doc","doc_e10","AI가 \"끝났다\"고 할 때 확인할 것은 두 가지예요. 벌점이 정말 0인가, 힌트 숫자를 건드리지 않았나."]],
+ race:[["doc","doc_e08","세 분 모두 같은 판, 같은 내리막 규칙입니다. 흔들기만 각자 정하세요."],
+  ["asst","asst_e10","저는 흔들기 0! 내리막만 꼼꼼하게 갈게요."],
+  ["sia","sia_e10","저는 0.45. 막히면 가끔 흔들어 볼게요."],
+  ["moa","moa_e19","저는 0.9! 마구 흔들면 빨리 가지 않을까요?"]],
+ outro:[["doc","doc_e16","오늘의 세 줄입니다.<br>① 틀린 정도를 벌점(에너지) 하나로 세면, 정답은 그릇의 바닥이 된다.<br>② 학습은 정답 예시로 그릇을 빚는 일, 추론은 그 그릇에서 공을 굴리는 일.<br>③ 작은 웅덩이를 빠져나오려면 적당히 흔들어야 하고, 벌점이 멈춤선에 닿으면 스스로 멈춘다."],
+  ["asst","asst_e16","직접 풀 때는 빈자리를 따졌는데, AI는 벌점만 보고 내려가는 거였어요."],
+  ["sia","sia_e16","규칙을 안 알려 줘도 벌점표에 규칙이 나타나는 게 제일 신기했어요."],
+  ["moa","moa_e19","다음 게임은 미로죠? 미로도 그릇이 돼요?"],
+  ["robo","robo_e14","흔들기도 실력이었네… 다음엔 0.45로 할게."],
+  ["fly","fly_e16","\"다 풀었다\"는 말은 언제나 벌점으로 확인. 그게 오늘의 숙제야."]]
+};
+U.dialogues(DLG);
+var CAST=[["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","직접 풀고, 공을 굴려요. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","규칙과 벌점을 정리해요."],["moa","moa_e13","인턴 모아 · 플레이어 3","\"왜요?\"를 가장 많이 물어요."],["fly","fly_e13","초파리 연구원","\"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","성급한 확신 담당. AI가 낸 결과 역할."]];
+$('#castgrid').innerHTML=CAST.map(function(c){return '<div class="castc" style="--cc:var(--c-'+c[0]+')"><img src="'+U.spr(c[1])+'" alt="" aria-hidden="true"><div><b>'+c[2]+'</b><p>'+c[3]+'</p></div></div>';}).join('');
+$('#secretrow').innerHTML=['x1','x2','x3'].map(function(x,i){return U.say(x,x+'_hint',['(두근두근)','(…끄덕)','(짝짝짝)'][i]);}).join('');
+$('#secretbtn').onclick=function(){var r=$('#secretrow');r.hidden=!r.hidden;this.setAttribute('aria-expanded',String(!r.hidden));this.textContent=r.hidden?'방청석 보기 (미공개 식구)':'방청석 닫기';};
+U.fillImgs();
+
+/* ── 판 그리기 ── */
+function grid(host,g,n,o){o=o||{};var b=n===4?2:3,h='',bad={};if(o.bad)o.bad.forEach(function(p){bad[p[0]]=1;bad[p[1]]=1;});
+  var peer={};if(o.sel!=null&&o.sel>=0){SD.B(n).peers[o.sel].forEach(function(k){peer[k]=1;});}
+  for(var k=0;k<n*n;k++){var r=Math.floor(k/n),c=k%n,cl='c';
+    if(c%b===b-1&&c<n-1)cl+=' br';if(r%b===b-1&&r<n-1)cl+=' bb';if(c===n-1)cl+=' lc';if(r===n-1)cl+=' lr';
+    if(o.clue&&o.clue[k])cl+=' clue';if(bad[k])cl+=' bad';if(o.win)cl+=' win';if(peer[k])cl+=' peer';if(o.sel===k)cl+=' sel';if(o.mv===k)cl+=' mv';
+    h+='<div class="'+cl+'" data-k="'+k+'" role="gridcell">'+(g[k]||'')+'</div>';}
+  host.style.gridTemplateColumns='repeat('+n+',1fr)';host.style.gridTemplateRows='repeat('+n+',1fr)';host.style.setProperty('--fs',o.fs||(n===4?'26px':'clamp(13px,3.6vw,22px)'));host.innerHTML=h;}
+function P(key){var p=PZ.puzzles[key];return {n:p.n,puz:SD.parse(p.p),sol:SD.parse(p.s),label:p.label};}
+function tabs(host,list,cur,on){host.innerHTML='';list.forEach(function(it){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=it[1];b.setAttribute('aria-pressed',String(it[0]===cur));b.onclick=function(){$$('button',host).forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');on(it[0]);};host.appendChild(b);});}
+/* 표지 판 */
+(function(){var p=P('p9a');grid($('#cv-board'),p.puz,9,{clue:p.puz.map(function(x){return x>0;}),fs:'clamp(6px,1.6cqw,16px)'});})();
+
+/* ── 단계 1: 직접 해 보기 ── */
+var PL={};
+function plLoad(key){var p=P(key);PL={key:key,n:p.n,puz:p.puz,sol:p.sol,g:p.puz.slice(),sel:-1,hints:0,done:false};
+  var pad=$('#pl-pad');pad.innerHTML='';for(var v=1;v<=p.n;v++)(function(v){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=v;b.onclick=function(){plPut(v);};pad.appendChild(b);})(v);
+  var e=document.createElement('button');e.type='button';e.className='bt';e.textContent='지우기';e.onclick=function(){plPut(0);};pad.appendChild(e);plDraw();}
+function plPut(v){if(PL.sel<0||PL.puz[PL.sel])return;PL.g[PL.sel]=v;plDraw();}
+function plDraw(){var bad=SD.conflictPairs(PL.g,PL.n),left=PL.g.filter(function(x){return !x;}).length,E=bad.length,win=!left&&!E;
+  grid($('#pl-grid'),PL.g,PL.n,{clue:PL.puz.map(function(x){return x>0;}),bad:bad,sel:PL.sel,win:win});
+  $('#pl-left').textContent=left;$('#pl-e').textContent=E;$('#pl-h').textContent=PL.hints;
+  $('#pl-s').textContent=win?'완성!':E?'부딪힘 있음':'진행 중';
+  var who=win?['asst','asst_e19','다 풀었어요! 벌점도 0이에요. 이게 바로 정답이네요.']:E?['asst','asst_e20','앗, 빨간 자리가 생겼어요. 같은 줄이나 묶음에 같은 숫자가 있나 봐요.']:left===PL.n*PL.n-PL.puz.filter(function(x){return x;}).length?['asst','asst_e12','자리를 하나 누르고 숫자를 골라 보세요!']:['asst','asst_e07','좋아요, 아직 부딪힌 곳은 없어요. 계속 가 봐요.'];
+  $('#pl-say').innerHTML=U.say(who[0],who[1],who[2]);
+  $$('#pl-grid .c').forEach(function(c){c.onclick=function(){PL.sel=+c.dataset.k;plDraw();};});}
+document.addEventListener('keydown',function(e){if(PL.sel<0)return;var r=document.activeElement;if(r&&(r.tagName==='INPUT'||r.tagName==='TEXTAREA'))return;
+  var g=$('#play').getBoundingClientRect();if(g.bottom<0||g.top>innerHeight)return;var n=PL.n;
+  if(/^[1-9]$/.test(e.key)&&+e.key<=n){plPut(+e.key);e.preventDefault();}
+  else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){plPut(0);e.preventDefault();}
+  else{var d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-n,ArrowDown:n}[e.key];if(d){var k=PL.sel+d;if(k>=0&&k<n*n){PL.sel=k;plDraw();}e.preventDefault();}}});
+$('#pl-hint').onclick=function(){var c=[];for(var k=0;k<PL.g.length;k++)if(!PL.puz[k]&&PL.g[k]!==PL.sol[k])c.push(k);if(!c.length)return;var k=c[Math.floor(Math.random()*c.length)];PL.g[k]=PL.sol[k];PL.sel=k;PL.hints++;plDraw();};
+$('#pl-check').onclick=function(){var left=PL.g.filter(function(x){return !x;}).length,E=SD.energy(PL.g,PL.n);
+  $('#pl-say').innerHTML=U.say('sia',left?'sia_e09':E?'sia_e20':'sia_e16',left?'아직 빈자리가 '+left+'개 남았어요.':E?'다 채웠지만 부딪힌 짝이 '+E+'개예요. 빨간 자리를 고쳐 봐요.':'빈자리 0, 부딪힌 짝 0. 완벽해요!');};
+$('#pl-reset').onclick=function(){plLoad(PL.key);};
+tabs($('#pl-tabs'),[['p4','연습판 4 × 4'],['p9a','9 × 9 쉬움'],['p9b','9 × 9 보통']],'p4',plLoad);plLoad('p4');
+
+/* ── 단계 2: 벌점 돋보기 ── */
+var B4s=SD.parse(PZ.bowl.s),MG={g:SD.parse(PZ.example.g)};
+function mgDraw(){var bad=SD.conflictPairs(MG.g,4),E=bad.length;grid($('#mg-grid'),MG.g,4,{bad:bad,win:!E,fs:'28px'});
+  var svg='';bad.forEach(function(p){var a=[(p[0]%4+0.5)*25,(Math.floor(p[0]/4)+0.5)*25],b=[(p[1]%4+0.5)*25,(Math.floor(p[1]/4)+0.5)*25];svg+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="#c9302c" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-dasharray="3 2"/>';});
+  $('#mg-lines').innerHTML=svg;$('#mg-e').textContent=E;
+  U.ins($('#mg-i'),E?[['r','부딪힌 짝 '+E+'개 = 벌점 '+E+'. 빨간 점선 하나가 벌점 1점입니다.'],['m',E>=6?'숫자 하나가 여러 짝에 동시에 걸리면 벌점이 빠르게 커집니다.':'한 자리를 바꾸면 그 자리에 걸린 짝이 한꺼번에 바뀝니다. 점선이 줄어드는 숫자를 찾아보세요.']]:[['g','벌점 0. 부딪힌 짝이 하나도 없으니 정답입니다.']]);
+  $$('#mg-grid .c').forEach(function(c){c.onclick=function(){var k=+c.dataset.k;MG.g[k]=MG.g[k]%4+1;mgDraw();};});}
+tabs($('#mg-preset'),[['ex','예시판 (벌점 2)'],['sol','정답판'],['mess','엉망판']],'ex',function(w){MG.g=w==='sol'?B4s.slice():w==='ex'?SD.parse(PZ.example.g):SD.parse('1111222233334444');mgDraw();});mgDraw();
+
+/* ── 단계 3: 그릇 만들기 ── */
+var BW={};
+function bwBuild(k){var pz=B4s.slice();PZ.bowl.order.slice(0,k).forEach(function(i){pz[i]=0;});var L=SD.landscape(pz,B4s,4);
+  // 작은 웅덩이: 벌점 > 0인데 한 자리만 바꿔서는 벌점이 줄지 않는 답안
+  var dips=[];L.list.forEach(function(a){if(!a.e)return;var g=SD.fill(pz,L.free,a.code,4),better=false;
+    for(var i=0;i<L.free.length&&!better;i++){var f=L.free[i],o=g[f],lo=SD.local(g,4,f);for(var v=1;v<=4;v++){if(v===o)continue;if(SD.local(g,4,f,v)<lo){better=true;break;}}}
+    if(!better){a.dip=true;dips.push(a);}});
+  BW={k:k,pz:pz,L:L,dips:dips,pick:null};
+  $('#bw-n').textContent=L.list.length.toLocaleString();$('#bw-z').textContent=L.list.filter(function(a){return !a.e;}).length;
+  $('#bw-max').textContent=Math.max.apply(null,L.list.map(function(a){return a.e;}));$('#bw-dips').textContent=dips.length;
+  bwShow(L.list.filter(function(a){return !a.e;})[0],true);}
+function bwShow(a,quiet){BW.pick=a;var g=SD.fill(BW.pz,BW.L.free,a.code,4),bad=SD.conflictPairs(g,4);
+  grid($('#bw-mini'),g,4,{clue:BW.pz.map(function(x){return x>0;}),bad:bad,win:!bad.length,fs:'16px'});
+  U.ins($('#bw-i'),!a.e?[['g','<b>정답</b>: 정답과 다른 자리 0개, 벌점 0. 그릇의 맨 바닥입니다.'],['m','빈자리 '+BW.k+'개 → 답안 '+BW.L.list.length.toLocaleString()+'가지 중 벌점 0은 딱 하나. 바닥이 하나뿐인 그릇입니다.']]:
+    [[a.dip?'a':'r','뽑은 답안: 정답과 '+a.d+'자리 다름, 벌점 '+a.e+'.'],a.dip?['a','<b>작은 웅덩이</b>입니다. 빈자리 하나만 바꿔서는 어느 쪽으로도 벌점이 줄지 않아요. 공이 여기 오면 멈춰 버립니다.']:['m','이 답안은 자리 하나를 바꾸면 벌점이 줄어드는 내리막 위에 있습니다.']]);
+  bwV.dirty=true;}
+var bwV={dirty:true};
+U.reg($('#bw-cv'),function(dt){if(!bwV.dirty&&dt!==0)return;bwV.dirty=false;var R=U.setup($('#bw-cv')),g=R.g,w=R.w,h=R.h;U.grid24(g,w,h);if(!BW.L)return;
+  var k=BW.k,L=BW.L.list,mx=Math.max.apply(null,L.map(function(a){return a.e;})),cx=w/2,base=h-34,top=22,sx=(w/2-40)/k,sy=(base-top)/Math.max(1,mx);
+  var X=function(a){var side=(a.code%2?1:-1);return cx+side*a.d*sx+((a.code*7919%97)/97-0.5)*sx*0.55*(a.d?1:0);},Y=function(e){return base-e*sy;};
+  g.strokeStyle='#d5dbe2';g.beginPath();g.moveTo(20,base+0.5);g.lineTo(w-20,base+0.5);g.stroke();
+  g.fillStyle=cssv('--muted');g.font='12px '+cssv('--font');g.textAlign='center';
+  for(var d=0;d<=k;d++){g.fillText(d,cx+d*sx,base+16);if(d)g.fillText(d,cx-d*sx,base+16);}
+  g.fillText('정답과 다른 자리 수 →',w-90,base+30);g.fillText('← 정답과 다른 자리 수',90,base+30);
+  g.save();g.translate(14,(top+base)/2);g.rotate(-Math.PI/2);g.fillText('벌점(높이)',0,0);g.restore();
+  var al=L.length>1500?0.25:L.length>300?0.4:0.65;
+  L.forEach(function(a){if(!a.e)return;g.beginPath();g.arc(X(a),Y(a.e),L.length>1500?1.6:2.4,0,7);g.fillStyle='rgba(30,85,200,'+al+')';g.fill();});
+  var mean=[];for(d=0;d<=k;d++){var s=0,c=0;L.forEach(function(a){if(a.d===d){s+=a.e;c++;}});mean.push(s/c);}
+  g.strokeStyle='#0f7f86';g.lineWidth=3;g.beginPath();for(d=k;d>=0;d--){var x=cx-d*sx,y=Y(mean[d]);d===k?g.moveTo(x,y):g.lineTo(x,y);}for(d=1;d<=k;d++)g.lineTo(cx+d*sx,Y(mean[d]));g.stroke();g.lineWidth=1;
+  BW.dips.forEach(function(a){g.beginPath();g.arc(X(a),Y(a.e),5.5,0,7);g.strokeStyle='#a35c00';g.lineWidth=2;g.stroke();g.lineWidth=1;});
+  g.beginPath();g.arc(cx,base,8,0,7);g.fillStyle='#13733a';g.fill();U.label(g,cx,base-18,'정답 · 벌점 0','#13733a','center');
+  if(BW.pick&&BW.pick.e){var p=BW.pick;g.beginPath();g.arc(X(p),Y(p.e),8,0,7);g.strokeStyle='#c42a6e';g.lineWidth=3;g.stroke();g.lineWidth=1;}});
+function bwK(){var k=+$('#bw-k').value;$('#bw-kv').textContent=k+'개';bwBuild(k);}
+$('#bw-k').oninput=bwK;
+$('#bw-pick').onclick=function(){var L=BW.L.list;bwShow(L[Math.floor(Math.random()*L.length)]);};
+$('#bw-dip').onclick=function(){if(!BW.dips.length){U.ins($('#bw-i'),[['m','빈자리 '+BW.k+'개 판에는 작은 웅덩이가 없습니다. 빈자리 수를 늘려 보세요.']]);return;}bwShow(BW.dips[Math.floor(Math.random()*BW.dips.length)]);};
+bwK();
+
+/* ── 단계 4: 공 놓아 보기 ── */
+function E1(x){return 0.12*x*x-0.9*Math.exp(-Math.pow(x+3.5,2)/0.45)+0.9*Math.exp(-Math.pow(3.5,2)/0.45);}
+function dE1(x){var h=1e-4;return (E1(x+h)-E1(x-h))/(2*h);}
+var BL={x:-5.4,run:false,shake:false,t:0,trail:[]};
+function blInfo(){var e=E1(BL.x);$('#bl-p').textContent=BL.x.toFixed(2);$('#bl-e').textContent=e.toFixed(2);}
+U.reg($('#bl-cv'),function(dt){var R=U.setup($('#bl-cv')),g=R.g,w=R.w,h=R.h;U.grid24(g,w,h);
+  var X=function(x){return 30+(x+6.5)/13*(w-60);},Y=function(e){return h-30-(e+0.1)/5.4*(h-50);};
+  g.strokeStyle='#0f7f86';g.lineWidth=3;g.beginPath();for(var i=0;i<=260;i++){var x=-6.5+13*i/260;i?g.lineTo(X(x),Y(E1(x))):g.moveTo(X(x),Y(E1(x)));}g.stroke();g.lineWidth=1;
+  U.label(g,X(0),Y(0)+16,'바닥(에너지 0)','#13733a','center');U.label(g,X(-3.45),Y(E1(-3.45))+18,'작은 웅덩이','#a35c00','center');
+  if(BL.run&&dt>0){for(var s=0;s<4;s++){var step=-0.9*dE1(BL.x)*dt;if(BL.shake){var temp=Math.max(0,1-BL.t/5);step+=(Math.random()-0.5)*2.8*temp*Math.sqrt(dt)*2;}BL.x=Math.max(-6.4,Math.min(6.4,BL.x+step));}
+    BL.t+=dt;BL.trail.push(BL.x);if(BL.trail.length>120)BL.trail.shift();
+    if((!BL.shake||BL.t>5)&&Math.abs(dE1(BL.x))<0.01){BL.run=false;var e=E1(BL.x),bottom=e<0.05;$('#bl-s').textContent=bottom?'바닥 도착':'웅덩이에 멈춤';
+      U.ins($('#bl-i'),bottom?[['g','에너지가 가장 낮은 바닥에서 멈췄습니다. 스도쿠라면 정답에 닿은 것입니다.'],['m',BL.shake?'처음엔 크게 흔들고 점점 덜 흔들었더니(흔들기 줄이기), 웅덩이를 넘어 바닥까지 왔습니다.':'이 자리에서는 웅덩이를 지나지 않아 그냥 굴러도 됐어요. 공을 왼쪽 끝(−5 근처)에 놓고 다시 해 보세요.']]:[['a','기울기가 0인 곳에서 멈췄지만 에너지가 '+e.toFixed(2)+'로 바닥(0)보다 높습니다. 작은 웅덩이에 갇혔습니다.'],['m',BL.shake?'흔들기에는 운이 섞여서 열 번에 한 번쯤은 다시 웅덩이로 돌아옵니다. 한 번 더 눌러 보세요.':'같은 자리에서 "흔들며 굴리기"를 눌러 보세요.']]);}
+    blInfo();}
+  BL.trail.forEach(function(x,i){g.beginPath();g.arc(X(x),Y(E1(x))-9,2,0,7);g.fillStyle='rgba(196,42,110,'+(i/BL.trail.length*0.5)+')';g.fill();});
+  g.beginPath();g.arc(X(BL.x),Y(E1(BL.x))-9,9,0,7);g.fillStyle='#c42a6e';g.fill();});
+function blStart(sh){BL.x=+$('#bl-x').value;BL.run=true;BL.shake=sh;BL.t=0;BL.trail=[];$('#bl-s').textContent=sh?'흔들며 굴러가는 중':'굴러가는 중';$('#bl-i').innerHTML='';
+  if(reduce){var n=0;while(BL.run&&n<4000){/* 모션 감소: 한 번에 끝까지 */BL.x+=-0.9*dE1(BL.x)*0.02+(sh?(Math.random()-0.5)*2.8*Math.max(0,1-n*0.02/5)*0.28:0);n++;if((!sh||n*0.02>5)&&Math.abs(dE1(BL.x))<0.01)break;}BL.t=99;}}
+$('#bl-x').oninput=function(){BL.x=+this.value;BL.run=false;BL.trail=[];$('#bl-xv').textContent=(BL.x<0?'−':'')+Math.abs(BL.x).toFixed(1);$('#bl-s').textContent='—';blInfo();};
+$('#bl-go').onclick=function(){blStart(false);};$('#bl-shake').onclick=function(){blStart(true);};blInfo();
+
+/* ── 단계 5: 벌점표 배우기 ── */
+var LN={pair:'row',L:null};var PAIRS={row:[0,1,'같은 가로줄의 두 자리'],box:[0,5,'같은 묶음의 대각선 두 자리'],free:[0,10,'아무 관계 없는 두 자리']};
+function lnReset(){var p=PAIRS[LN.pair];LN.L=SD.Learner(p[0],p[1],4);var g=new Array(16).fill(0);g[p[0]]='A';g[p[1]]='B';
+  grid($('#ln-grid'),g.map(function(x){return x||'';}),4,{clue:g.map(function(x,i){return i===p[0]||i===p[1];}),fs:'18px'});lnDraw();}
+function lnDraw(){var W=LN.L.W(),n=LN.L.seen,h='<div class="h"></div>';for(var b=1;b<=4;b++)h+='<div class="h">B = '+b+'</div>';
+  var ds=0,os=0;for(var a=0;a<4;a++){h+='<div class="h">A = '+(a+1)+'</div>';for(b=0;b<4;b++){var v=W[a][b],t=Math.max(-1,Math.min(1,v)),col=t>0?'rgba(201,48,44,'+(0.12+0.7*t)+')':'rgba(30,85,200,'+(0.12+0.7*(-t))+')';
+      h+='<div style="background:'+(n?col:'#f6f8fa')+';color:'+(Math.abs(t)>0.6?'#fff':'#16212b')+'">'+(n?(v>=0?'+':'−')+Math.abs(v).toFixed(2):'?')+'</div>';if(a===b)ds+=v;else os+=v;}}
+  $('#ln-heat').innerHTML=h;$('#ln-n').textContent=n.toLocaleString();$('#ln-d').textContent=n?(ds/4).toFixed(2):'—';$('#ln-o').textContent=n?(os/12).toFixed(2):'—';
+  var rel=LN.pair!=='free',found=n>=200&&ds/4>0.6;$('#ln-r').textContent=!n?'—':n<200?'아직 흐릿함':rel?(found?'"같은 숫자 금지"':'아직 흐릿함'):'"서로 상관없음"';
+  U.ins($('#ln-i'),!n?[['m',PAIRS[LN.pair][2]+'를 골랐습니다. 아직 아무것도 모르니 표가 비어 있어요. 정답 예시를 보여 주세요.']]:
+    n<50?[['m','예시 '+n+'장으로는 들쭉날쭉합니다. 우연히 많이 나온 짝도 있어요. 더 보여 주세요.']]:
+    rel?[['g','같은 숫자 짝(대각선)만 빨갛게, 다른 숫자 짝은 파랗게 정리되고 있습니다. 규칙을 알려 주지 않았는데 "이 두 자리에는 같은 숫자가 오면 안 된다"를 찾아냈습니다.'],['m','기대값: 같은 숫자 짝 +1.00, 다른 숫자 짝 −0.33.']]:
+    [['g','표 전체가 0 근처로 흐려집니다. 이 두 자리는 서로 아무 규칙이 없다는 것도 배웠습니다. 벌점표는 규칙이 있는 곳에만 벽을 세웁니다.']]);}
+tabs($('#ln-pair'),[['row','같은 가로줄'],['box','같은 묶음'],['free','관계없는 자리']],'row',function(w){LN.pair=w;lnReset();});
+$('#ln-1').onclick=function(){LN.L.show(1);lnDraw();};$('#ln-50').onclick=function(){LN.L.show(50);lnDraw();};$('#ln-500').onclick=function(){LN.L.show(500);lnDraw();};$('#ln-0').onclick=lnReset;lnReset();
+
+/* ── 벌점 곡선 그리기 ── */
+function curve(cv,series,maxX){var R=U.setup(cv),g=R.g,w=R.w,h=R.h,L=46,Rm=14,T=16,B=30;U.grid24(g,w,h);
+  var my=1;series.forEach(function(s){s.h.forEach(function(v){if(v>my)my=v;});});var mx=maxX||Math.max(10,Math.max.apply(null,series.map(function(s){return s.h.length-1;})));
+  var X=function(i){return L+i/mx*(w-L-Rm);},Y=function(v){return h-B-v/my*(h-T-B);};
+  g.strokeStyle='#5b6874';g.beginPath();g.moveTo(L,T);g.lineTo(L,h-B);g.lineTo(w-Rm,h-B);g.stroke();
+  g.fillStyle=cssv('--muted');g.font='11.5px '+cssv('--font');g.textAlign='right';g.fillText(my,L-6,T+8);g.fillText('0',L-6,h-B+4);g.textAlign='center';g.fillText('걸음 →  ('+mx.toLocaleString()+')',w/2,h-8);
+  g.save();g.translate(12,(T+h-B)/2);g.rotate(-Math.PI/2);g.fillText('벌점',0,0);g.restore();
+  series.forEach(function(s){var H=s.h,st=Math.max(1,Math.floor(H.length/600));g.strokeStyle=s.c;g.lineWidth=2;g.beginPath();for(var i=0;i<H.length;i+=st){i?g.lineTo(X(i),Y(H[i])):g.moveTo(X(i),Y(H[i]));}g.lineTo(X(H.length-1),Y(H[H.length-1]));g.stroke();g.lineWidth=1;});}
+
+/* ── 단계 6: 공 굴리기 ── */
+var RL={key:'p9a',W:null,run:false,sh:0};
+function rlNew(){var p=P(RL.key);RL.p=p;RL.sh=+$('#rl-sh').value;RL.W=SD.Walker(p.puz,p.n,RL.sh);RL.run=false;$('#rl-go').textContent='굴리기 ▶';rlDraw();}
+function rlDraw(){var W=RL.W,p=RL.p,bad=SD.conflictPairs(W.g,p.n);grid($('#rl-grid'),W.g,p.n,{clue:p.puz.map(function(x){return x>0;}),bad:bad,mv:W.moved,win:W.E===0});
+  $('#rl-k').textContent=W.steps.toLocaleString();$('#rl-e').textContent=W.E;$('#rl-s').textContent=(W.shakes||0).toLocaleString();
+  var st=W.E===0?'바닥 도착!':W.stuck?'웅덩이에 갇힘':W.steps>=PZ.raceMax?'시간 초과':RL.run?'굴러가는 중':'준비';$('#rl-st').textContent=st;
+  curve($('#rl-cv'),[{h:W.hist,c:'#c42a6e'}]);
+  if(W.E===0)U.ins($('#rl-i'),[['g',W.steps.toLocaleString()+'걸음 만에 벌점 0, 멈춤선에 닿아 스스로 멈췄습니다. 힌트는 하나도 바뀌지 않았어요.'],['m','"새 출발점"을 누르면 다른 숫자로 채운 데서 다시 굴러갑니다. 걸음 수가 매번 달라요.']]);
+  else if(W.stuck)U.ins($('#rl-i'),[['a','벌점 '+W.E+'에서 멈췄습니다. 어느 빈자리를 바꿔도 벌점이 줄지 않는 <b>작은 웅덩이</b>입니다. 흔들기가 0이라 빠져나올 방법이 없어요.'],['m','흔들기를 0.3~0.6으로 올리고 "새 출발점"을 눌러 보세요.']]);
+  else if(W.steps>=PZ.raceMax)U.ins($('#rl-i'),[['r',PZ.raceMax.toLocaleString()+'걸음 안에 바닥에 닿지 못했습니다.'],['m',RL.sh>0.75?'흔들기가 너무 세면 바닥 근처에서도 다시 튀어 나갑니다.':'판이 어려울수록 걸음이 많이 듭니다. 다시 해 보세요.']]);
+  else $('#rl-i').innerHTML='';}
+function rlTick(){if(!RL.run)return;var W=RL.W,n=reduce?400:(RL.p.n===4?1:8);for(var i=0;i<n&&!W.done&&W.steps<PZ.raceMax;i++){W.step();if(W.kind==='shake')W.shakes=(W.shakes||0)+1;}
+  if(W.done||W.steps>=PZ.raceMax){RL.run=false;$('#rl-go').textContent='굴리기 ▶';}rlDraw();if(RL.run)requestAnimationFrame(rlTick);}
+$('#rl-go').onclick=function(){if(RL.W.done||RL.W.steps>=PZ.raceMax)rlNew();RL.run=!RL.run;this.textContent=RL.run?'멈춤 ❚❚':'굴리기 ▶';if(RL.run)requestAnimationFrame(rlTick);};
+$('#rl-one').onclick=function(){RL.run=false;$('#rl-go').textContent='굴리기 ▶';if(!RL.W.done){RL.W.step();if(RL.W.kind==='shake')RL.W.shakes=(RL.W.shakes||0)+1;}rlDraw();};
+$('#rl-new').onclick=rlNew;
+$('#rl-sh').oninput=function(){$('#rl-shv').textContent=(+this.value).toFixed(2);RL.W.shake=+this.value;RL.sh=+this.value;};
+tabs($('#rl-tabs'),[['p4','4 × 4'],['p9a','9 × 9 쉬움'],['p9b','9 × 9 보통']],'p9a',function(k){RL.key=k;rlNew();});rlNew();
+
+/* ── AI 판단 코너 ── */
+(function(){var p=P('p9a'),g=p.sol.slice(),fr=[];for(var r=0;r<9&&fr.length<2;r++){fr=[];for(var c=0;c<9;c++)if(!p.puz[r*9+c])fr.push(r*9+c);if(fr.length<2)fr=[];}
+  var t=g[fr[0]];g[fr[0]]=g[fr[1]];g[fr[1]]=t; // 같은 가로줄의 빈자리 두 개를 맞바꾼 답
+  var c0=-1;for(var k=0;k<81;k++)if(p.puz[k]&&k!==fr[0]&&k!==fr[1]){c0=k;break;} // 힌트 하나도 슬쩍 바꿈
+  var orig=g[c0];g[c0]=g[c0]%9+1;var AI={g:g};
+  $('#aic-say').innerHTML=DLG.aic.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+  grid($('#aic-grid'),g,9,{clue:p.puz.map(function(x){return x>0;}),fs:'clamp(11px,2.6vw,17px)'});
+  $('#aic-1').onclick=function(){var bad=SD.conflictPairs(g,9);grid($('#aic-grid'),g,9,{clue:p.puz.map(function(x){return x>0;}),bad:bad,fs:'clamp(11px,2.6vw,17px)'});
+    U.ins($('#aic-i'),[['r','벌점 '+bad.length+'. 빈자리는 다 찼지만 부딪힌 짝이 남아 있습니다. "다 채움"과 "정답"은 다릅니다.']]);};
+  $('#aic-2').onclick=function(){var ch=[];for(var k=0;k<81;k++)if(p.puz[k]&&p.puz[k]!==g[k])ch.push(k);
+    grid($('#aic-grid'),g,9,{clue:p.puz.map(function(x){return x>0;}),bad:ch.map(function(k){return [k,k];}),fs:'clamp(11px,2.6vw,17px)'});
+    U.ins($('#aic-i'),[['r','힌트 숫자 '+ch.length+'개가 바뀌어 있습니다(빨강). 그 자리는 처음에 '+p.puz[ch[0]]+', 지금은 '+g[ch[0]]+'. 힌트를 바꾸면 다른 문제를 푼 셈입니다.'],['m','그래서 공 굴리기에서는 힌트를 처음부터 고정합니다. AI가 낸 결과는 이렇게 규칙으로 한 번 더 확인합니다.']]);};})();
+
+/* ── 레이스 ── */
+var PL3=[['asst','하루',PZ.race.haru,'#c42a6e'],['sia','시아',PZ.race.sia,'#5a5a6e'],['moa','모아',PZ.race.moa,'#93651a']],RC={run:false,W:[],pred:null};
+$('#rc-lanes').innerHTML=PL3.map(function(x,i){return '<div class="lane" style="--cc:var(--c-'+x[0]+')"><div class="head"><img id="rc-img'+i+'" data-mood="'+x[0]+'_e13" alt=""><div><b>'+x[1]+'</b><br><span class="muted">흔들기 '+x[2]+'</span></div></div><div class="sdk ro" id="rc-g'+i+'"></div><div class="st" id="rc-s'+i+'">—</div></div>';}).join('');
+U.fillImgs();
+var pr=$('#rc-pred');PL3.forEach(function(x){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=x[1];b.setAttribute('aria-pressed','false');b.onclick=function(){$$('button',pr).forEach(function(y){y.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');RC.pred=x[0];};pr.appendChild(b);});
+function rcDraw(){var p=P('p9a');RC.W.forEach(function(W,i){grid($('#rc-g'+i),W.g,9,{clue:p.puz.map(function(x){return x>0;}),bad:SD.conflictPairs(W.g,9),win:W.E===0,fs:'clamp(8px,1.4vw,12px)'});
+  $('#rc-s'+i).innerHTML='걸음 '+W.steps.toLocaleString()+' · 벌점 <b>'+W.E+'</b> · '+(W.E===0?'<b style="color:var(--gfp)">바닥 도착</b>':W.stuck?'<b style="color:var(--amber)">웅덩이에 갇힘</b>':W.steps>=PZ.raceMax?'<b style="color:var(--eye)">시간 초과</b>':'굴러가는 중');});
+  curve($('#rc-cv'),RC.W.map(function(W,i){return {h:W.hist,c:PL3[i][3]};}),PZ.raceMax);}
+function rcStart(){var p=P('p9a');RC.W=PL3.map(function(x){return SD.Walker(p.puz,9,x[2]);});RC.run=true;$('#rc-res').hidden=true;$('#rc-tblw').hidden=true;PL3.forEach(function(x,i){U.setMood($('#rc-img'+i),x[0]+'_e12');});requestAnimationFrame(rcTick);}
+function rcTick(){var n=reduce?4000:12,live=false;RC.W.forEach(function(W){for(var i=0;i<n&&!W.done&&W.steps<PZ.raceMax;i++)W.step();if(!W.done&&W.steps<PZ.raceMax)live=true;});rcDraw();if(live)requestAnimationFrame(rcTick);else rcEnd();}
+function rcEnd(){RC.run=false;var ok=RC.W.map(function(W){return W.E===0;}),win=-1,best=1e9;RC.W.forEach(function(W,i){if(ok[i]&&W.steps<best){best=W.steps;win=i;}});
+  var face={asst:['asst_e20','asst_e24'],sia:['sia_e16','sia_e20'],moa:['moa_e20','moa_e24']};
+  PL3.forEach(function(x,i){U.setMood($('#rc-img'+i),i===win?x[0]+(x[0]==='asst'?'_e19':'_e16'):(RC.W[i].stuck?face[x[0]][1]:face[x[0]][0]));});
+  var says=[];RC.W.forEach(function(W,i){var x=PL3[i];if(W.stuck)says.push([x[0],x[0]+(x[0]==='asst'?'_e24':'_e20'),'벌점 '+W.E+'에서 멈췄어요… 어느 자리를 바꿔도 벌점이 안 줄어요. 작은 웅덩이에 갇혔나 봐요.']);
+    else if(W.E===0)says.push([x[0],x[0]+'_e16',W.steps.toLocaleString()+'걸음에 바닥 도착! 막힐 때 흔들어 준 덕분이에요.']);
+    else says.push([x[0],x[0]+'_e20','4,000걸음을 다 썼는데 벌점이 '+W.E+'예요. 너무 흔들어서 바닥 근처에서도 자꾸 튀어 나갔어요.']);});
+  says.push(['doc','doc_e10',win<0?'이번 판은 아무도 바닥에 닿지 못했습니다. 다시 해 보세요.':'판정: <b>'+PL3[win][1]+' 승</b>. 흔들기가 없으면 웅덩이에 갇히고, 너무 세면 바닥에 머물지 못합니다. 적당히 흔드는 쪽이 이깁니다.']);
+  $('#rc-say').innerHTML=says.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+  $('#rc-score').textContent=win<0?'이번 판: 무승부':'이번 판: '+PL3[win][1]+' 승 ('+best.toLocaleString()+'걸음)';$('#rc-my').textContent=RC.pred?('내 예상: '+PL3.filter(function(x){return x[0]===RC.pred;})[0][1]+(win>=0&&PL3[win][0]===RC.pred?' — 맞혔어요!':' — 아쉬워요')):'';
+  $('#rc-res').hidden=false;}
+$('#rc-go').onclick=function(){if(!RC.run)rcStart();};
+$('#rc-10').onclick=function(){var btn=this,p=P('p9a'),res=PL3.map(function(){return [0,0,0];}),t=0;btn.disabled=true;btn.textContent='돌리는 중…';
+  (function chunk(){for(var i=0;i<PL3.length;i++){var W=SD.run(p.puz,9,PL3[i][2],PZ.raceMax);if(W.E===0){res[i][0]++;res[i][2]+=W.steps;}if(W.stuck)res[i][1]++;}t++;
+    if(t<10){setTimeout(chunk,0);return;}
+    $('#rc-tbl').innerHTML=PL3.map(function(x,i){return '<tr><td>'+x[1]+'</td><td>'+x[2]+'</td><td>'+res[i][0]+' / 10</td><td>'+res[i][1]+' / 10</td><td>'+(res[i][0]?Math.round(res[i][2]/res[i][0]).toLocaleString():'—')+'</td></tr>';}).join('');
+    $('#rc-tblw').hidden=false;$('#rc-res').hidden=false;if(!RC.W.length)$('#rc-say').innerHTML=U.say('doc','doc_e10','10판씩 돌린 결과입니다. 한 판의 승부는 운이 섞이지만, 여러 판을 보면 흔들기의 효과가 또렷해요.');
+    btn.disabled=false;btn.textContent='10판씩 돌려 보기';})();};
+(function(){var p=P('p9a');RC.W=PL3.map(function(x){return SD.Walker(p.puz,9,x[2]);});rcDraw();RC.W=[];})();
+
+/* ── 용어·퀴즈 ── */
+U.Gloss({
+ '벌점':['벌점','이 페이지','같은 줄·같은 묶음에서 같은 숫자인 짝 하나당 1점. 정답만 0.'],
+ '에너지':['에너지','물리·AI','답안마다 매기는 높이. 낮을수록 좋은 답. 여기서는 벌점의 합.'],
+ '최적화':['최적화','수학','가장 좋은(여기서는 가장 낮은) 곳을 찾는 일.'],
+ '최솟값':['최솟값','수학','함수가 가질 수 있는 가장 작은 값.'],
+ '학습':['학습','AI','예시를 보며 모델의 숫자(여기서는 벌점표)를 고치는 일.'],
+ '추론':['추론','AI','다 배운 모델로 새 문제의 답을 내는 일.'],
+ '멈춤선':['멈춤선','AI','이 높이 아래로 내려오면 "다 풀었다"고 멈추는 기준.'],
+ '작은 웅덩이':['작은 웅덩이 (국소 최솟값)','최적화','정답은 아닌데 한 걸음으로는 더 내려갈 수 없는 곳.'],
+ '흔들기':['흔들기','AI','가끔 일부러 아무 숫자로 바꿔 작은 웅덩이에서 빠져나오는 것. 논문의 온도와 같은 역할.'],
+ '벌점표':['벌점표 (가중치)','AI','자리 두 개마다 "이 숫자 짝은 벌점 몇 점"을 적은 표. AI가 정답 예시로 배운다.'],
+ '반복형 모델':['반복형 모델 (looped model)','AI','같은 계산 덩어리를 여러 번 되풀이해 답을 통째로 그려 내는 AI.'],
+ '힌트':['힌트','스도쿠','처음부터 적혀 있어 바꿀 수 없는 숫자.']
+},['벌점','에너지','최적화','학습','추론','멈춤선','작은 웅덩이','흔들기','벌점표','반복형 모델']);
+U.Study({quiz:{
+ g1:[{q:'9 × 9 스도쿠에서 숫자가 한 번씩만 들어가야 하는 곳이 아닌 것은?',o:['가로줄','세로줄','대각선'],a:2,why:'규칙은 가로줄·세로줄·굵은 선 묶음 셋입니다. 대각선은 규칙에 없어요.',hint:'규칙 상자 세 개를 다시 보세요.'},
+     {q:'스도쿠 숫자를 서로 더하거나 곱할 일이 없는 이유는?',o:['숫자가 작아서','숫자가 크기가 아니라 이름표 역할이라서','계산기를 쓰면 되니까'],a:1,why:'1~9 대신 그림 9가지를 써도 같은 게임입니다. 규칙을 지키는 배치만 중요해요.',hint:'"일상으로 치면" 상자.'}],
+ g2:[{q:'가로 한 줄에 같은 숫자 셋이 있으면 그 줄에서 생기는 벌점은?',o:['1','2','3'],a:2,why:'같은 숫자 셋은 짝이 셋(A–B, A–C, B–C)이라 벌점 3입니다.',hint:'짝을 하나씩 세어 보세요.'},
+     {q:'벌점이 0인 답안은?',o:['빈자리가 없는 답안','규칙을 모두 지킨 답안, 곧 정답','숫자가 가장 작은 답안'],a:1,why:'부딪힌 짝이 하나도 없어야 0입니다. 빈자리가 없어도 부딪히면 0이 아니에요.',hint:'벌점 돋보기의 정답판.'}],
+ g3:[{q:'그릇 그림에서 정답이 바닥에 있는 이유는?',o:['정답을 가운데 그렸기 때문','정답만 벌점이 0이라 가장 낮기 때문','답안 수가 가장 많기 때문'],a:1,why:'높이 = 벌점이고, 벌점 0은 정답 하나뿐입니다.',hint:'벌점 0인 답안이 몇 개였나요?'},
+     {q:'빈자리를 2개에서 6개로 늘렸을 때 맞는 것은?',o:['바닥이 여러 개 생긴다','답안은 4,096가지로 늘지만 바닥은 여전히 하나','그릇 모양이 사라진다'],a:1,why:'정답이 하나뿐인 문제라 벌점 0도 하나뿐입니다. 평균 높이는 정답과 멀수록 올라가요.',hint:'"벌점 0인 답안" 숫자.'}],
+ g4:[{q:'에너지 모델의 좋은 점이 아닌 것은?',o:['에너지가 멈춤선 아래면 끝났다고 스스로 안다','답을 한 번에 외워서 낸다','쉬운 문제는 금방, 어려운 문제는 오래 걸린다'],a:1,why:'에너지 모델은 정답을 외우지 않고, 정답이 바닥에 오는 땅을 만든 뒤 내려갑니다.',hint:'왜 이 모델 상자의 ①~④.'},
+     {q:'"그냥 굴리기"로 공이 작은 웅덩이에 멈춘 이유는?',o:['기울기가 0인 곳에 닿았기 때문','에너지가 0이 되었기 때문','공이 너무 무거워서'],a:0,why:'웅덩이 바닥도 기울기가 0이라 내리막만 따라가면 거기서 멈춥니다. 에너지는 0보다 높아요.',hint:'공 놓아 보기의 "지금 에너지".'}],
+ g5:[{q:'같은 가로줄의 두 자리 벌점표에서 같은 숫자 짝이 빨갛게 되는 이유는?',o:['사람이 규칙을 입력해서','정답 예시에서 한 번도 안 나오고 가짜 답에서만 나와서','숫자가 커서'],a:1,why:'정답에서 본 비율 0, 가짜 답에서 본 비율 1/16 → 16 × (1/16 − 0) = +1.',hint:'조수 수식 상자의 숫자 예.'},
+     {q:'관계없는 두 자리의 벌점표는 어떻게 되나?',o:['모두 빨갛게','모두 0 근처로 흐리게','대각선만 파랗게'],a:1,why:'규칙이 없는 자리 짝은 정답에서도 가짜 답에서도 비율이 비슷해 벌점이 0 근처입니다.',hint:'"관계없는 자리"를 골라 500장 보여 주세요.'}],
+ g6:[{q:'공 굴리기에서 힌트 숫자를 고정하는 이유는?',o:['계산을 빨리 하려고','힌트를 바꾸면 다른 문제를 푼 셈이 되어서','힌트는 언제나 1이라서'],a:1,why:'힌트는 문제 그 자체입니다. AI 판단 코너의 주판봇처럼 힌트를 바꾸면 정답이 아닙니다.',hint:'AI 판단 코너 ②.'},
+     {q:'흔들기 0으로 굴리다 멈췄을 때 벌점이 3이라면?',o:['정답에 닿았다','작은 웅덩이에 갇혔다','멈춤선을 지났다'],a:1,why:'멈춤선(0)에 못 닿았는데 더 내려갈 수 없으니 작은 웅덩이입니다.',hint:'상태 표시를 보세요.'}],
+ race:[{q:'레이스에서 모아(흔들기 0.9)가 거의 성공하지 못한 이유는?',o:['출발점이 나빠서','너무 자주 흔들어 바닥 근처에서도 다시 튀어 나가서','걸음이 너무 느려서'],a:1,why:'흔들기가 세면 내리막 걸음보다 아무 숫자 걸음이 많아 바닥에 머물지 못합니다.',hint:'세 사람의 벌점 곡선 모양.'}]
+}});
+U.start();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1506 @@
+{
+ "version": "1.3",
+ "page": "ai_game_lab_sudoku",
+ "nodes": [
+  {
+   "id": "lab:concept/sudoku-rules",
+   "type": "Concept",
+   "label": {
+    "ko": "스도쿠 규칙",
+    "en": "Sudoku rules"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "가로줄·세로줄·굵은 선 묶음 안에 숫자가 한 번씩만 들어간다. 힌트는 바꿀 수 없다."
+   }
+  },
+  {
+   "id": "lab:concept/constraint-satisfaction",
+   "type": "Concept",
+   "label": {
+    "ko": "규칙을 지키는 배치 찾기",
+    "en": "Constraint satisfaction"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "여러 규칙을 한꺼번에 지키는 배치를 찾는 문제. 시간표·근무표도 같은 모양."
+   }
+  },
+  {
+   "id": "lab:concept/conflict-penalty",
+   "type": "Concept",
+   "label": {
+    "ko": "벌점(부딪힌 짝의 수)",
+    "en": "Conflict penalty"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "같은 줄·같은 묶음에서 같은 숫자인 짝 하나당 1점. 정답만 0."
+   }
+  },
+  {
+   "id": "lab:concept/energy-function",
+   "type": "Concept",
+   "label": {
+    "ko": "에너지",
+    "en": "Energy function"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "답안마다 매기는 높이. 낮을수록 좋은 답."
+   },
+   "altLabel": {
+    "ko": [
+     "에너지 함수"
+    ]
+   }
+  },
+  {
+   "id": "lab:concept/energy-landscape",
+   "type": "Concept",
+   "label": {
+    "ko": "에너지 그릇(지형)",
+    "en": "Energy landscape"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "모든 답안을 벌점 높이로 세운 땅. 정답이 바닥."
+   }
+  },
+  {
+   "id": "lab:concept/local-minimum",
+   "type": "Concept",
+   "label": {
+    "ko": "작은 웅덩이(국소 최솟값)",
+    "en": "Local minimum"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "정답은 아닌데 한 자리만 바꿔서는 벌점이 줄지 않는 곳."
+   }
+  },
+  {
+   "id": "lab:concept/energy-based-model",
+   "type": "Concept",
+   "label": {
+    "ko": "에너지 모델",
+    "en": "Energy-based model"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "답마다 에너지를 매기고, 학습으로 정답 자리를 깊게 만든 뒤 추론 때 에너지를 내려가 답을 찾는 모델."
+   }
+  },
+  {
+   "id": "lab:concept/optimization",
+   "type": "Concept",
+   "label": {
+    "ko": "최적화(최솟값 찾기)",
+    "en": "Optimization"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "가장 좋은(여기서는 가장 낮은) 곳을 찾는 일."
+   }
+  },
+  {
+   "id": "lab:concept/looped-model",
+   "type": "Concept",
+   "label": {
+    "ko": "반복형 모델",
+    "en": "Looped model"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "같은 계산 덩어리를 여러 번 되풀이해 답을 통째로 그려 내는 AI."
+   }
+  },
+  {
+   "id": "lab:concept/pairwise-penalty-table",
+   "type": "Concept",
+   "label": {
+    "ko": "벌점표(자리 짝 가중치)",
+    "en": "Pairwise weights"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "자리 두 개마다 숫자 짝의 벌점을 적은 표. 논문은 약 26만 개 숫자."
+   }
+  },
+  {
+   "id": "lab:method/contrastive-energy-learning",
+   "type": "Method",
+   "label": {
+    "ko": "그릇 빚기(정답은 낮추고 가짜 답은 올리기)",
+    "en": "Lowering energy of solutions, raising negatives"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "정답 예시의 에너지는 낮추고 가짜 답의 에너지는 올려 벌점표를 배운다."
+   }
+  },
+  {
+   "id": "lab:method/energy-descent",
+   "type": "Method",
+   "label": {
+    "ko": "공 굴리기(에너지 내려가기)",
+    "en": "Energy descent inference"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "힌트 고정 → 빈자리 아무 숫자 → 벌점이 큰 자리를 벌점이 줄어드는 숫자로 → 가끔 흔들기 → 멈춤선에서 멈춤."
+   }
+  },
+  {
+   "id": "lab:concept/noise-temperature",
+   "type": "Concept",
+   "label": {
+    "ko": "흔들기(온도)",
+    "en": "Noise / temperature"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "가끔 일부러 아무 숫자로 바꿔 작은 웅덩이를 빠져나오는 것."
+   }
+  },
+  {
+   "id": "lab:concept/stopping-threshold",
+   "type": "Concept",
+   "label": {
+    "ko": "멈춤선",
+    "en": "Stopping threshold"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "이 아래로 내려오면 다 풀었다고 스스로 멈추는 에너지 높이."
+   }
+  },
+  {
+   "id": "lab:concept/clamped-clues",
+   "type": "Concept",
+   "label": {
+    "ko": "힌트 고정",
+    "en": "Clamped clues"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "문제로 주어진 숫자는 추론 내내 바꾸지 않는다."
+   }
+  },
+  {
+   "id": "lab:limitation/rule-penalty-simplified",
+   "type": "Limitation",
+   "label": {
+    "ko": "이 페이지는 규칙 벌점·비율 차이로 단순화",
+    "en": "Simplified energy and learning on this page"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/easy-benchmarks",
+   "type": "Limitation",
+   "label": {
+    "ko": "쉬운 시험(스도쿠·미로)에서 얻은 결과",
+    "en": "Results on easy benchmarks"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#sum",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/landscape-1d-view",
+   "type": "Limitation",
+   "label": {
+    "ko": "그릇 그림은 한 방향으로만 본 단면",
+    "en": "Bowl drawn along one direction only"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/name-tags",
+   "type": "Analogy",
+   "label": {
+    "ko": "이름표 자리 배치",
+    "en": "Seating name tags"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/dictation-score",
+   "type": "Analogy",
+   "label": {
+    "ko": "받아쓰기 틀린 개수",
+    "en": "Counting dictation mistakes"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/playground-blocks",
+   "type": "Analogy",
+   "label": {
+    "ko": "운동장의 답안지 블록 탑",
+    "en": "Answer sheets stacked as blocks"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/ball-valley",
+   "type": "Analogy",
+   "label": {
+    "ko": "골짜기로 굴러가는 공",
+    "en": "A ball rolling into a valley"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/soap-bubble",
+   "type": "Analogy",
+   "label": {
+    "ko": "동그래지는 비눗방울",
+    "en": "A soap bubble becoming round"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/seating-photos",
+   "type": "Analogy",
+   "label": {
+    "ko": "자리 배치 사진으로 규칙 알아채기",
+    "en": "Learning rules from seating photos"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-play",
+   "type": "Simulation",
+   "label": {
+    "ko": "직접 해 보기",
+    "en": "Play sudoku"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-penalty",
+   "type": "Simulation",
+   "label": {
+    "ko": "벌점 돋보기",
+    "en": "Penalty magnifier"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-bowl",
+   "type": "Simulation",
+   "label": {
+    "ko": "그릇 만들기",
+    "en": "Building the bowl"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-ball",
+   "type": "Simulation",
+   "label": {
+    "ko": "공 놓아 보기",
+    "en": "Dropping a ball"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-learn",
+   "type": "Simulation",
+   "label": {
+    "ko": "벌점표 배우기",
+    "en": "Learning the penalty table"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-roll",
+   "type": "Simulation",
+   "label": {
+    "ko": "공 굴리기",
+    "en": "Rolling the ball"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/sdk-race",
+   "type": "Simulation",
+   "label": {
+    "ko": "세 플레이어 레이스",
+    "en": "Three-player race"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#race",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:question/how-ai-solves-sudoku",
+   "type": "Question",
+   "label": {
+    "ko": "AI는 스도쿠를 어떻게 풀까?",
+    "en": "How does AI solve sudoku?"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#top",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/hoover2026cram",
+   "type": "Work",
+   "label": {
+    "ko": "Hoover 외 2026 (CRAM)",
+    "en": "Hoover et al. 2026 (CRAM)"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/hopfield1985neural",
+   "type": "Work",
+   "label": {
+    "ko": "Hopfield·Tank 1985",
+    "en": "Hopfield & Tank 1985"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:claim/cram-learns-energy",
+   "type": "Claim",
+   "label": {
+    "ko": "학습은 정답의 에너지를 낮추고 가짜 답의 에너지를 올린다",
+    "en": "Training lowers the energy of solutions and raises it for negatives"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "hoover2026cram",
+     "loc": "본문·그림 1"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/cram-stopping",
+   "type": "Claim",
+   "label": {
+    "ko": "추론은 에너지가 정답 예시로 정한 멈춤선 아래로 내려오면 멈춘다",
+    "en": "Inference stops when energy falls below a threshold fitted on training solutions"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "hoover2026cram",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/cram-results",
+   "type": "Claim",
+   "label": {
+    "ko": "스도쿠 시험 99.996% 풀이, 학습 0.042초(GPU 한 대), 반복형 모델보다 학습 1,000배 이상 빠르고 추론 계산 282배 이상 적음(저자 보고)",
+    "en": "99.996% of Sudoku-Extreme, 42 ms training, ≥1,000x faster training and ≥282x fewer inference FLOPs (as reported)"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#sum",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "hoover2026cram",
+     "loc": "초록"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/hopfield-optimization",
+   "type": "Claim",
+   "label": {
+    "ko": "에너지를 낮추는 신경망으로 최적화 문제를 풀 수 있다",
+    "en": "Networks descending an energy can solve optimization problems"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "hopfield1985neural",
+     "loc": "초록"
+    }
+   ]
+  },
+  {
+   "id": "lab:quiz/sdk-g1-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g1 문제 1",
+    "en": "Quiz g1-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g1-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g1 문제 2",
+    "en": "Quiz g1-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g2-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g2 문제 1",
+    "en": "Quiz g2-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g2-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g2 문제 2",
+    "en": "Quiz g2-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g3-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g3 문제 1",
+    "en": "Quiz g3-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g3-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g3 문제 2",
+    "en": "Quiz g3-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g4-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g4 문제 1",
+    "en": "Quiz g4-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g4-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g4 문제 2",
+    "en": "Quiz g4-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g5-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g5 문제 1",
+    "en": "Quiz g5-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g5-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g5 문제 2",
+    "en": "Quiz g5-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g6-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g6 문제 1",
+    "en": "Quiz g6-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-g6-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "g6 문제 2",
+    "en": "Quiz g6-2"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#g6",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/sdk-race-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "race 문제 1",
+    "en": "Quiz race-1"
+   },
+   "page": "ai_game_lab_sudoku",
+   "anchor": "#race",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "optimization",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  }
+ ],
+ "edges": [
+  {
+   "s": "lab:analogy/name-tags",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/constraint-satisfaction",
+   "anchor": "#g1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/dictation-score",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/conflict-penalty",
+   "anchor": "#g2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/playground-blocks",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/energy-landscape",
+   "anchor": "#g3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/ball-valley",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/energy-function",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/soap-bubble",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/energy-function",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/seating-photos",
+   "p": "lab:analogyOf",
+   "o": "lab:method/contrastive-energy-learning",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/sudoku-rules",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/conflict-penalty",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/conflict-penalty",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/energy-function",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-function",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/energy-landscape",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-landscape",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/optimization",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/optimization",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/energy-descent",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/pairwise-penalty-table",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/contrastive-energy-learning",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/contrastive-energy-learning",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/energy-landscape",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-landscape",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/energy-descent",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/local-minimum",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/noise-temperature",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/sudoku-rules",
+   "p": "lab:partOf",
+   "o": "lab:concept/constraint-satisfaction",
+   "anchor": "#g1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/conflict-penalty",
+   "p": "lab:relatedTo",
+   "o": "lab:concept/energy-function",
+   "anchor": "#g2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-based-model",
+   "p": "lab:relatedTo",
+   "o": "lab:concept/optimization",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-based-model",
+   "p": "lab:contrastsWith",
+   "o": "lab:concept/looped-model",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/pairwise-penalty-table",
+   "p": "lab:partOf",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/contrastive-energy-learning",
+   "p": "lab:partOf",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/energy-descent",
+   "p": "lab:partOf",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/stopping-threshold",
+   "p": "lab:partOf",
+   "o": "lab:method/energy-descent",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/clamped-clues",
+   "p": "lab:partOf",
+   "o": "lab:method/energy-descent",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/noise-temperature",
+   "p": "lab:partOf",
+   "o": "lab:method/energy-descent",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/local-minimum",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/landscape-1d-view",
+   "anchor": "#g3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/energy-descent",
+   "p": "lab:hasLimitation",
+   "o": "lab:concept/local-minimum",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/local-minimum",
+   "p": "lab:addressedBy",
+   "o": "lab:concept/noise-temperature",
+   "anchor": "#race",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/contrastive-energy-learning",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/rule-penalty-simplified",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-based-model",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/easy-benchmarks",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/sudoku-rules",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-play",
+   "anchor": "#g1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/conflict-penalty",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-penalty",
+   "anchor": "#g2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-landscape",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-bowl",
+   "anchor": "#g3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/local-minimum",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-ball",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/contrastive-energy-learning",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-learn",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/energy-descent",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-roll",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/noise-temperature",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/sdk-race",
+   "anchor": "#race",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-based-model",
+   "p": "lab:raises",
+   "o": "lab:question/how-ai-solves-sudoku",
+   "anchor": "#top",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-learns-energy",
+   "p": "lab:supports",
+   "o": "lab:method/contrastive-energy-learning",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-learns-energy",
+   "p": "lab:assertedIn",
+   "o": "lab:work/hoover2026cram",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-stopping",
+   "p": "lab:supports",
+   "o": "lab:concept/stopping-threshold",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-stopping",
+   "p": "lab:assertedIn",
+   "o": "lab:work/hoover2026cram",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-results",
+   "p": "lab:supports",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/cram-results",
+   "p": "lab:assertedIn",
+   "o": "lab:work/hoover2026cram",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/hopfield-optimization",
+   "p": "lab:supports",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/hopfield-optimization",
+   "p": "lab:assertedIn",
+   "o": "lab:work/hopfield1985neural",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/energy-function",
+   "p": "lab:broader",
+   "o": "lab:topic/loss-function",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/energy-descent",
+   "p": "lab:broader",
+   "o": "lab:topic/gradient-descent",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/contrastive-energy-learning",
+   "p": "lab:broader",
+   "o": "lab:topic/contrastive",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/stopping-threshold",
+   "p": "lab:broader",
+   "o": "lab:topic/early-stopping",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/noise-temperature",
+   "p": "lab:broader",
+   "o": "lab:topic/exploration",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/optimization",
+   "p": "lab:broader",
+   "o": "lab:topic/calculus-optimization-math",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g1-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/sudoku-rules",
+   "anchor": "#g1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g1-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/constraint-satisfaction",
+   "anchor": "#g1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g2-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/conflict-penalty",
+   "anchor": "#g2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g2-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/conflict-penalty",
+   "anchor": "#g2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g3-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/energy-landscape",
+   "anchor": "#g3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g3-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/energy-landscape",
+   "anchor": "#g3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g4-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/energy-based-model",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g4-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/local-minimum",
+   "anchor": "#g4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g5-1",
+   "p": "lab:assesses",
+   "o": "lab:method/contrastive-energy-learning",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g5-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/pairwise-penalty-table",
+   "anchor": "#g5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g6-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/clamped-clues",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-g6-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/local-minimum",
+   "anchor": "#g6",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/sdk-race-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/noise-temperature",
+   "anchor": "#race",
+   "confidence": "high"
+  }
+ ]
+}
