@@ -306,14 +306,37 @@ p,li{line-height:1.8}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:6px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px}
 
-.tcover{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--rule);background:linear-gradient(180deg,#fff8ec 0%,#ffffff 55%,#eef4fb 100%);container-type:inline-size}
-.tcover .row1{position:absolute;left:5%;top:12%;width:48%;display:flex;flex-wrap:wrap;gap:1.2cqw}
-.tcover .row2{position:absolute;left:5%;top:58%;width:48%;display:flex;gap:1.6cqw}
-.tcover .ppl{position:absolute;right:4%;top:8%;display:flex;gap:2%;width:36%;justify-content:flex-end}
-.tcover .ppl img{width:31%;image-rendering:pixelated}
-.tcover .bub{position:absolute;left:56%;top:44%;background:#fff;border:2px solid #16212b;border-radius:14px;padding:.6em 1em;font-weight:700;font-size:clamp(11px,2.1cqw,24px)}
-.tcover .ttl{position:absolute;left:56%;bottom:7%;font-weight:700;font-size:clamp(14px,3.3cqw,38px);color:#16212b;width:40%}
-.tcover .ttl small{display:block;font-size:.45em;color:var(--muted);font-weight:500}
+
+.stagebox{position:relative;container-type:inline-size;margin:10px 0}
+.stage{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:3px solid #16212b;background:#b98a52}
+.stage .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.stage .robo{position:absolute;left:50%;top:17%;width:25%;height:auto;transform:translateX(-50%);image-rendering:pixelated;transition:opacity .2s}
+.tablecoins{position:absolute;left:6%;right:6%;top:62%;display:flex;flex-wrap:wrap;justify-content:center;gap:.7cqw}
+.tablecoins img{width:var(--cs,4.2cqw);height:var(--cs,4.2cqw);image-rendering:pixelated;transition:opacity .35s,transform .35s}
+.tablecoins img.gone{opacity:0;transform:translateY(-60%) scale(.6)}
+.tablecoins img.mark{filter:drop-shadow(0 0 .5cqw #ffef8a)}
+.dlgwin{position:absolute;left:2%;right:2%;bottom:3%;height:24%;display:flex;gap:1.4cqw;align-items:stretch;background:rgba(255,255,255,.95);border:3px solid #16212b;border-radius:1.4cqw;padding:1cqw 1.2cqw;box-shadow:0 .4cqw 0 rgba(22,33,43,.25)}
+.dlgwin .face{height:100%;aspect-ratio:1;image-rendering:pixelated;border-radius:.8cqw;background:#f6f8fa;border:2px solid var(--cc,#16212b);flex:none}
+.dlgwin .txt{flex:1;min-width:0;font-size:clamp(13px,1.85cqw,19px);line-height:1.55}
+.dlgwin .txt b{color:var(--cc,#16212b);display:block;font-size:.85em}
+.dlgwin .txt p{margin:.2em 0 0}
+.dlgwin .menu{display:flex;flex-direction:column;gap:.5cqw;justify-content:center;flex:none}
+.dlgwin .menu button{font-size:clamp(12px,1.55cqw,16px);padding:.25em .9em;text-align:left;border-radius:6px;border:2px solid #16212b;background:#fff;font-weight:700;cursor:pointer}
+.dlgwin .menu button:not(:disabled):hover,.dlgwin .menu button:not(:disabled):focus-visible{background:#fff3c4}
+.dlgwin .menu button:not(:disabled)::before{content:"▶ ";color:var(--amber)}
+.dlgwin .menu button:disabled{opacity:.35;cursor:default}
+.stage .result{position:absolute;inset:0;z-index:2}
+.stage .result img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.stage .result .rbar{position:absolute;left:50%;top:5%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:3px solid #16212b;border-radius:12px;padding:.5em 1em;display:flex;gap:12px;align-items:center;white-space:nowrap;font-size:clamp(13px,2cqw,20px)}
+.felt .slot{position:absolute;top:36%;width:13cqw;height:13cqw;transition:left .45s ease,transform .25s ease;cursor:pointer;background:none;border:0;padding:0}
+.felt .slot img{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 .5cqw .2cqw rgba(0,0,0,.35))}
+.felt .slot.sel{transform:translateY(-22%)}
+.felt .slot.sel img{filter:drop-shadow(0 0 .9cqw #ffe36b) drop-shadow(0 .9cqw .3cqw rgba(0,0,0,.3))}
+.felt .slot:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:50%}
+.felt .ctag{position:absolute;top:66%;width:13cqw;text-align:center;color:#fff;font-weight:700;font-size:clamp(11px,1.8cqw,18px);text-shadow:0 1px 2px #000;transition:left .45s ease}
+.felt .done{position:absolute;left:50%;top:10%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:3px solid #13733a;color:#13733a;border-radius:10px;padding:.3em 1em;font-weight:700;font-size:clamp(13px,2.2cqw,22px)}
+@media(max-width:640px){.dlgwin{position:static;height:auto;margin-top:8px;padding:10px;gap:10px}.dlgwin .face{height:64px;width:64px}.dlgwin{flex-wrap:wrap}.dlgwin .menu{flex-direction:row;width:100%}}
+.scene{margin:16px 0}.scene img{width:100%;height:auto;border-radius:12px;border:1px solid var(--rule);display:block}.scene figcaption{font-size:13.5px;color:var(--muted);margin-top:6px;text-align:center}
 .coin{display:inline-grid;place-items:center;width:var(--cw,34px);height:var(--cw,34px);border-radius:50%;font-weight:700;font-size:calc(var(--cw,34px)*.38);flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);transition:transform .25s,opacity .25s}
 .coin.g{background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c230 55%,#b8860b);color:#6b4a00;border:2px solid #9a6f00}
 .coin.s{background:radial-gradient(circle at 35% 30%,#ffffff,#cfd6de 55%,#8f99a5);color:#3d4652;border:2px solid #6f7884}
@@ -365,13 +388,13 @@ p,li{line-height:1.8}
   </div>
 </div></nav>
 
-<!-- lab-cover : 새 표지(coin/img/coin_cover.webp)가 오면 이 블록을 그림으로 바꾼다 -->
-<div class="cover" id="cover" data-img="coin_cover"><div class="tcover" role="img" aria-label="금화 한 줄과 금·은 동전 다섯 개 옆에서 하루·시아·모아가 동전을 세는 임시 표지">
-  <div class="row1" id="cv-row1" style="--cw:4.2cqw"></div>
-  <div class="row2" id="cv-row2" style="--cw:6cqw"></div>
-  <div class="ppl"><img data-mood="asst_e09" alt=""><img data-mood="sia_e10" alt=""><img data-mood="moa_e19" alt=""></div>
-  <span class="bub">1개 남기면 지는 거죠?</span>
-  <div class="ttl">AI는 필승법을 어떻게 찾을까?<small>AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임</small></div>
+<!-- lab-cover -->
+<div class="cover" id="cover" data-img="coin_cover"><div class="frame">
+  <picture>
+    <source type="image/webp" srcset="img/coin_cover_960.webp 960w, img/coin_cover.webp 1600w" sizes="(max-width:1080px) 100vw, 1080px">
+    <img class="art" src="img/coin_cover.webp" width="1600" height="900" alt="낮의 항구 술집 둥근 탁자에 금화 열세 개가 놓여 있고, 하루·시아·모아가 탁자 건너편의 주판봇과 동전 게임을 하는 픽셀아트 표지" fetchpriority="high" decoding="async">
+  </picture>
+  <span class="cover-chip">AI로 풀어보는 게임 시리즈 · ② 대항해시대 4 코인 게임</span>
 </div></div>
 <!-- /lab-cover -->
 
@@ -429,14 +452,21 @@ p,li{line-height:1.8}
   <h2 id="h-c2"><span class="hex">2</span>직접 해 보기 — 주판봇과 동전 1개 남기기 <span class="sub">모아의 도전</span></h2>
   <div data-dlg="c2"></div>
   <div class="panel game" id="play">
-    <div class="ptitle">동전 1개 남기기 — 한 번에 1~3개, 자기 차례에 1개가 남으면 집니다</div>
-    <div class="ctrl"><div class="group"><span class="glabel">시작 개수</span><span class="tabs" id="pl-n" role="group" aria-label="시작 개수"></span></div>
+    <div class="ptitle">동전 1개 남기기 — 항구 술집에서 주판봇과 한 판 (한 번에 1~3개, 자기 차례에 1개가 남으면 집니다)</div>
+    <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
+      <div class="group"><span class="glabel">시작 개수</span><span class="tabs" id="pl-n" role="group" aria-label="시작 개수"></span></div>
       <div class="group"><span class="glabel">먼저 두는 쪽</span><span class="tabs" id="pl-first" role="group" aria-label="먼저 두는 쪽"></span></div>
       <div class="group"><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
-    <div class="coinrow" id="pl-coins" aria-label="남은 동전"></div>
-    <div class="ctrl"><div class="group" id="pl-take"></div></div>
-    <div class="minis"><div class="mini a"><span>남은 동전</span><b id="pl-left">—</b></div><div class="mini m"><span>지금 차례</span><b id="pl-turn" style="font-size:16px">—</b></div><div class="mini g"><span>나의 전적</span><b id="pl-rec">0승 0패</b></div><div class="mini r"><span>하루의 귀띔</span><b id="pl-hint" style="font-size:15px">꺼짐</b></div></div>
-    <div id="pl-say"></div>
+    <div class="stagebox">
+      <div class="stage">
+        <img class="bg" src="img/bg_tavern.webp" width="1600" height="900" alt="" aria-hidden="true">
+        <img class="robo" id="pl-robo" src="img/robo_seat_e16.webp" width="400" height="400" alt="탁자 건너편에 앉은 주판봇">
+        <div class="tablecoins" id="pl-coins" aria-label="탁자 위 동전"></div>
+        <div class="result" id="pl-result" hidden><img id="pl-rimg" alt=""><div class="rbar"><b id="pl-rtxt"></b><button class="bt primary" type="button" id="pl-again">한 판 더</button></div></div>
+      </div>
+      <div class="dlgwin" id="pl-dlg"><img class="face" id="pl-face" alt=""><div class="txt" aria-live="polite"><b id="pl-name"></b><p id="pl-line"></p></div><div class="menu" id="pl-take"></div></div>
+    </div>
+    <div class="minis"><div class="mini a"><span>남은 동전</span><b id="pl-left">—</b></div><div class="mini m"><span>지금 차례</span><b id="pl-turn" style="font-size:16px">—</b></div><div class="mini g"><span>전적</span><b id="pl-rec">0승 0패</b></div><div class="mini r"><span>하루의 귀띔</span><b id="pl-hint" style="font-size:15px">꺼짐</b></div></div>
     <div class="glog" id="pl-log" aria-live="polite"></div>
   </div>
   <p class="calm">몇 판 져도 괜찮아요. 처음엔 다들 주판봇에게 집니다. "하루의 귀띔"을 켜고 남은 개수를 잘 보세요.</p>
@@ -533,8 +563,13 @@ p,li{line-height:1.8}
   <h2 id="h-c5"><span class="hex">5</span>동전 옮기기 — 모든 수 찾기 <span class="sub">하루의 차례 · AI 방법 ③</span></h2>
   <div data-dlg="c5a"></div>
   <div class="panel game" id="mv">
-    <div class="ptitle">직접 해 보기 — 동전을 누르면 그 동전과 오른쪽 이웃 2개가 집힙니다</div>
-    <div class="mvrow" id="mv-row" style="--cw:52px"></div>
+    <div class="ptitle">동전 옮기기 — 동전을 누르면 그 동전과 오른쪽 이웃 2개가 집힙니다</div>
+    <div class="stagebox">
+      <div class="stage felt" id="mv-stage">
+        <img class="bg" src="img/bg_table.webp" width="1600" height="900" alt="" aria-hidden="true">
+        <div id="mv-row"></div>
+      </div>
+    </div>
     <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="mv-L">← 맨 왼쪽으로</button><button class="bt primary" type="button" id="mv-R">맨 오른쪽으로 →</button><button class="bt" type="button" id="mv-reset">처음부터</button></div></div>
     <div class="minis"><div class="mini a"><span>옮긴 횟수</span><b id="mv-k">0</b></div><div class="mini m"><span>집은 동전</span><b id="mv-sel" style="font-size:16px">없음</b></div><div class="mini g"><span>상태</span><b id="mv-st" style="font-size:16px">—</b></div><div class="mini r"><span>가장 짧은 풀이</span><b>2수</b></div></div>
     <div id="mv-say"></div>
@@ -648,7 +683,7 @@ p,li{line-height:1.8}
   <ul><li>4단계와 대결의 숫자(판 수, 승률)는 이 페이지의 단순한 Q 학습(학습률 0.5, 탐험 30%, 동전 2~21개에서 무작위 시작)으로 얻은 값입니다(검산: 저장소의 code/check_coin.js).</li>
     <li>동전 옮기기는 공략글의 단계와 맞는 규칙으로 보았고, 실제 게임 화면과는 대조하지 못했습니다.</li>
     <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다.</li>
-    <li>표지는 임시 그림입니다. 새 표지는 연구실 시리즈 화풍(16비트 픽셀아트)으로 준비 중입니다.</li></ul>
+    <li>표지·게임 화면(술집·탁자 배경, 주판봇, 동전)·결과 장면은 연구실 시리즈 화풍(16비트 픽셀아트)으로 새로 만든 그림이며, 원작 게임의 그림이 아닙니다.</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
 </div></footer>
@@ -949,27 +984,43 @@ $('#secretbtn').onclick=function(){var r=$('#secretrow');r.hidden=!r.hidden;this
 U.fillImgs();
 function tabs(host,list,cur,on){host.innerHTML='';list.forEach(function(it){var b=document.createElement('button');b.type='button';b.className='bt';b.textContent=it[1];b.setAttribute('aria-pressed',String(it[0]===cur));b.onclick=function(){$$('button',host).forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');on(it[0]);};host.appendChild(b);});}
 function coins(str,cls){return str.split('').map(function(c,i){return '<span class="coin '+(c==='G'?'g':'s')+(cls&&cls[i]?' '+cls[i]:'')+'">'+(c==='G'?'금':'은')+'</span>';}).join('');}
-/* 표지 */
-(function(){var h='';for(var i=0;i<13;i++)h+='<span class="coin g">'+'</span>';$('#cv-row1').innerHTML=h;$('#cv-row2').innerHTML=coins('GSGSG');})();
 
-/* ── 단계 2: 직접 해 보기 ── */
-var PL={start:13,first:'me',n:13,turn:'me',over:false,w:0,l:0,log:[]};
-function plNew(){PL.n=PL.start==='rand'?10+Math.floor(Math.random()*16):PL.start;PL.turn=PL.first;PL.over=false;PL.log=['동전 '+PL.n+'개로 시작. '+(PL.turn==='me'?'내가':'주판봇이')+' 먼저 둡니다.'];plDraw();if(PL.turn==='robo')setTimeout(plRobo,reduce?0:700);}
-function plDraw(){var h='',tot=PL.total||PL.n;for(var i=0;i<PL.n;i++)h+='<span class="coin g"></span>';$('#pl-coins').innerHTML=h||'<span class="muted">동전이 없습니다</span>';
-  $('#pl-left').textContent=PL.n;$('#pl-turn').textContent=PL.over?'끝':PL.turn==='me'?'나':'주판봇';$('#pl-rec').textContent=PL.w+'승 '+PL.l+'패';
-  var tip=$('#pl-tip').checked;$('#pl-hint').textContent=!tip?'꺼짐':PL.over?'—':PL.turn!=='me'?'주판봇 차례':(PL.n-1)%4===0?'지는 자리… 버티기':((PL.n-1)%4)+'개 가져가기';
-  var tk=$('#pl-take');tk.innerHTML='';[1,2,3].forEach(function(a){var b=document.createElement('button');b.type='button';b.className='bt primary';b.textContent=a+'개 가져가기';b.disabled=PL.over||PL.turn!=='me'||a>PL.n;b.onclick=function(){plTake(a,'me');};tk.appendChild(b);});
-  $('#pl-log').innerHTML=PL.log.slice(-6).map(function(t){return '<div>'+t+'</div>';}).join('');}
-function plTake(a,who){PL.n-=a;PL.log.push((who==='me'?'나':'주판봇')+': '+a+'개 → 남은 동전 '+PL.n+'개');
-  if(PL.n===0){PL.over=true;var meLost=who==='me';if(meLost)PL.l++;else PL.w++;
-    $('#pl-say').innerHTML=meLost?U.say('robo','robo_e16','마지막 동전을 가져갔으니 네가 졌다! 공식대로라면 당연하지.')+U.say('moa','moa_e20','으앗, 1개 남은 게 제 차례였어요…'):U.say('robo','robo_e20','내, 내가 마지막을 가져가다니… 공식을 외웠는데!')+U.say('moa','moa_e19','이겼다! 주판봇 차례에 1개를 남겼어요!');plDraw();return;}
-  if(PL.n===1){PL.log.push((who==='me'?'주판봇':'나')+' 차례에 1개가 남았습니다.');}
-  PL.turn=who==='me'?'robo':'me';plDraw();if(PL.turn==='robo')setTimeout(plRobo,reduce?0:700);}
-function plRobo(){if(PL.over)return;plTake(CG.perfect(PL.n),'robo');}
+/* ── 단계 2: 직접 해 보기 (게임 화면) ── */
+var WHO={asst:['조수 하루','var(--c-asst)',{start:'asst_e12',think:'asst_e09',happy:'asst_e19',sad:'asst_e24',tip:'asst_e07'}],
+ sia:['인턴 시아','var(--c-sia)',{start:'sia_e10',think:'sia_e09',happy:'sia_e16',sad:'sia_e20',tip:'sia_e07'}],
+ moa:['인턴 모아','var(--c-moa)',{start:'moa_e19',think:'moa_e09',happy:'moa_e19',sad:'moa_e24',tip:'moa_e01'}]};
+var PL={who:'moa',start:13,first:'me',n:13,turn:'me',over:false,w:0,l:0,log:[],busy:false};
+function say2(who,mood,text){var robo=who==='robo';$('#pl-dlg').style.setProperty('--cc',robo?'var(--c-robo)':WHO[who][1]);$('#pl-face').src=U.spr(mood);$('#pl-name').textContent=robo?'주판봇':WHO[who][0];$('#pl-line').innerHTML=text;}
+function roboFace(){var losing=!PL.over&&PL.turn==='robo'&&(PL.n-1)%4===0;$('#pl-robo').src='img/robo_seat_'+(losing||(PL.over&&PL.lastRoboLost)?'e20':'e16')+'.webp';}
+function plCoins(fade){$('#pl-coins').style.setProperty('--cs',PL.n+(fade||0)>15?'3.3cqw':'4.2cqw');var h='';for(var i=0;i<PL.n+(fade||0);i++)h+='<img src="img/coin_gold.webp" alt="" class="'+(i>=PL.n?'gone':'')+(PL.mark&&i<PL.n&&i>=PL.n-PL.mark?' mark':'')+'">';$('#pl-coins').innerHTML=h;
+  if(fade)setTimeout(function(){plCoins(0);},reduce?0:380);}
+function plStatus(){$('#pl-left').textContent=PL.n;$('#pl-turn').textContent=PL.over?'끝':PL.turn==='me'?WHO[PL.who][0].split(' ')[1]:'주판봇';$('#pl-rec').textContent=PL.w+'승 '+PL.l+'패';
+  var tip=$('#pl-tip').checked,adv=(PL.n-1)%4;$('#pl-hint').textContent=!tip?'꺼짐':PL.over?'—':PL.turn!=='me'?'주판봇 차례':adv===0?'지는 자리… 버티기':adv+'개 가져가기';
+  var tk=$('#pl-take');tk.innerHTML='';[1,2,3].forEach(function(a){var b=document.createElement('button');b.type='button';b.textContent=a+'개 가져가기';b.disabled=PL.over||PL.busy||PL.turn!=='me'||a>PL.n;b.onclick=function(){plTake(a,'me');};tk.appendChild(b);});
+  $('#pl-log').innerHTML=PL.log.slice(-5).map(function(t){return '<div>'+t+'</div>';}).join('');roboFace();}
+function myLine(){var F=WHO[PL.who][2],tip=$('#pl-tip').checked,adv=(PL.n-1)%4;
+  if(tip)say2('asst',F===WHO.asst[2]?'asst_e07':'asst_e07','<span class="muted">(하루의 귀띔)</span> 동전 '+PL.n+'개. '+(adv===0?'지금은 지는 자리예요. 1개만 가져가고 주판봇이 실수하길 기다려요.':adv+'개를 가져가면 주판봇 앞에 '+(PL.n-adv)+'개(1 + 4N)가 남아요.'));
+  else say2(PL.who,F.think,'동전 '+PL.n+'개… 몇 개를 가져갈까요?');}
+function plNew(){PL.n=PL.start==='rand'?10+Math.floor(Math.random()*16):PL.start;PL.turn=PL.first;PL.over=false;PL.busy=false;PL.mark=0;PL.lastRoboLost=false;$('#pl-result').hidden=true;
+  PL.log=['동전 '+PL.n+'개로 시작. '+(PL.turn==='me'?WHO[PL.who][0].split(' ')[1]+'가':'주판봇이')+' 먼저 둡니다.'];plCoins(0);
+  if(PL.turn==='me'){say2(PL.who,WHO[PL.who][2].start,'동전 '+PL.n+'개! 제가 먼저 둘게요. 몇 개를 가져갈까요?');plStatus();}
+  else{say2('robo','robo_e16','동전 '+PL.n+'개. 내가 먼저 간다! 공식은 다 외웠지.');PL.busy=true;plStatus();setTimeout(plRobo,reduce?0:1100);}}
+function plTake(a,who){if(PL.over)return;PL.n-=a;PL.mark=0;PL.log.push((who==='me'?WHO[PL.who][0].split(' ')[1]:'주판봇')+': '+a+'개 → 남은 동전 '+PL.n+'개');plCoins(a);
+  if(PL.n===0){PL.over=true;var meLost=who==='me';PL.lastRoboLost=!meLost;if(meLost)PL.l++;else PL.w++;plStatus();
+    setTimeout(function(){$('#pl-rimg').src='img/scene_'+(meLost?'lose':'win')+'.webp';$('#pl-rimg').alt=meLost?'주판봇이 주판을 높이 들고 기뻐하고, 하루·시아·모아가 아쉬워하는 장면':'하루·시아·모아가 환호하고, 주판봇이 눈이 빙글빙글 돈 채 주저앉은 장면';
+      $('#pl-rtxt').textContent=meLost?'주판봇 승리… 마지막 동전을 가져갔어요':'승리! 주판봇 차례에 1개를 남겼어요';$('#pl-result').hidden=false;},reduce?0:500);
+    if(meLost)say2(PL.who,WHO[PL.who][2].sad,'으앗, 1개 남은 게 제 차례였어요… 다음엔 주판봇 앞에 1 + 4N개를 남길래요.');else say2(PL.who,WHO[PL.who][2].happy,'이겼다! 주판봇 차례에 마지막 1개를 남겼어요!');return;}
+  PL.turn=who==='me'?'robo':'me';
+  if(PL.turn==='robo'){PL.busy=true;var losing=(PL.n-1)%4===0;say2('robo',losing?'robo_e20':'robo_e14',losing?'동전 '+PL.n+'개… 이, 이건 공식으로 지는 자리인데?!':'흠, 동전 '+PL.n+'개라… 계산 중…');plStatus();setTimeout(plRobo,reduce?0:1100);}
+  else{plStatus();myLine();}}
+function plRobo(){if(PL.over)return;PL.busy=false;var a=CG.perfect(PL.n);var rem=PL.n-a;PL.mark=0;
+  if(rem>0)say2('robo','robo_e16',a+'개 가져간다! 네 앞에 '+rem+'개. '+((rem-1)%4===0?'공식대로 1 + 4N이다!':'…어라?'));
+  setTimeout(function(){plTake(a,'robo');},reduce?0:600);}
+tabs($('#pl-who'),[['asst','하루'],['sia','시아'],['moa','모아']],'moa',function(v){PL.who=v;plNew();});
 tabs($('#pl-n'),[[13,'13'],[17,'17'],[21,'21'],['rand','무작위']],13,function(v){PL.start=v;plNew();});
-tabs($('#pl-first'),[['me','나'],['robo','주판봇']],'me',function(v){PL.first=v;plNew();});
-$('#pl-new').onclick=plNew;$('#pl-tip').onchange=plDraw;
-$('#pl-say').innerHTML=U.say('asst','asst_e07','개수를 골라 시작하세요. 귀띔을 켜면 몇 개를 가져가면 좋을지 알려 줄게요.');plNew();
+tabs($('#pl-first'),[['me','플레이어'],['robo','주판봇']],'me',function(v){PL.first=v;plNew();});
+$('#pl-new').onclick=plNew;$('#pl-again').onclick=plNew;$('#pl-tip').onchange=function(){plStatus();if(!PL.over&&PL.turn==='me')myLine();};
+plNew();
 
 /* ── 단계 3: 뒤에서부터 따지기 ── */
 var BT={k:0};
@@ -1000,14 +1051,17 @@ $('#ql-1').onclick=function(){qlTrain(1);};$('#ql-10').onclick=function(){qlTrai
 $('#ql-0').onclick=function(){QL.L=CG.Learner();$('#ql-m').textContent='—';qlDraw();};
 $('#ql-match').onclick=function(){var w=CG.match(QL.L,100);$('#ql-m').textContent=w+'승 / 100';};qlDraw();
 
-/* ── 단계 5: 동전 옮기기 ── */
-var MV={s:'GSGSG',sel:-1,k:0,hist:[]};
-function mvDraw(){var cls={};if(MV.sel>=0){cls[MV.sel]='hl';cls[MV.sel+1]='hl';}$('#mv-row').innerHTML=coins(MV.s,cls);
-  $$('#mv-row .coin').forEach(function(c,i){c.setAttribute('role','button');c.setAttribute('tabindex','0');c.onclick=function(){MV.sel=Math.min(i,3);mvDraw();};c.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();c.onclick();}};});
-  var done=CG.solved(MV.s);$('#mv-k').textContent=MV.k;$('#mv-sel').textContent=MV.sel<0?'없음':(MV.sel+1)+'·'+(MV.sel+2)+'번';$('#mv-st').textContent=done?'성공!':'정리 중';
-  $('#mv-say').innerHTML=done?U.say('asst',MV.k<=2?'asst_e19':'asst_e16',MV.k<=2?MV.k+'번 만에 성공! 이게 가장 짧은 풀이예요.':MV.k+'번 만에 성공! 그런데 2번이면 되는 길이 있대요. 다시 해 볼까요?'):U.say('asst','asst_e09',MV.sel<0?'동전 하나를 누르면 그 동전과 오른쪽 이웃이 함께 집혀요.':'집은 두 개를 맨 왼쪽이나 맨 오른쪽으로 보내 보세요.');}
-function mvGo(d){if(MV.sel<0||CG.solved(MV.s))return;var t=CG.apply(MV.s,MV.sel+1,d);MV.k++;MV.s=t;MV.sel=-1;mvDraw();}
-$('#mv-L').onclick=function(){mvGo('L');};$('#mv-R').onclick=function(){mvGo('R');};$('#mv-reset').onclick=function(){MV={s:'GSGSG',sel:-1,k:0};mvDraw();};mvDraw();
+/* ── 단계 5: 동전 옮기기 (게임 화면) ── */
+var MV;function mvInit(){MV={ids:[0,1,2,3,4],col:{0:'G',1:'S',2:'G',3:'S',4:'G'},sel:-1,k:0};
+  $('#mv-row').innerHTML=MV.ids.map(function(id){return '<button type="button" class="slot" data-id="'+id+'" aria-label="'+(MV.col[id]==='G'?'금화':'은화')+'"><img src="img/coin_'+(MV.col[id]==='G'?'gold':'silver')+'.webp" alt=""></button><div class="ctag" data-tag="'+id+'">'+(MV.col[id]==='G'?'금':'은')+'</div>';}).join('')+'<div class="done" id="mv-done" hidden>같은 색끼리 모였어요!</div>';
+  $$('#mv-row .slot').forEach(function(b){b.onclick=function(){var i=MV.ids.indexOf(+b.dataset.id);MV.sel=Math.min(i,3);mvDraw();};});mvDraw();}
+function mvStr(){return MV.ids.map(function(id){return MV.col[id];}).join('');}
+function mvDraw(){var X=function(i){return (14+i*15.2)+'%';};
+  MV.ids.forEach(function(id,i){var b=$('#mv-row .slot[data-id="'+id+'"]'),t=$('#mv-row .ctag[data-tag="'+id+'"]');b.style.left=X(i);t.style.left=X(i);b.classList.toggle('sel',MV.sel>=0&&(i===MV.sel||i===MV.sel+1));});
+  var s=mvStr(),done=CG.solved(s);$('#mv-done').hidden=!done;$('#mv-k').textContent=MV.k;$('#mv-sel').textContent=MV.sel<0?'없음':(MV.sel+1)+'·'+(MV.sel+2)+'번';$('#mv-st').textContent=done?'성공!':'정리 중';
+  $('#mv-say').innerHTML=done?U.say('asst',MV.k<=2?'asst_e19':'asst_e16',MV.k<=2?MV.k+'번 만에 성공! 이게 가장 짧은 풀이예요.':MV.k+'번 만에 성공! 그런데 2번이면 되는 길이 있대요. 다시 해 볼까요?'):U.say('asst','asst_e09',MV.sel<0?'동전 하나를 누르면 그 동전과 오른쪽 이웃이 함께 들려요.':'들린 두 개를 맨 왼쪽이나 맨 오른쪽으로 보내 보세요.');}
+function mvGo(d){if(MV.sel<0||CG.solved(mvStr()))return;var i=MV.sel,p=MV.ids.slice(i,i+2),r=MV.ids.slice(0,i).concat(MV.ids.slice(i+2));MV.ids=d==='L'?p.concat(r):r.concat(p);MV.k++;MV.sel=-1;mvDraw();}
+$('#mv-L').onclick=function(){mvGo('L');};$('#mv-R').onclick=function(){mvGo('R');};$('#mv-reset').onclick=mvInit;mvInit();
 /* 넓이 우선 탐색 */
 var BF={d:0,goal:'GGGSS'},BFS=CG.bfs('GSGSG');
 function bfDraw(){var path=BFS.path(BF.goal).map(function(p){return p.to;}),h='';
