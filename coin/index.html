@@ -389,7 +389,7 @@ p,li{line-height:1.8}
 .replay li{display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap}
 .replay .tagx{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--amber-soft);color:var(--amber);font-weight:700}
 </style>
-<!-- lab-kg:head -->
+<!-- px-fix v1 --><style id="px-fix">img{image-rendering:auto!important}</style><script id="px-fix-js">(function(){var R=window.ResizeObserver;function f(i){var n=i.naturalWidth,w=i.getBoundingClientRect().width;if(!n||!w)return;var s=w*(window.devicePixelRatio||1)/n;i.style.setProperty("image-rendering",s>=1.95?"pixelated":"auto","important")}var ro=R?new R(function(es){es.forEach(function(e){f(e.target)})}):null;function a(i){if(i.__px)return;i.__px=1;i.addEventListener("load",function(){f(i)});if(ro)ro.observe(i);f(i)}function all(r){(r||document).querySelectorAll&&(r||document).querySelectorAll("img").forEach(a)}function go(){all();if(window.MutationObserver)new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if(n.tagName==="IMG")a(n);else all(n)})})}).observe(document.documentElement,{childList:true,subtree:true});window.addEventListener("resize",function(){document.querySelectorAll("img").forEach(f)})}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go()})();</script><!-- /px-fix --><!-- lab-kg:head -->
 <meta name="citation_title" content="AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까?">
 <meta name="dc.title" content="AI로 풀어보는 게임 시리즈 ② 대항해시대 4 코인 게임 — AI는 필승법을 어떻게 찾을까?">
 <meta name="dc.date" content="2026-11-21">
@@ -398,7 +398,7 @@ p,li{line-height:1.8}
 <meta name="citation_author" content="안상선">
 <meta name="dcterms.isPartOf" content="AI로 풀어보는 게임 시리즈">
 <!-- /lab-kg:head -->
-<!-- px-fix v1 --><style id="px-fix">img{image-rendering:auto!important}</style><script id="px-fix-js">(function(){var R=window.ResizeObserver;function f(i){var n=i.naturalWidth,w=i.getBoundingClientRect().width;if(!n||!w)return;var s=w*(window.devicePixelRatio||1)/n;i.style.setProperty("image-rendering",s>=1.95?"pixelated":"auto","important")}var ro=R?new R(function(es){es.forEach(function(e){f(e.target)})}):null;function a(i){if(i.__px)return;i.__px=1;i.addEventListener("load",function(){f(i)});if(ro)ro.observe(i);f(i)}function all(r){(r||document).querySelectorAll&&(r||document).querySelectorAll("img").forEach(a)}function go(){all();if(window.MutationObserver)new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if(n.tagName==="IMG")a(n);else all(n)})})}).observe(document.documentElement,{childList:true,subtree:true});window.addEventListener("resize",function(){document.querySelectorAll("img").forEach(f)})}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go()})();</script><!-- /px-fix --></head>
+</head>
 <body>
 <nav class="top" aria-label="섹션 바로가기"><div class="row">
   <a class="logo" href="../index.html">AI로 풀어보는 <i>게임</i> · 코인 게임</a>
@@ -656,7 +656,7 @@ p,li{line-height:1.8}
     <div><b>탐험</b> = 가끔 일부러 아무 수나 둬서 새 길을 알아보는 것.</div>
     <div><b>넓이 우선 탐색</b> = 가까운 배치부터 빠짐없이 훑어 가장 짧은 길을 찾는 방법.</div>
   </div>
-  <div class="next"><a href="../sudoku/index.html"><b>← ① 스도쿠</b><br>답안마다 높이를 매기고 굴러 내려가기</a><a href="../index.html"><b>시리즈 목차</b><br>다음 게임(준비 중) — 미로</a><a href="https://adminmrobo.github.io/optimization_3d_map/index.html"><b>좌표축 위의 그릇 →</b><br>최적화를 3D 지도로</a></div>
+  <div class="next"><a href="../sudoku/index.html"><b>← ① 스도쿠</b><br>답안마다 높이를 매기고 굴러 내려가기</a><a href="../dice/index.html"><b>③ 다이스 →</b><br>확률로 고르기 — 모든 경우 세기와 굴려 보기</a><a href="../index.html"><b>시리즈 목차</b></a><a href="https://adminmrobo.github.io/optimization_3d_map/index.html"><b>좌표축 위의 그릇 →</b><br>최적화를 3D 지도로</a></div>
 </div></section>
 
 <section class="sec" id="outro" aria-labelledby="h-outro"><div class="wrap">
@@ -963,6 +963,11 @@ function noise(o){var c=ac();if(!c)return;var t=c.currentTime+(o.at||0),n=Math.f
   var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type=o.hp?'highpass':'lowpass';f.frequency.setValueAtTime(o.f||1200,t);if(o.to)f.frequency.exponentialRampToValueAtTime(o.to,t+o.d);
   var g=c.createGain();s.connect(f);f.connect(g);g.connect(master);env(g,t,o.a||0.004,o.v||0.3,o.d);s.start(t);s.stop(t+o.d+0.02);}
 var LIB={
+ /* 주사위 달그락 · 카드 넘기기 · 슬라임 통통 · 출발 신호 (③·④·⑤) */
+ roll:function(){for(var i=0;i<5;i++){noise({d:0.05,f:2400+i*300,v:0.18,hp:true,at:i*0.07});tone({f:300+((i*137)%5)*60,d:0.04,type:'square',v:0.05,at:i*0.07});}},
+ card:function(){noise({d:0.09,f:3000,to:900,v:0.16,hp:true});tone({f:1200,to:700,d:0.06,type:'triangle',v:0.05});},
+ hop:function(k){tone({f:220+(k||0)*40,to:440+(k||0)*40,d:0.09,type:'square',v:0.07});},
+ start:function(){[0,0.5,1.0].forEach(function(t){tone({f:440,d:0.18,type:'square',v:0.09,at:t});});tone({f:880,d:0.5,type:'square',v:0.11,at:1.5});},
  click:function(){tone({f:880,d:0.05,type:'square',v:0.08});},
  coin:function(k){tone({f:1318+(k||0)*60,d:0.07,type:'square',v:0.11,at:0});tone({f:1976+(k||0)*60,d:0.18,type:'square',v:0.09,at:0.06});},
  take:function(n){for(var i=0;i<n;i++)(function(i){var c=ac();if(!c)return;tone({f:1318+i*120,d:0.07,type:'square',v:0.1,at:i*0.12});tone({f:1976+i*120,d:0.16,type:'square',v:0.08,at:i*0.12+0.06});})(i);},

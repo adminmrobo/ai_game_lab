@@ -1,0 +1,1155 @@
+{
+ "version": "1.3",
+ "page": "ai_game_lab_blackjack",
+ "nodes": [
+  {
+   "id": "lab:concept/blackjack-hit-stand",
+   "type": "Concept",
+   "label": {
+    "ko": "블랙잭(받기·서기만)",
+    "en": "Blackjack with hit/stand"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "21에 가깝게, 넘지 않게. 딜러는 17 이상이면 선다."
+   }
+  },
+  {
+   "id": "lab:concept/soft-hand",
+   "type": "Concept",
+   "label": {
+    "ko": "소프트(A를 11로 세는 손패)",
+    "en": "Soft hand"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "받아도 A를 1로 바꾸면 되니 잘 안 터진다."
+   }
+  },
+  {
+   "id": "lab:concept/dealer-outcome-distribution",
+   "type": "Concept",
+   "label": {
+    "ko": "딜러 최종 결과 분포",
+    "en": "Dealer outcome distribution"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c3",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "딜러의 보이는 카드만 알면 17~21·터짐의 확률을 끝까지 따질 수 있다."
+   }
+  },
+  {
+   "id": "lab:concept/expected-value",
+   "type": "Concept",
+   "label": {
+    "ko": "기댓값",
+    "en": "Expected value"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "결과마다 몫 × 확률을 더한 값."
+   }
+  },
+  {
+   "id": "lab:concept/policy-table",
+   "type": "Concept",
+   "label": {
+    "ko": "정책(받기·서기 표)",
+    "en": "Policy table"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "상황 200개마다 받기·서기를 정한 표."
+   }
+  },
+  {
+   "id": "lab:concept/state-value",
+   "type": "Concept",
+   "label": {
+    "ko": "가치",
+    "en": "Value"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "그 상황에서 앞으로 가장 잘했을 때 얻을 기댓값."
+   }
+  },
+  {
+   "id": "lab:method/expected-value-recursion",
+   "type": "Method",
+   "label": {
+    "ko": "기댓값 계산(벨만 방정식)",
+    "en": "Expected-value recursion (Bellman)"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "받기의 기댓값 = 카드 확률 × 다음 상황의 가장 좋은 기댓값의 합."
+   }
+  },
+  {
+   "id": "lab:method/monte-carlo-control",
+   "type": "Method",
+   "label": {
+    "ko": "몬테카를로 학습(탐험 시작)",
+    "en": "Monte Carlo control with exploring starts"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "해 보고 상황·행동마다 결과를 평균 내서 표를 배운다."
+   }
+  },
+  {
+   "id": "lab:concept/incremental-mean",
+   "type": "Concept",
+   "label": {
+    "ko": "평균 고치기(1 ÷ 횟수)",
+    "en": "Incremental mean"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "새 평균 = 옛 평균 + (결과 − 옛 평균) ÷ 횟수."
+   }
+  },
+  {
+   "id": "lab:concept/exploring-starts",
+   "type": "Concept",
+   "label": {
+    "ko": "탐험 시작",
+    "en": "Exploring starts"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "판마다 무작위 상황·행동에서 시작해 모든 경우를 겪게 한다."
+   }
+  },
+  {
+   "id": "lab:concept/house-edge",
+   "type": "Concept",
+   "label": {
+    "ko": "딜러의 우위",
+    "en": "House edge"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#duel",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "플레이어가 먼저 두어 먼저 터지므로, 가장 좋은 표도 한 판 평균 약 2.4%를 잃는다."
+   }
+  },
+  {
+   "id": "lab:limitation/infinite-deck",
+   "type": "Limitation",
+   "label": {
+    "ko": "카드 뭉치를 끝없이 많다고 봄",
+    "en": "Infinite-deck assumption"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/model-needed",
+   "type": "Limitation",
+   "label": {
+    "ko": "계산에는 확률 모형이 필요",
+    "en": "Exact computation needs a model"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/many-episodes",
+   "type": "Limitation",
+   "label": {
+    "ko": "해 보며 배우기는 수만~수십만 판이 필요",
+    "en": "Needs many episodes"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/one-more-feature",
+   "type": "Analogy",
+   "label": {
+    "ko": "마감 직전 기능을 하나 더 넣을까",
+    "en": "One more feature before the deadline"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/commute-time",
+   "type": "Analogy",
+   "label": {
+    "ko": "늘 같은 길로 퇴근하는 사람의 도착 시각",
+    "en": "Commute time of a creature of habit"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/lottery-ev",
+   "type": "Analogy",
+   "label": {
+    "ko": "복권은 확률 × 상금으로",
+    "en": "Lottery: probability × prize"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/menu-average",
+   "type": "Analogy",
+   "label": {
+    "ko": "여러 메뉴를 먹어 보고 단골 메뉴 정하기",
+    "en": "Pick a usual dish by tasting"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/bj-play",
+   "type": "Simulation",
+   "label": {
+    "ko": "딜러 주판봇과 한 판",
+    "en": "Play against dealer AbaBot"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/bj-dealer",
+   "type": "Simulation",
+   "label": {
+    "ko": "딜러 카드별 결과 분포",
+    "en": "Dealer distribution by up card"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/bj-table",
+   "type": "Simulation",
+   "label": {
+    "ko": "받기·서기 표",
+    "en": "Hit/stand table"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/bj-mc",
+   "type": "Simulation",
+   "label": {
+    "ko": "해 보고 배운 표",
+    "en": "Learned table"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/bj-duel",
+   "type": "Simulation",
+   "label": {
+    "ko": "세 가지 습관, 2만 판",
+    "en": "Three habits, 20,000 hands"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#duel",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:question/hit-or-stand",
+   "type": "Question",
+   "label": {
+    "ko": "AI는 받을지 설지 어떻게 정할까?",
+    "en": "How does AI decide to hit or stand?"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#top",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/namu_uw2",
+   "type": "Work",
+   "label": {
+    "ko": "나무위키 「대항해시대 2」",
+    "en": "Namuwiki: Uncharted Waters II"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/sutton2018rl",
+   "type": "Work",
+   "label": {
+    "ko": "Sutton·Barto 2018",
+    "en": "Sutton & Barto 2018"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/thorp1962",
+   "type": "Work",
+   "label": {
+    "ko": "Thorp 1962",
+    "en": "Thorp 1962"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:claim/uw2-blackjack",
+   "type": "Claim",
+   "label": {
+    "ko": "대항해시대 2의 술집에서 블랙잭을 할 수 있었고 규칙은 일반 블랙잭과 같다",
+    "en": "UW2 taverns offered standard blackjack"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "namu_uw2",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/mc-blackjack-example",
+   "type": "Claim",
+   "label": {
+    "ko": "블랙잭은 몬테카를로 학습의 대표 예제다",
+    "en": "Blackjack is the classic Monte Carlo example"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "sutton2018rl",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/basic-strategy-computed",
+   "type": "Claim",
+   "label": {
+    "ko": "컴퓨터 계산으로 블랙잭의 기본 전략을 구할 수 있다",
+    "en": "Basic strategy can be computed"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#sum",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "thorp1962",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:quiz/bj-c1-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c1 문제 1",
+    "en": "Quiz c1-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c1-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c1 문제 2",
+    "en": "Quiz c1-2"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c2-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c2 문제 1",
+    "en": "Quiz c2-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c3-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c3 문제 1",
+    "en": "Quiz c3-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c3-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c3 문제 2",
+    "en": "Quiz c3-2"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c4-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c4 문제 1",
+    "en": "Quiz c4-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c4-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c4 문제 2",
+    "en": "Quiz c4-2"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c5-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c5 문제 1",
+    "en": "Quiz c5-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-c5-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c5 문제 2",
+    "en": "Quiz c5-2"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/bj-duel-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "duel 문제 1",
+    "en": "Quiz duel-1"
+   },
+   "page": "ai_game_lab_blackjack",
+   "anchor": "#duel",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "rl",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  }
+ ],
+ "edges": [
+  {
+   "s": "lab:analogy/one-more-feature",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/commute-time",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/dealer-outcome-distribution",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/lottery-ev",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/expected-value",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/menu-average",
+   "p": "lab:analogyOf",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/dealer-outcome-distribution",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/expected-value",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/expected-value",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/expected-value-recursion",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/expected-value-recursion",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/policy-table",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/state-value",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/expected-value-recursion",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/incremental-mean",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/exploring-starts",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/policy-table",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/soft-hand",
+   "p": "lab:partOf",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/expected-value-recursion",
+   "p": "lab:solves",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:solves",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:contrastsWith",
+   "o": "lab:method/expected-value-recursion",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/house-edge",
+   "p": "lab:partOf",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#duel",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/expected-value-recursion",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/model-needed",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:limitation/model-needed",
+   "p": "lab:addressedBy",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/many-episodes",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/blackjack-hit-stand",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/infinite-deck",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/blackjack-hit-stand",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/bj-play",
+   "anchor": "#c2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/dealer-outcome-distribution",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/bj-dealer",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/policy-table",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/bj-table",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/bj-mc",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/house-edge",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/bj-duel",
+   "anchor": "#duel",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/blackjack-hit-stand",
+   "p": "lab:raises",
+   "o": "lab:question/hit-or-stand",
+   "anchor": "#top",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-blackjack",
+   "p": "lab:supports",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-blackjack",
+   "p": "lab:assertedIn",
+   "o": "lab:work/namu_uw2",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/mc-blackjack-example",
+   "p": "lab:supports",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/mc-blackjack-example",
+   "p": "lab:assertedIn",
+   "o": "lab:work/sutton2018rl",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/basic-strategy-computed",
+   "p": "lab:supports",
+   "o": "lab:concept/policy-table",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/basic-strategy-computed",
+   "p": "lab:assertedIn",
+   "o": "lab:work/thorp1962",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/expected-value",
+   "p": "lab:broader",
+   "o": "lab:topic/probability-statistics",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/state-value",
+   "p": "lab:broader",
+   "o": "lab:topic/value-function",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/expected-value-recursion",
+   "p": "lab:broader",
+   "o": "lab:topic/mdp",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo-control",
+   "p": "lab:broader",
+   "o": "lab:topic/value-function",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/exploring-starts",
+   "p": "lab:broader",
+   "o": "lab:topic/exploration",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/policy-table",
+   "p": "lab:broader",
+   "o": "lab:topic/reward",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c1-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/soft-hand",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c1-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/blackjack-hit-stand",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c2-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/house-edge",
+   "anchor": "#c2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c3-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/dealer-outcome-distribution",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c3-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/dealer-outcome-distribution",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c4-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/expected-value",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c4-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/policy-table",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c5-1",
+   "p": "lab:assesses",
+   "o": "lab:method/monte-carlo-control",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-c5-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/incremental-mean",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/bj-duel-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/house-edge",
+   "anchor": "#duel",
+   "confidence": "high"
+  }
+ ]
+}

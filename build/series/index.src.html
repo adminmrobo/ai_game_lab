@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI로 풀어보는 게임 시리즈 — 연구실 식구들과 게임으로 배우는 AI</title>
-<meta name="description" content="하루·시아·모아가 플레이어로 나서서 게임을 직접 풀어 보고, AI가 같은 게임을 어떻게 푸는지 따라가는 연구실 해설 시리즈. ① 스도쿠 — 에너지 모델, ② 대항해시대 4 코인 게임 — 게임 나무·강화학습·탐색.">
+<meta name="description" content="하루·시아·모아가 플레이어로 나서서 게임을 직접 풀어 보고, AI가 같은 게임을 어떻게 푸는지 따라가는 연구실 해설 시리즈. ① 스도쿠 — 에너지 모델, ② 대항해시대 4 코인 게임 — 게임 나무·강화학습·탐색, ③ 대항해시대 2 다이스 — 확률·몬테카를로, ④ 대항해시대 2 블랙잭 — 기댓값·몬테카를로 학습, ⑤ 슬라임 레이스 — 탐험과 활용(밴딧).">
 <meta property="og:title" content="AI로 풀어보는 게임 시리즈">
 <meta property="og:description" content="게임을 직접 풀어 보고, AI는 같은 게임을 어떻게 푸는지 따라가 봅니다.">
 <meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/sudoku/img/sdk_cover.webp">
@@ -17,6 +17,7 @@
 .game{display:block;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--text)}
 .game .thumb{aspect-ratio:16/9;display:grid;place-items:center;background:linear-gradient(180deg,#f3f8ff,#fff 60%,#eef7f3);border-bottom:1px solid var(--rule);position:relative}
 .game .thumb svg{width:70%;height:auto}
+.game .thumb svg.scene{width:100%;height:100%}
 .game .body{padding:14px 16px}
 .game .no{font-size:12.5px;font-weight:700;color:var(--terrain)}
 .game h3{margin:2px 0 6px}
@@ -32,7 +33,7 @@
 <body>
 <nav class="top" aria-label="바로가기"><div class="row">
   <a class="logo" href="#top">AI로 풀어보는 <i>게임</i></a>
-  <div class="links"><a href="#games">게임 목록</a><a href="sudoku/index.html">① 스도쿠</a><a href="coin/index.html">② 코인 게임</a></div>
+  <div class="links"><a href="#games">게임 목록</a><a href="sudoku/index.html">① 스도쿠</a><a href="coin/index.html">② 코인 게임</a><a href="dice/index.html">③ 다이스</a><a href="blackjack/index.html">④ 블랙잭</a><a href="slime/index.html">⑤ 슬라임 레이스</a></div>
 </div></nav>
 <header class="hero" id="top"><div class="wrap">
   <div class="eyebrow">연구실 해설 시리즈</div>
@@ -52,9 +53,18 @@
     <a class="game" href="coin/index.html">
       <div class="thumb"><img src="coin/img/coin_cover_960.webp" width="960" height="540" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div>
       <div class="body"><div class="no">② 대항해시대 4 코인 게임</div><h3>AI는 필승법을 어떻게 찾을까?</h3><p>동전 1개 남기기와 동전 옮기기. 끝에서부터 따지고, 스스로 수백 판 두며 배우고, 모든 수를 찾아봅니다.</p><div class="tags">#게임나무 #강화학습 #넓이우선탐색 #필승법</div></div></a>
+    <a class="game" href="dice/index.html">
+      <div class="thumb"><!--@@THUMB:dice@@--></div>
+      <div class="body"><div class="no">③ 대항해시대 2 다이스</div><h3>AI는 확률로 어떻게 고를까?</h3><p>주사위 다섯 개, 다시 굴릴 기회는 한 번. 7,776가지를 모두 세고, 수천 번 굴려 보며 남길 주사위를 고릅니다.</p><div class="tags">#경우의수 #확률 #몬테카를로 #큰수의법칙</div></div></a>
+    <a class="game" href="blackjack/index.html">
+      <div class="thumb"><!--@@THUMB:blackjack@@--></div>
+      <div class="body"><div class="no">④ 대항해시대 2 블랙잭</div><h3>AI는 받을지 설지 어떻게 정할까?</h3><p>딜러의 결과를 확률로 따지고, 받기·서기의 기댓값을 비교하고, 10만 판을 해 보며 같은 표를 스스로 찾습니다.</p><div class="tags">#기댓값 #정책 #몬테카를로학습 #강화학습</div></div></a>
+    <a class="game" href="slime/index.html">
+      <div class="thumb"><!--@@THUMB:slime@@--></div>
+      <div class="body"><div class="no">⑤ 슬라임 레이스</div><h3>강화학습은 모르는 확률을 어떻게 배울까?</h3><p>옛 온라인 게임의 슬라임 경주장을 각색했습니다. 응원하고, 결과를 보고, 다시 고르며 탐험과 활용을 저울질합니다.</p><div class="tags">#강화학습 #탐험과활용 #UCB #맥락밴딧</div></div></a>
     <div class="game soon">
       <div class="thumb"><span class="badge">준비 중</span><svg viewBox="0 0 320 150" aria-hidden="true"><g fill="none" stroke="#16212b" stroke-width="4"><path d="M70 15h180v120H70zM70 45h60v30M160 15v60h60M100 105h120M250 75h-40v30"/></g><circle cx="85" cy="30" r="7" fill="#c42a6e"/><circle cx="235" cy="120" r="7" fill="#13733a"/></svg></div>
-      <div class="body"><div class="no">③ 미로</div><h3>AI는 미로를 어떻게 빠져나갈까?</h3><p>스도쿠를 푼 에너지 모델이 미로도 풉니다. 다음 편에서 만나요.</p></div></div>
+      <div class="body"><div class="no">⑥ 미로</div><h3>AI는 미로를 어떻게 빠져나갈까?</h3><p>스도쿠를 푼 에너지 모델이 미로도 풉니다. 다음 편에서 만나요.</p></div></div>
   </div>
 </div></section>
 </main>

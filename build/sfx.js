@@ -16,6 +16,11 @@ function noise(o){var c=ac();if(!c)return;var t=c.currentTime+(o.at||0),n=Math.f
   var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type=o.hp?'highpass':'lowpass';f.frequency.setValueAtTime(o.f||1200,t);if(o.to)f.frequency.exponentialRampToValueAtTime(o.to,t+o.d);
   var g=c.createGain();s.connect(f);f.connect(g);g.connect(master);env(g,t,o.a||0.004,o.v||0.3,o.d);s.start(t);s.stop(t+o.d+0.02);}
 var LIB={
+ /* 주사위 달그락 · 카드 넘기기 · 슬라임 통통 · 출발 신호 (③·④·⑤) */
+ roll:function(){for(var i=0;i<5;i++){noise({d:0.05,f:2400+i*300,v:0.18,hp:true,at:i*0.07});tone({f:300+((i*137)%5)*60,d:0.04,type:'square',v:0.05,at:i*0.07});}},
+ card:function(){noise({d:0.09,f:3000,to:900,v:0.16,hp:true});tone({f:1200,to:700,d:0.06,type:'triangle',v:0.05});},
+ hop:function(k){tone({f:220+(k||0)*40,to:440+(k||0)*40,d:0.09,type:'square',v:0.07});},
+ start:function(){[0,0.5,1.0].forEach(function(t){tone({f:440,d:0.18,type:'square',v:0.09,at:t});});tone({f:880,d:0.5,type:'square',v:0.11,at:1.5});},
  click:function(){tone({f:880,d:0.05,type:'square',v:0.08});},
  coin:function(k){tone({f:1318+(k||0)*60,d:0.07,type:'square',v:0.11,at:0});tone({f:1976+(k||0)*60,d:0.18,type:'square',v:0.09,at:0.06});},
  take:function(n){for(var i=0;i<n;i++)(function(i){var c=ac();if(!c)return;tone({f:1318+i*120,d:0.07,type:'square',v:0.1,at:i*0.12});tone({f:1976+i*120,d:0.16,type:'square',v:0.08,at:i*0.12+0.06});})(i);},

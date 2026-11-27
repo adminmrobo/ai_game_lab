@@ -1,0 +1,42 @@
+{
+ "title": "AI로 풀어보는 게임 시리즈 ⑤ 슬라임 레이스 — 강화학습은 모르는 확률을 어떻게 배울까?",
+ "series": "AI로 풀어보는 게임 시리즈",
+ "number": "5",
+ "creator": [
+  {
+   "name": "안상선",
+   "role": "author",
+   "affiliation": "(주)M-Robo"
+  }
+ ],
+ "contributor": [
+  {
+   "name": "AI 보조 제작",
+   "role": "assistant"
+  }
+ ],
+ "date": "2026-11-27",
+ "version": "1.0",
+ "language": [
+  "ko"
+ ],
+ "license": "",
+ "url": "https://adminmrobo.github.io/ai_game_lab/slime/",
+ "about": [
+  "lab:concept/multi-armed-bandit",
+  "lab:method/epsilon-greedy",
+  "lab:method/ucb1",
+  "lab:method/contextual-bandit"
+ ],
+ "basedOn": [
+  "inven_lineage_race",
+  "dailygame_lineage_race",
+  "sutton2018rl",
+  "auer2002ucb",
+  "alphabiz_lineage_classic"
+ ],
+ "educationalLevel": "입문",
+ "learningResourceType": "interactive explainer",
+ "registry": "KG_00_registry 0.2",
+ "suggestedCitation": "안상선 (2026). AI로 풀어보는 게임 시리즈 ⑤ 슬라임 레이스 — 강화학습은 모르는 확률을 어떻게 배울까? v1.0."
+}

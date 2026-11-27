@@ -1,0 +1,1112 @@
+{
+ "version": "1.3",
+ "page": "ai_game_lab_dice",
+ "nodes": [
+  {
+   "id": "lab:concept/poker-dice",
+   "type": "Concept",
+   "label": {
+    "ko": "다섯 주사위 포커(다이스)",
+    "en": "Poker dice"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "주사위 다섯 개를 굴리고 한 번 다시 굴려 족보로 겨룬다."
+   }
+  },
+  {
+   "id": "lab:concept/poker-dice-hands",
+   "type": "Concept",
+   "label": {
+    "ko": "족보",
+    "en": "Hand ranking"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "파이브다이스·포다이스·풀하우스·스트레이트·트리플·투페어·원페어·노페어."
+   }
+  },
+  {
+   "id": "lab:concept/counting-outcomes",
+   "type": "Concept",
+   "label": {
+    "ko": "경우의 수(7,776)",
+    "en": "Counting outcomes"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "주사위 다섯 개의 모든 결과는 6을 다섯 번 곱한 7,776가지."
+   }
+  },
+  {
+   "id": "lab:concept/classical-probability",
+   "type": "Concept",
+   "label": {
+    "ko": "확률 = 경우 수 ÷ 모든 경우",
+    "en": "Classical probability"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "모든 결과가 똑같이 잘 나올 때의 확률."
+   }
+  },
+  {
+   "id": "lab:method/exhaustive-enumeration",
+   "type": "Method",
+   "label": {
+    "ko": "모든 경우 세기(완전 열거)",
+    "en": "Exhaustive enumeration"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "다시 굴릴 주사위의 결과를 빠짐없이 늘어놓고 이기는 비율을 센다."
+   }
+  },
+  {
+   "id": "lab:concept/win-probability-choice",
+   "type": "Concept",
+   "label": {
+    "ko": "이길 확률로 고르기",
+    "en": "Choosing by win probability"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "남기기마다 상대 패를 넘을 확률을 구해 가장 높은 것을 고른다."
+   }
+  },
+  {
+   "id": "lab:method/monte-carlo",
+   "type": "Method",
+   "label": {
+    "ko": "몬테카를로 방법(굴려 보며 어림하기)",
+    "en": "Monte Carlo method"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "무작위로 많이 시험해 보고 이긴 비율로 확률을 어림한다."
+   }
+  },
+  {
+   "id": "lab:concept/law-of-large-numbers",
+   "type": "Concept",
+   "label": {
+    "ko": "큰수의 법칙",
+    "en": "Law of large numbers"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "시험 횟수가 늘수록 비율이 진짜 확률에 가까워진다. 흔들림은 횟수의 제곱근에 반비례."
+   }
+  },
+  {
+   "id": "lab:concept/gut-heuristic",
+   "type": "Concept",
+   "label": {
+    "ko": "감(같은 숫자 남기기)",
+    "en": "Keep-the-most-common heuristic"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "상대를 보지 않고 가장 많이 나온 숫자만 남기는 규칙."
+   }
+  },
+  {
+   "id": "lab:concept/expected-win-rate",
+   "type": "Concept",
+   "label": {
+    "ko": "기대 승률",
+    "en": "Expected win rate"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#duel",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "definition": {
+    "ko": "고른 선택의 이길 확률을 여러 판 평균한 값. 운을 걸러 낸 선택의 질."
+   }
+  },
+  {
+   "id": "lab:limitation/enumeration-blows-up",
+   "type": "Limitation",
+   "label": {
+    "ko": "경우가 많아지면 다 셀 수 없다",
+    "en": "Enumeration blows up"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/few-samples-noisy",
+   "type": "Limitation",
+   "label": {
+    "ko": "적게 굴려 보면 엉뚱한 선택",
+    "en": "Few samples are noisy"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:limitation/rules-adapted",
+   "type": "Limitation",
+   "label": {
+    "ko": "원작 세부 규칙은 각색",
+    "en": "Original rules adapted"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/retake-subjects",
+   "type": "Analogy",
+   "label": {
+    "ko": "잘하는 과목은 두고 몇 과목만 다시 공부하기",
+    "en": "Restudy a few subjects"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/count-roster",
+   "type": "Analogy",
+   "label": {
+    "ko": "출석부를 처음부터 끝까지 세기",
+    "en": "Counting the roster"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/taste-soup",
+   "type": "Analogy",
+   "label": {
+    "ko": "국을 저어 한 숟가락씩 여러 번 맛보기",
+    "en": "Tasting soup spoon by spoon"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:analogy/race-just-enough",
+   "type": "Analogy",
+   "label": {
+    "ko": "앞사람을 이길 만큼만 무리하기",
+    "en": "Push just enough to win"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/dice-play",
+   "type": "Simulation",
+   "label": {
+    "ko": "술집 탁자의 세 사람",
+    "en": "Play against two opponents"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/dice-count",
+   "type": "Simulation",
+   "label": {
+    "ko": "7,776가지 모두 세기",
+    "en": "Counting all 7,776 rolls"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/dice-keep",
+   "type": "Simulation",
+   "label": {
+    "ko": "남기기마다 이길 확률",
+    "en": "Win probability per keep"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/dice-mc",
+   "type": "Simulation",
+   "label": {
+    "ko": "굴려 보며 어림하기",
+    "en": "Monte Carlo estimates"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:sim/dice-duel",
+   "type": "Simulation",
+   "label": {
+    "ko": "굴려 보는 횟수가 다른 세 AI",
+    "en": "Three AIs with different sample sizes"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#duel",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:question/how-ai-chooses-by-probability",
+   "type": "Question",
+   "label": {
+    "ko": "AI는 확률로 어떻게 고를까?",
+    "en": "How does AI choose by probability?"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#top",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/namu_uw2",
+   "type": "Work",
+   "label": {
+    "ko": "나무위키 「대항해시대 2」",
+    "en": "Namuwiki: Uncharted Waters II"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/steemit_uw2",
+   "type": "Work",
+   "label": {
+    "ko": "알티의 인생 게임 대항해시대 2",
+    "en": "Steemit retrospective on UW2"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:work/metropolis1949mc",
+   "type": "Work",
+   "label": {
+    "ko": "Metropolis·Ulam 1949",
+    "en": "Metropolis & Ulam 1949"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:claim/uw2-dice-five-dice-poker",
+   "type": "Claim",
+   "label": {
+    "ko": "대항해시대 2의 다이스는 다섯 주사위 포커이고 세 사람이 겨룬다",
+    "en": "UW2 Dice is five-dice poker for three players"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "namu_uw2",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/uw2-tavern-gambling",
+   "type": "Claim",
+   "label": {
+    "ko": "대항해시대 2의 술집에서 블랙잭과 다이스를 할 수 있었다",
+    "en": "UW2 taverns offered blackjack and dice"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#top",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "steemit_uw2",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:claim/monte-carlo-1949",
+   "type": "Claim",
+   "label": {
+    "ko": "계산하기 어려운 문제는 무작위 시험으로 어림할 수 있다",
+    "en": "Hard problems can be estimated by random sampling"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 2,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": [],
+   "source": [
+    {
+     "ref": "metropolis1949mc",
+     "loc": "본문"
+    }
+   ]
+  },
+  {
+   "id": "lab:quiz/dice-c1-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c1 문제 1",
+    "en": "Quiz c1-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c1-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c1 문제 2",
+    "en": "Quiz c1-2"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c1",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c2-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c2 문제 1",
+    "en": "Quiz c2-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c2",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c3-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c3 문제 1",
+    "en": "Quiz c3-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c3-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c3 문제 2",
+    "en": "Quiz c3-2"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c3",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c4-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c4 문제 1",
+    "en": "Quiz c4-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c4-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c4 문제 2",
+    "en": "Quiz c4-2"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c4",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c5-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c5 문제 1",
+    "en": "Quiz c5-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-c5-2",
+   "type": "QuizItem",
+   "label": {
+    "ko": "c5 문제 2",
+    "en": "Quiz c5-2"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#c5",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  },
+  {
+   "id": "lab:quiz/dice-duel-1",
+   "type": "QuizItem",
+   "label": {
+    "ko": "duel 문제 1",
+    "en": "Quiz duel-1"
+   },
+   "page": "ai_game_lab_dice",
+   "anchor": "#duel",
+   "level": 1,
+   "status": "known",
+   "confidence": "high",
+   "coverage": "explained",
+   "family": "probability",
+   "domain": [
+    "ai"
+   ],
+   "match": []
+  }
+ ],
+ "edges": [
+  {
+   "s": "lab:analogy/retake-subjects",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/win-probability-choice",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/count-roster",
+   "p": "lab:analogyOf",
+   "o": "lab:method/exhaustive-enumeration",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/taste-soup",
+   "p": "lab:analogyOf",
+   "o": "lab:method/monte-carlo",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:analogy/race-just-enough",
+   "p": "lab:analogyOf",
+   "o": "lab:concept/win-probability-choice",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/counting-outcomes",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/classical-probability",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/classical-probability",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/exhaustive-enumeration",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/exhaustive-enumeration",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/win-probability-choice",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/classical-probability",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/monte-carlo",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/law-of-large-numbers",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:method/monte-carlo",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/win-probability-choice",
+   "p": "lab:prerequisiteOf",
+   "o": "lab:concept/expected-win-rate",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/poker-dice-hands",
+   "p": "lab:partOf",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/exhaustive-enumeration",
+   "p": "lab:solves",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo",
+   "p": "lab:solves",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo",
+   "p": "lab:contrastsWith",
+   "o": "lab:method/exhaustive-enumeration",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/win-probability-choice",
+   "p": "lab:contrastsWith",
+   "o": "lab:concept/gut-heuristic",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/exhaustive-enumeration",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/enumeration-blows-up",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:limitation/enumeration-blows-up",
+   "p": "lab:addressedBy",
+   "o": "lab:method/monte-carlo",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/few-samples-noisy",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/poker-dice",
+   "p": "lab:hasLimitation",
+   "o": "lab:limitation/rules-adapted",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/poker-dice",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/dice-play",
+   "anchor": "#c2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/counting-outcomes",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/dice-count",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/exhaustive-enumeration",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/dice-keep",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/dice-mc",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/expected-win-rate",
+   "p": "lab:demonstratedBy",
+   "o": "lab:sim/dice-duel",
+   "anchor": "#duel",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/poker-dice",
+   "p": "lab:raises",
+   "o": "lab:question/how-ai-chooses-by-probability",
+   "anchor": "#top",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-dice-five-dice-poker",
+   "p": "lab:supports",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-dice-five-dice-poker",
+   "p": "lab:assertedIn",
+   "o": "lab:work/namu_uw2",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-tavern-gambling",
+   "p": "lab:supports",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#top",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/uw2-tavern-gambling",
+   "p": "lab:assertedIn",
+   "o": "lab:work/steemit_uw2",
+   "anchor": "#top",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/monte-carlo-1949",
+   "p": "lab:supports",
+   "o": "lab:method/monte-carlo",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:claim/monte-carlo-1949",
+   "p": "lab:assertedIn",
+   "o": "lab:work/metropolis1949mc",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/classical-probability",
+   "p": "lab:broader",
+   "o": "lab:topic/probability-statistics",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:method/monte-carlo",
+   "p": "lab:broader",
+   "o": "lab:topic/probability-statistics",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/law-of-large-numbers",
+   "p": "lab:broader",
+   "o": "lab:topic/probability-statistics",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:concept/win-probability-choice",
+   "p": "lab:broader",
+   "o": "lab:topic/value-function",
+   "anchor": "#sum",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c1-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/poker-dice",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c1-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/poker-dice-hands",
+   "anchor": "#c1",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c2-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/win-probability-choice",
+   "anchor": "#c2",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c3-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/counting-outcomes",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c3-2",
+   "p": "lab:assesses",
+   "o": "lab:concept/poker-dice-hands",
+   "anchor": "#c3",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c4-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/win-probability-choice",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c4-2",
+   "p": "lab:assesses",
+   "o": "lab:method/exhaustive-enumeration",
+   "anchor": "#c4",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c5-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/law-of-large-numbers",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-c5-2",
+   "p": "lab:assesses",
+   "o": "lab:limitation/few-samples-noisy",
+   "anchor": "#c5",
+   "confidence": "high"
+  },
+  {
+   "s": "lab:quiz/dice-duel-1",
+   "p": "lab:assesses",
+   "o": "lab:concept/expected-win-rate",
+   "anchor": "#duel",
+   "confidence": "high"
+  }
+ ]
+}

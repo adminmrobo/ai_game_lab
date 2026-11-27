@@ -34,12 +34,19 @@ function attach(H,kg,refs,meta){
 const fill=s=>s.replace('<!--@@CSS@@-->',()=>'<style>\n'+css+'\n</style>').replace('/*@@SPRITES@@*/',()=>sprites).replace('/*@@COMMON@@*/',()=>common);
 function out(rel,H){const f=path.join(R,rel);fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,H);console.log(rel,(Buffer.byteLength(H)/1024).toFixed(0)+' KB');}
 // 시리즈 목차
-out('index.html',fill(rd('series/index.src.html')));
+out('index.html',fill(rd('series/index.src.html')).replace(/<!--@@THUMB:(\w+)@@-->/g,(m,g)=>fs.existsSync(path.join(R,g,'img',g+'_cover_960.webp'))?'<img src="'+g+'/img/'+g+'_cover_960.webp" width="960" height="540" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">':rd(g+'/thumb.svg.html')));
 // 게임 페이지
 const pagecss=rd('page.css'),sfx=rd('sfx.js');
-const GAMES=[['sudoku','sudoku.js'],['coin','coin.js']];
-for(const [game,engine] of GAMES){const d=game+'/';
-  let H=fill(rd(d+'src.html')).replace('/*@@PAGECSS@@*/',()=>pagecss).replace('/*@@ENGINE@@*/',()=>rd(d+engine)).replace('/*@@SUDOKU@@*/',()=>rd(d+engine)).replace('/*@@SFX@@*/',()=>sfx);
+const GAMES=[['sudoku','sudoku.js'],['coin','coin.js'],['dice','dice.js'],['blackjack','bj.js'],['slime','slime.js']];
+const gamecss=rd('game.css'),gamejs=rd('game.js');
+// ③~⑤: 표지 그림(<게임>/img/<게임>_cover.webp)이 있으면 그림, 없으면 임시 표지(build/<게임>/cover.html)
+function coverHTML(game){const img=path.join(R,game,'img',game+'_cover.webp');const alt=fs.existsSync(path.join(B,game,'cover_alt.txt'))?rd(game+'/cover_alt.txt').trim():'';
+  if(fs.existsSync(img))return '<picture><source type="image/webp" srcset="img/'+game+'_cover_960.webp 960w, img/'+game+'_cover.webp 1600w" sizes="(max-width:1080px) 100vw, 1080px"><img class="art" src="img/'+game+'_cover.webp" width="1600" height="900" alt="'+esc(alt)+'" fetchpriority="high" decoding="async"></picture>';
+  return rd(game+'/cover.html');}
+for(const [game,engine] of GAMES){const d=game+'/';if(!fs.existsSync(path.join(B,d+'src.html')))continue;
+  let H=fill(rd(d+'src.html')).replace('/*@@PAGECSS@@*/',()=>pagecss).replace('/*@@ENGINE@@*/',()=>rd(d+engine)).replace('/*@@SUDOKU@@*/',()=>rd(d+engine)).replace('/*@@SFX@@*/',()=>sfx).replace('/*@@GAMECSS@@*/',()=>gamecss).replace('/*@@GAMEJS@@*/',()=>gamejs);
+  if(H.includes('<!--@@COVER@@-->'))H=H.replace('<!--@@COVER@@-->',()=>coverHTML(game));
+  if(fs.existsSync(path.join(B,d+'nums.json'))){const N=JSON.parse(rd(d+'nums.json'));H=H.replace(/@@([A-Z0-9_]+)@@/g,(m,k)=>{if(!(k in N))throw new Error(game+': 숫자 '+k+' 없음');return N[k];});}
   if(fs.existsSync(path.join(B,d+'puzzles.json')))H=H.replace('/*@@PUZZLES@@*/null',()=>JSON.stringify(JSON.parse(rd(d+'puzzles.json'))));
   H=attach(H,JSON.parse(rd(d+'kg.json')),JSON.parse(rd(d+'refs.json')),JSON.parse(rd(d+'meta.json')));
   out(game+'/index.html',H);}

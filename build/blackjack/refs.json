@@ -1,0 +1,124 @@
+[
+ {
+  "id": "namu_uw2",
+  "type": "webpage",
+  "title": "대항해시대 2",
+  "author": [
+   {
+    "literal": "나무위키"
+   }
+  ],
+  "URL": "https://namu.wiki/w/%EB%8C%80%ED%95%AD%ED%95%B4%EC%8B%9C%EB%8C%80%202",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/namu_uw2",
+   "role": "primary",
+   "supports": [
+    "lab:concept/blackjack-hit-stand"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ },
+ {
+  "id": "sutton2018rl",
+  "type": "book",
+  "title": "Reinforcement Learning: An Introduction",
+  "author": [
+   {
+    "family": "Sutton",
+    "given": "Richard S."
+   },
+   {
+    "family": "Barto",
+    "given": "Andrew G."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2018
+    ]
+   ]
+  },
+  "edition": "2",
+  "publisher": "MIT Press",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/sutton2018rl",
+   "role": "background",
+   "supports": [
+    "lab:method/monte-carlo-control"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값"
+  }
+ },
+ {
+  "id": "thorp1962",
+  "type": "book",
+  "title": "Beat the Dealer",
+  "author": [
+   {
+    "family": "Thorp",
+    "given": "Edward O."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     1962
+    ]
+   ]
+  },
+  "publisher": "Random House",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/thorp1962",
+   "role": "background",
+   "supports": [
+    "lab:concept/policy-table"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값"
+  }
+ }
+]

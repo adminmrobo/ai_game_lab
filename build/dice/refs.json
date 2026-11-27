@@ -1,0 +1,118 @@
+[
+ {
+  "id": "namu_uw2",
+  "type": "webpage",
+  "title": "대항해시대 2",
+  "author": [
+   {
+    "literal": "나무위키"
+   }
+  ],
+  "URL": "https://namu.wiki/w/%EB%8C%80%ED%95%AD%ED%95%B4%EC%8B%9C%EB%8C%80%202",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/namu_uw2",
+   "role": "primary",
+   "supports": [
+    "lab:concept/poker-dice"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ },
+ {
+  "id": "steemit_uw2",
+  "type": "webpage",
+  "title": "[알티의 인생 게임] 대항해시대 2",
+  "author": [
+   {
+    "literal": "rt4u (Steemit)"
+   }
+  ],
+  "URL": "https://steemit.com/krgame/@rt4u/7yvrjf-2",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/steemit_uw2",
+   "role": "background",
+   "supports": [
+    "lab:concept/poker-dice"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ },
+ {
+  "id": "metropolis1949mc",
+  "type": "article-journal",
+  "title": "The Monte Carlo Method",
+  "author": [
+   {
+    "family": "Metropolis",
+    "given": "Nicholas"
+   },
+   {
+    "family": "Ulam",
+    "given": "Stanislaw"
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     1949
+    ]
+   ]
+  },
+  "container-title": "Journal of the American Statistical Association",
+  "volume": "44",
+  "issue": "247",
+  "page": "335-341",
+  "DOI": "10.1080/01621459.1949.10483310",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/metropolis1949mc",
+   "role": "background",
+   "supports": [
+    "lab:method/monte-carlo"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값, 원문 대조 필요"
+  }
+ }
+]

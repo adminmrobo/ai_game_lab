@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI로 풀어보는 게임 시리즈 ⑤ 슬라임 레이스 — 강화학습은 모르는 확률을 어떻게 배울까?</title>
+<meta name="description" content="옛 온라인 게임의 슬라임 경주장을 각색한 '연구실 슬라임 레이스'에서, 하루·시아·모아가 어느 슬라임을 응원할지 해 보며 배우는 강화학습(탐험과 활용, UCB, 상태 보고 고르기)을 따라가는 연구실 해설.">
+<meta property="og:title" content="슬라임 레이스 — 강화학습은 모르는 확률을 어떻게 배울까? (AI로 풀어보는 게임 시리즈 ⑤)">
+<meta property="og:description" content="진짜 승률은 아무도 모릅니다. 응원하고, 결과를 보고, 다시 고르며 배웁니다. 탐험과 활용의 줄다리기.">
+<meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/slime/img/slime_cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!--@@CSS@@-->
+<style>
+/*@@PAGECSS@@*/
+/*@@GAMECSS@@*/
+.track{position:relative;background:linear-gradient(#9fd3f2 0 14%,#7cbf5a 14% 20%,#d9b27a 20%);border:6px solid #6b4423;border-radius:14px;padding:46px 12px 10px;overflow:hidden}
+.trk{position:relative;height:54px;border-bottom:2px dashed rgba(255,255,255,.7)}
+.trk .sl{position:absolute;left:0;top:4px;width:46px;height:46px;transition:left .12s linear;image-rendering:pixelated}
+.trk .sl svg{width:100%;height:100%;display:block}
+.trk .tag{position:absolute;left:52px;top:14px;font-size:12.5px;font-weight:700;color:#5b3a1f;background:rgba(255,255,255,.75);border-radius:6px;padding:0 6px;white-space:nowrap}
+.trk.mine .tag{background:#ffe36b}
+.finish{position:absolute;right:30px;top:40px;bottom:6px;width:8px;background:repeating-linear-gradient(#fff 0 6px,#16212b 6px 12px)}
+.trk .sl.hop{animation:hop .3s infinite}
+@keyframes hop{50%{transform:translateY(-18%) scaleX(.92)}}
+@media(prefers-reduced-motion:reduce){.trk .sl.hop{animation:none}.trk .sl{transition:none}}
+.booth{position:absolute;left:12px;top:6px;display:flex;gap:8px;align-items:center;color:#16212b;font-size:13px;font-weight:700}
+.booth img{width:34px;height:34px;background:#fff;border-radius:8px;border:2px solid var(--c-robo)}
+.picks{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+@media(max-width:700px){.picks{grid-template-columns:repeat(2,1fr)}}
+.picks button{font:inherit;display:flex;gap:8px;align-items:center;text-align:left;background:#fff;border:2px solid var(--rule);border-radius:10px;padding:6px 8px;cursor:pointer}
+.picks button svg{width:34px;height:34px;flex:none}
+.picks button small{display:block;color:var(--muted);font-size:12px}
+.picks button[aria-pressed="true"]{border-color:#a35c00;background:#fff6d6}
+.picks .c0{color:#13733a}.picks .c2{color:#c9302c}
+.est{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+.est td,.est th{border:1px solid var(--rule);padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums}
+.est th{background:var(--panel2);color:var(--muted)}
+.est td.nm{text-align:left;white-space:nowrap}
+.est td.nm svg{width:22px;height:22px;vertical-align:-6px;margin-right:4px}
+.est .pick{background:#fff6d6;font-weight:700}
+.est .truth{color:var(--stain)}
+.est .bar{display:inline-block;height:10px;background:var(--terrain);border-radius:3px;vertical-align:middle}
+.cnt{display:grid;grid-template-columns:150px 1fr 120px;gap:10px;align-items:center;font-size:14px;margin:5px 0}
+.cnt .bar{height:16px;background:var(--panel2);border-radius:4px;overflow:hidden}
+.cnt .bar i{display:block;height:100%}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="섹션 바로가기"><div class="row">
+  <a class="logo" href="../index.html">AI로 풀어보는 <i>게임</i> · 슬라임 레이스</a>
+  <div class="links">
+    <a href="../index.html">← 시리즈</a><a href="#c1">1 경주장</a><a href="#c2">2 응원하기</a><a href="#c3">3 탐험과 활용</a><a href="#c4">4 덤 주기</a><a href="#c5">5 상태 보기</a><a href="#duel">대결</a><a href="#sum">정리</a><a href="#kg">색인</a><a href="#export">꾸러미</a>
+  </div>
+</div></nav>
+
+<!-- lab-cover -->
+<div class="cover" id="cover" data-img="slime_cover"><div class="frame" id="coverframe">
+  <!--@@COVER@@-->
+  <span class="cover-chip">AI로 풀어보는 게임 시리즈 · ⑤ 슬라임 레이스</span>
+</div></div>
+<!-- /lab-cover -->
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow"><a href="../index.html">AI로 풀어보는 게임 시리즈</a> · ⑤ 슬라임 레이스</div>
+  <h1>슬라임 레이스 — 강화학습은 모르는 확률을 어떻게 배울까?</h1>
+  <p class="question">2000년 무렵 온라인 게임 「리니지」의 마을에는 슬라임 경주장이 있었습니다. 매표소에서 슬라임의 승률과 상태를 보고 표를 사서, 1등을 맞히면 배당만큼 돌려받았지요 [1][2]. 진짜 승률을 모른 채 표를 사야 한다면, AI는 어떻게 배울까요?</p>
+  <p class="lead">연구실 앞마당에 작은 슬라임 경주장을 만들었습니다. 표는 쿠키 한 개짜리 응원권이고, 매표소는 주판봇이 지킵니다. 하루·시아·모아가 응원해 본 뒤, 해 보며 배우는 AI — 강화학습의 가장 단순한 모양 — 이 "탐험할까, 아는 걸 쓸까"를 어떻게 저울질하는지 따라갑니다.</p>
+  <p class="byline">글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · 2026-11-27 · v1.0</p>
+  <div class="three"><b>처음 오신 분께 — 이 페이지를 3줄로</b><ol>
+    <li><b>무엇을</b>: 다섯 슬라임 중 어디에 응원권을 걸지 정하는 AI가, 진짜 승률을 모르는 채 결과만 보고 배우는 과정을 봅니다. ① 가끔 일부러 딴 슬라임도 해 보기(탐험과 활용) ② 덜 해 본 슬라임에 덤 주기(UCB) ③ 그날 상태까지 보고 고르기.</li>
+    <li><b>왜 중요한가</b>: 아는 것만 쓰면 더 좋은 선택을 영영 못 찾고, 탐험만 하면 손해를 봅니다. 이 줄다리기가 강화학습의 핵심이고, 광고·추천·임상시험 배정에도 그대로 쓰입니다.</li>
+    <li><b>일상·현장에서는</b>: 늘 가던 식당에 갈까, 새 식당을 가 볼까 — 우리가 매일 하는 고민과 같습니다.</li></ol>
+    <p class="calm" style="margin:8px 0 0">코드나 수식을 몰라도 됩니다. 쿠키는 연습용이고 돈은 오가지 않습니다. 슬라임 이름·그림·경주 규칙은 이 페이지에서 새로 만든 것입니다.</p>
+    <details class="fold"><summary>영어 약어 풀이</summary><p><b>AI</b> 인공지능 · <b>ε(엡실론)-탐욕</b> 대개는 가장 좋아 보이는 것, ε 비율로는 아무거나 고르는 방법 · <b>UCB</b> Upper Confidence Bound, 덜 해 본 선택에 "혹시 모를 몫"을 덤으로 얹어 주는 방법</p></details>
+  </div>
+  <div class="kpis" aria-label="숫자 요약">
+    <div class="kpi r"><b>@@EV_FAV@@</b><span>인기 1위 말랑이에 늘 걸 때, 쿠키 1개당 돌려받는 몫<sup>①</sup></span></div>
+    <div class="kpi m"><b>@@EV_BEST@@</b><span>진짜로 가장 좋은 슬라임(몽글이)의 몫<sup>①</sup></span></div>
+    <div class="kpi a"><b>@@FOUND_UCB@@</b><span>1,000번 경주로 UCB가 몽글이를 찾아낸 비율<sup>②</sup></span></div>
+    <div class="kpi g"><b>@@CTX_NET@@</b><span>상태까지 보고 고른 AI의 1,000번 경주 쿠키 수지<sup>②</sup></span></div>
+  </div>
+  <p class="muted" style="font-size:13px">① 이 페이지의 경주를 20만 번 돌려 얻은 값입니다(1보다 작으면 길게 할수록 잃음). ② 씨앗을 바꿔 20번 해 본 평균입니다(4·5단계).</p>
+</div></header>
+
+<main>
+<section class="sec" id="cast" aria-labelledby="h-cast"><div class="wrap">
+  <h2 id="h-cast">오늘의 플레이어와 연구실 식구</h2>
+  <div class="cast" id="castgrid"></div>
+  <div class="secret"><button class="bt" id="secretbtn" type="button" aria-expanded="false">방청석 보기 (미공개 식구)</button><div class="row" id="secretrow" hidden></div></div>
+  <div data-dlg="hero"></div>
+</div></section>
+
+<!-- 단계 1 -->
+<section class="sec" id="c1" aria-labelledby="h-c1"><div class="wrap">
+  <h2 id="h-c1"><span class="hex">1</span>어떤 경주일까 — 연구실 슬라임 경주장 <span class="sub">박사의 규칙 설명</span></h2>
+  <div data-dlg="c1"></div>
+  <p>원작의 슬라임 경주는 짧은 직선 트랙에서 슬라임들이 달리고, 사람들은 승률과 상태를 보고 표를 사서 1등을 맞히는 미니게임이었습니다 [1][2]. 이 페이지는 그 틀만 빌려 새 경주장을 만들었습니다.</p>
+  <div class="rules">
+    <div><b>① 슬라임 다섯 마리</b>말랑이·퐁당이·몽글이·쫀득이·출렁이. 빠르기는 조금씩 다르지만 <b>얼마나 빠른지는 아무도 모릅니다</b>(숨김).</div>
+    <div><b>② 그날의 상태</b>경주마다 슬라임마다 상태가 좋음·보통·나쁨 중 하나로 정해져 공개됩니다. 상태가 좋으면 조금 더 빨리 뜁니다.</div>
+    <div><b>③ 응원권</b>쿠키 1개로 한 마리를 응원합니다. 1등을 맞히면 <b>배당만큼</b> 쿠키를 돌려받고, 못 맞히면 0개. 배당은 늘 같습니다.</div>
+  </div>
+  <div class="tblwrap"><table class="est" id="c1-tbl"></table></div>
+  <div class="pair">
+    <div><div class="tl">일상으로 치면</div>새 동네로 이사 와서 점심 식당을 고르는 일과 같습니다. 어느 집이 맛있는지는 가 봐야 압니다. 늘 가는 집만 가면 더 맛있는 집을 모르고, 매일 새 집만 가면 실패도 많습니다.</div>
+    <div><div class="tr">AI에서는</div>보상의 확률을 모르는 채 선택지 중 하나를 고르고, 결과(보상)를 보고 다시 고르는 문제를 <b>다중 슬롯머신 문제</b>(멀티암드 밴딧)라고 합니다. 강화학습 교과서가 가장 먼저 다루는, 강화학습의 가장 단순한 모양입니다 [3].</div>
+  </div>
+  <p class="calm">이 페이지의 배당은 일부러 고정해 두었습니다. 진짜 경주장과 도박장은 배당을 정할 때 손님이 길게 하면 잃도록 정합니다. 이 경주장도 다섯 마리 중 네 마리는 "돌려받는 몫"이 1보다 작습니다(3단계에서 열어 봅니다).</p>
+  <div class="quiz" data-quiz="c1"></div>
+</div></section>
+
+<!-- 단계 2 -->
+<section class="sec" id="c2" aria-labelledby="h-c2"><div class="wrap">
+  <h2 id="h-c2"><span class="hex">2</span>직접 응원하기 — 오늘은 누가 1등? <span class="sub">모아의 도전</span></h2>
+  <div data-dlg="c2"></div>
+  <div class="panel game" id="play">
+    <div class="ptitle">슬라임 레이스 — 한 마리를 고르고 "출발!" (응원권 = 쿠키 1개)</div>
+    <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
+      <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 기록표 보기</label></div></div>
+    <div class="picks" id="pl-picks" role="group" aria-label="응원할 슬라임"></div>
+    <div class="track" id="pl-track"><div class="booth"><img id="booth-robo" alt="">매표소 · 주판봇</div><div class="finish"></div><div id="pl-lanes"></div></div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-go">출발!</button><button class="bt" type="button" id="pl-next">다음 경주(상태 새로)</button></div></div>
+    <div id="pl-say" aria-live="polite"></div>
+    <div class="minis"><div class="mini a"><span>응원한 경주</span><b id="pl-n">0</b></div><div class="mini g"><span>맞힌 경주</span><b id="pl-w">0</b></div><div class="mini m"><span>쿠키 수지</span><b id="pl-net">0</b></div><div class="mini r"><span>지금 응원</span><b id="pl-pick" style="font-size:16px">—</b></div></div>
+    <div id="pl-rec"></div>
+    <div class="glog" id="pl-log" aria-live="polite"></div>
+  </div>
+  <p class="calm">열 번쯤 응원해 보세요. 몇 번 맞혔다고 그 슬라임이 좋은 건지, 운이 좋았던 건지 — 그게 이 페이지의 질문입니다.</p>
+  <div class="quiz" data-quiz="c2"></div>
+</div></section>
+
+<!-- 단계 3 -->
+<section class="sec" id="c3" aria-labelledby="h-c3"><div class="wrap">
+  <h2 id="h-c3"><span class="hex">3</span>탐험과 활용 — 아는 걸 쓸까, 새로 해 볼까 <span class="sub">시아의 정리 · AI 방법 ①</span></h2>
+  <div data-dlg="c3a"></div>
+  <p>AI는 슬라임마다 "응원권 1장에 평균 몇 쿠키를 돌려받았나"를 적어 둡니다. 이 평균이 가장 높은 슬라임을 고르는 것을 <b>활용</b>, 일부러 다른 슬라임을 골라 보는 것을 <b>탐험</b>이라고 부릅니다. 가장 쉬운 규칙은 "대개는 활용, 열 번에 한 번(ε = 0.1)은 아무 슬라임이나"입니다 — <b>ε-탐욕</b>.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 일부러 탐험하나</h4>
+      <ol><li><b>문제 상황</b>: 처음 몇 번의 결과는 운이 큽니다. 첫 경주에서 말랑이로 이기면 말랑이의 평균이 2.6, 나머지는 0입니다.</li>
+        <li><b>앞 방법의 한계</b>: 늘 평균이 가장 높은 것만 고르면(탐험 0) 말랑이만 계속 고르게 되고, 다른 슬라임의 평균은 영영 0으로 남습니다. 몽글이가 진짜로 더 좋아도 알 길이 없습니다.</li>
+        <li><b>해법</b>: 가끔 아무 슬라임이나 응원해 모든 슬라임의 평균을 계속 고쳐 갑니다. 대신 탐험한 만큼은 손해를 감수합니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 단골집이 있어도 열 번에 한 번은 새 식당에 가 보는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> "돌려받는 몫"이 1보다 크면 좋은 거죠? 그건 어떻게 알아요?</p></div>
+      <div class="words"><b>응원권 1장으로 평균 몇 쿠키를 돌려받는지예요.</b> 1이면 본전, 1보다 크면 남고, 작으면 잃어요. 진짜 몫은 "1등 할 확률 × 배당"인데, 확률을 모르니 AI는 응원해 본 결과의 평균으로 어림합니다.</div>
+      <div class="pic"><table class="tbl2"><tr><th></th><th>1등 할 확률(숨김)</th><th>배당</th><th>돌려받는 몫</th></tr><tr><td>말랑이(인기 1위)</td><td>@@P_FAV@@</td><td>2.6배</td><td><b>@@EV_FAV@@</b></td></tr><tr><td>몽글이</td><td>@@P_BEST@@</td><td>5.6배</td><td><b>@@EV_BEST@@</b></td></tr></table></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 몽글이를 10번 응원해 2번 이기면 돌려받은 쿠키 5.6 × 2 = 11.2개, 평균 1.12. 1번 이기면 0.56, 3번 이기면 1.68. 열 번으로는 평균이 이렇게 크게 흔들립니다.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 자주 이기는 말랑이보다, 덜 이겨도 배당이 큰 몽글이가 더 남을 수 있는 거군요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">진짜 몫 = P(1등) × 배당 · 어림한 몫 = 돌려받은 쿠키의 평균</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>ε</td><td>탐험 비율. 0.1이면 열 번에 한 번 아무 슬라임</td></tr><tr><td>평균 고치기</td><td>새 평균 = 옛 평균 + (이번 결과 − 옛 평균) ÷ 그 슬라임을 고른 횟수(④편과 같음)</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 기댓값(확률 × 값)과 평균입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">ε-탐욕 AI — 슬라임별로 고른 횟수와 어림한 몫</div>
+    <div class="ctrl"><div class="group"><span class="glabel">탐험 비율 ε</span><span class="tabs" id="eg-eps"></span></div>
+      <div class="group"><button class="bt primary" type="button" id="eg-10">10번 경주</button><button class="bt" type="button" id="eg-100">100번</button><button class="bt" type="button" id="eg-1000">1,000번</button><button class="bt" type="button" id="eg-0">처음부터</button></div>
+      <div class="group"><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="eg-truth"> 진짜 몫 열어 보기</label></div></div>
+    <table class="est" id="eg-tbl"></table>
+    <div class="minis"><div class="mini a"><span>경주 수</span><b id="eg-n">0</b></div><div class="mini m"><span>쿠키 수지</span><b id="eg-net">0</b></div><div class="mini g"><span>지금 가장 좋아 보이는 슬라임</span><b id="eg-best" style="font-size:16px">—</b></div><div class="mini r"><span>탐험한 횟수</span><b id="eg-ex">0</b></div></div>
+    <div class="insight" id="eg-i" aria-live="polite"></div>
+  </div>
+  <div class="aicheck" id="aic">
+    <h4>AI 판단 코너 — "늘 1등을 제일 많이 하는 슬라임에 걸면 남는다", 맞을까?</h4>
+    <div id="aic-say"></div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="aic-go">말랑이만 1,000번 응원해 보기</button></div></div>
+    <div class="insight" id="aic-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c3"></div>
+</div></section>
+
+<!-- 단계 4 -->
+<section class="sec" id="c4" aria-labelledby="h-c4"><div class="wrap">
+  <h2 id="h-c4"><span class="hex">4</span>똑똑하게 탐험하기 — 덜 해 본 쪽에 덤 주기(UCB) <span class="sub">모아의 질문 · AI 방법 ②</span></h2>
+  <div data-dlg="c4a"></div>
+  <p>ε-탐욕의 탐험은 눈을 감고 아무거나 고릅니다. 이미 100번 해 봐서 나쁜 줄 아는 출렁이도, 겨우 3번 해 본 몽글이도 똑같이 고르지요. <b>UCB</b>는 다르게 탐험합니다. 평균에 <b>"아직 잘 모르는 만큼의 덤"</b>을 얹어 주고, 덤을 얹은 점수가 가장 높은 슬라임을 고릅니다 [4].</p>
+  <ol class="steps5">
+    <li><b>평균을 적는다</b>: ε-탐욕과 같습니다.</li>
+    <li><b>덤을 얹는다</b>: 적게 해 본 슬라임일수록 덤이 큽니다. 전체 경주가 쌓이면 덤도 천천히 커져서, 오래 안 고른 슬라임은 언젠가 다시 고르게 됩니다.</li>
+    <li><b>덤 얹은 점수가 가장 높은 슬라임을 고른다</b>: 평균이 높거나, 아직 잘 몰라서 혹시 좋을지도 모르는 쪽.</li>
+  </ol>
+  <div class="why2">
+    <div class="whyb"><h4>왜 덤을 주나</h4>
+      <ol><li><b>문제 상황</b>: 탐험은 필요하지만, 아무거나 고르는 탐험은 이미 나쁜 걸 아는 슬라임에도 쿠키를 씁니다.</li>
+        <li><b>앞 방법의 한계</b>: ε-탐욕은 언제나 같은 비율로 탐험해서, 1,000번째 경주에서도 열 번에 한 번은 아무거나 고릅니다.</li>
+        <li><b>해법</b>: "모르는 것"에만 탐험을 몰아줍니다. 많이 해 본 슬라임은 덤이 작아 평균대로 평가받고, 덜 해 본 슬라임만 덤으로 기회를 얻습니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 한 번 가 본 식당은 "한 번 운이 나빴을 수도" 하며 점수를 조금 후하게 쳐주고, 열 번 가 본 식당은 아는 만큼만 쳐준다.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 덤은 얼마나 줘요? 마음대로요?</p></div>
+      <div class="words"><b>해 본 횟수가 4배가 되면 덤은 절반이 돼요.</b> 그만큼 평균을 믿을 수 있게 됐으니까요. 그리고 전체 경주 수가 늘면 덤이 아주 천천히 커져서, 너무 오래 안 고른 슬라임도 다시 한 번 기회를 얻습니다.</div>
+      <div class="pic"><table class="tbl2"><tr><th>그 슬라임을 해 본 횟수(전체 100번 중)</th><th>덤(이 페이지의 크기)</th></tr><tr><td>4번</td><td>약 1.07</td></tr><tr><td>16번</td><td>약 0.54</td></tr><tr><td>64번</td><td>약 0.27</td></tr></table></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 말랑이는 64번 해서 평균 0.80, 덤 0.27 → 1.07점. 몽글이는 4번 해서 평균 0.00(아직 못 이김), 덤 1.07 → 1.07점. 거의 같아서, 운이 없던 몽글이에게도 다시 기회가 갑니다.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 몇 번 져서 평균이 0인 슬라임도 "아직 모른다"는 덤 덕분에 버려지지 않는군요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">점수 = 평균 + k × √( ln(전체 경주 수) ÷ 그 슬라임 횟수 )</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>k</td><td>덤의 크기. 이 페이지는 1</td></tr><tr><td>√(… ÷ 횟수)</td><td>횟수가 4배면 덤은 절반</td></tr><tr><td>ln(전체 경주 수)</td><td>전체가 늘면 아주 천천히 커짐(자연로그)</td></tr></table><p style="font-size:14px;margin:6px 0 0">ln 100 ≈ 4.6, √(4.6 ÷ 4) ≈ 1.07. <b>학교 수학으로 보면</b> 제곱근과 로그입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">세 가지 탐험 방법, 각각 20번씩 1,000번 경주 — 가장 좋은 슬라임(몽글이)을 찾아냈나?</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="ub-go">20번씩 돌려 보기</button></div></div>
+    <div id="ub-res"></div>
+    <div class="insight" id="ub-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c4"></div>
+</div></section>
+
+<!-- 단계 5 -->
+<section class="sec" id="c5" aria-labelledby="h-c5"><div class="wrap">
+  <h2 id="h-c5"><span class="hex">5</span>상태 보고 고르기 — 맥락이 있는 강화학습 <span class="sub">하루의 차례 · AI 방법 ③</span></h2>
+  <div data-dlg="c5a"></div>
+  <p>3·4단계의 AI는 슬라임 이름만 봤습니다. 그런데 경주장에는 <b>그날의 상태</b>가 공개됩니다. 이번 AI는 평균을 (슬라임 × 그날 상태) 15가지로 나눠 적고, 경주마다 공개된 상태에 맞는 평균(+ UCB의 덤)으로 고릅니다. 이렇게 상황(맥락)을 보고 고르는 방법을 <b>맥락 밴딧</b>이라고 부르고, 상황이 다음 상황으로 이어지면 ②·④편의 강화학습이 됩니다.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 상태까지 보나</h4>
+      <ol><li><b>문제 상황</b>: 몽글이는 평균으로는 가장 좋지만, 상태가 나쁜 날엔 돌려받는 몫이 @@EV_BEST_BAD@@로 뚝 떨어집니다. 반대로 출렁이는 평균은 나쁘지만 상태가 좋은 날은 @@EV_LAST_GOOD@@입니다.</li>
+        <li><b>앞 방법의 한계</b>: 이름만 보는 AI는 "평균적으로" 가장 좋은 한 마리에만 걸어서, 날마다 바뀌는 기회를 놓칩니다.</li>
+        <li><b>해법</b>: 보이는 정보(상태)마다 따로 배우면, 그날그날 가장 좋은 슬라임을 고를 수 있습니다. 대신 배울 평균이 5개에서 15개로 늘어 처음엔 더 오래 헤맵니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> "그 식당이 맛있다"가 아니라 "비 오는 날엔 그 집 칼국수"까지 기억하는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 평균을 15개로 나누면 하나하나는 더 적게 해 보게 되잖아요. 괜찮아요?</p></div>
+      <div class="words"><b>처음엔 손해, 나중엔 이득이에요.</b> 여럿으로 나누면 하나당 경험이 적어 처음엔 흔들리지만, 몇백 번이 지나면 "상태 좋은 날의 쫀득이"처럼 이름만 봐서는 안 보이던 기회를 잡습니다.</div>
+      <div class="pic"><table class="est" id="c5-pic"></table><div class="muted" style="font-size:13px;margin-top:6px">숫자 = 상태별 진짜 몫(20만 번 경주로 계산, AI는 모름). 1보다 크면 남는 응원.</div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 오늘 몽글이 "나쁨", 쫀득이 "좋음"이면? 이름만 보는 AI는 몽글이(@@EV_BEST_BAD@@)에 걸고, 상태를 보는 AI는 쫀득이(@@EV_4_GOOD@@)에 겁니다.</div>
+      <div class="q"><img data-mood="asst_e19" alt=""><p><b>하루</b> 보이는 정보를 버리지 않고 쓰는 게 이렇게 크군요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">점수(슬라임, 오늘 상태) = 평균(슬라임, 상태) + k × √( ln(전체 경주 수) ÷ 횟수(슬라임, 상태) )</div><p style="font-size:14px;margin:6px 0 0">4단계의 UCB를 (슬라임, 상태) 15가지로 나눠 그대로 씁니다. <b>학교 수학으로 보면</b> 조건부 확률 — "상태가 좋을 때의 확률"입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">상태 보고 고르는 AI — (슬라임 × 상태)별 어림한 몫, 진하게 = 자주 고른 곳</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="cx-100">100번 경주</button><button class="bt" type="button" id="cx-1000">1,000번</button><button class="bt" type="button" id="cx-0">처음부터</button></div></div>
+    <table class="est" id="cx-tbl"></table>
+    <div class="minis"><div class="mini a"><span>경주 수</span><b id="cx-n">0</b></div><div class="mini m"><span>쿠키 수지</span><b id="cx-net">0</b></div><div class="mini g"><span>경주 1번당 수지</span><b id="cx-per">—</b></div><div class="mini r"><span>상태를 다 아는 이상적 선택(1번당)</span><b>@@CTX_ORACLE@@</b></div></div>
+    <div class="insight" id="cx-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c5"></div>
+</div></section>
+
+<!-- 대결 -->
+<section class="sec" id="duel" aria-labelledby="h-duel"><div class="wrap">
+  <h2 id="h-duel">대결 — 같은 1,000번 경주, 세 가지 응원 습관</h2>
+  <div data-dlg="duel"></div>
+  <p class="lead">같은 1,000번 경주(상태·결과까지 같음)를 세 AI에게 줍니다. 하루는 <b>인기 1위 말랑이만</b>, 시아는 <b>ε-탐욕(10%)</b>, 모아는 <b>상태 보고 고르기</b>입니다.</p>
+  <div class="race" id="dl-lanes"></div>
+  <canvas id="dl-cv" style="width:100%;height:260px;display:block;border:1px solid var(--rule);border-radius:8px;background:#fff" aria-label="경주가 쌓일수록 쿠키 수지"></canvas>
+  <div class="panel">
+    <div class="ctrl"><div class="group"><span class="glabel">먼저 맞혀 보기 — 쿠키가 가장 많이 남을 습관은?</span><span class="tabs" id="dl-pred"></span></div>
+      <div class="group"><button class="bt primary" type="button" id="dl-go">1,000번 경주 시작</button></div></div>
+    <div id="dl-res" hidden><div id="dl-say"></div><div class="score"><span id="dl-score"></span><span id="dl-my"></span></div></div>
+  </div>
+  <p>이 페이지의 검산(씨앗 20개 평균, 1,000번 경주)에서 쿠키 수지는 말랑이만 @@DUEL_FAV@@, ε-탐욕 @@DUEL_EPS@@, 상태 보고 고르기 @@DUEL_CTX@@였습니다. 1,000번으로는 ε-탐욕도 몽글이를 확신하지 못하는 때가 많습니다.</p>
+  <div class="quiz" data-quiz="duel"></div>
+</div></section>
+
+<!-- 정리 -->
+<section class="sec" id="sum" aria-labelledby="h-sum"><div class="wrap">
+  <h2 id="h-sum">정리 — 해 보며 배우는 AI의 세 가지 탐험</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th></th><th>① ε-탐욕</th><th>② 덤 주기(UCB)</th><th>③ 상태 보고 고르기</th></tr></thead><tbody>
+    <tr><td>탐험하는 법</td><td>열 번에 한 번 아무거나</td><td>덜 해 본 쪽에 덤</td><td>(슬라임 × 상태)마다 덤</td></tr>
+    <tr><td>보는 정보</td><td>슬라임 이름</td><td>슬라임 이름</td><td>슬라임 이름 + 그날 상태</td></tr>
+    <tr><td>오늘의 결과(1,000번)</td><td>몽글이 찾음 @@FOUND_EPS@@</td><td>몽글이 찾음 @@FOUND_UCB@@</td><td>쿠키 수지 @@CTX_NET@@</td></tr>
+    <tr><td>약점</td><td>나쁜 걸 알아도 계속 탐험</td><td>덤 크기 k를 정해야 함</td><td>배울 평균이 많아 처음엔 헤맴</td></tr>
+    <tr><td>②·④편과 비교</td><td colspan="3">코인 게임과 블랙잭은 한 번 고르면 다음 상황이 이어졌습니다(동전 개수, 내 합). 슬라임 레이스는 경주마다 새로 시작하니 다음 상황이 없습니다. 그래서 "탐험과 활용"만 떼어 보기에 가장 좋은, 강화학습의 첫걸음입니다.</td></tr>
+  </tbody></table></div>
+  <div class="paper"><b>이 방법의 뿌리 [3][4]</b> — 여러 손잡이 중 하나를 당기는 슬롯머신에서 이름이 나온 "다중 슬롯머신 문제"는 서턴과 바토의 강화학습 교과서 2장이 가장 먼저 다룹니다. 2002년 아우어 등은 "덤"의 크기를 정하는 UCB1을 내놓고, 길게 보면 손해가 아주 천천히(로그만큼)만 늘어난다는 것을 증명했습니다. 오늘날 광고·추천 배치, 임상시험의 환자 배정에 쓰입니다.</div>
+  <div class="review"><b>한 번 더 생각하기</b> — 이 페이지의 배당은 일부러 틈을 남겨 두었습니다. 진짜 경주장은 배당을 손님들의 표 판매에 맞춰 정하고 수수료를 떼므로, 길게 하면 손님이 잃게 됩니다. 원작의 슬라임 경주장도 사행성 논란 끝에 문을 닫았습니다 [2][5].</div>
+  <h3>용어 대응 카드</h3>
+  <div class="gloss">
+    <div><b>다중 슬롯머신 문제(밴딧)</b> = 보상 확률을 모르는 선택지 중 하나를 고르고, 결과를 보고 다시 고르는 문제.</div>
+    <div><b>보상</b> = 고른 뒤 받는 결과. 오늘은 돌려받은 쿠키.</div>
+    <div><b>활용</b> = 지금까지 가장 좋아 보이는 선택을 하는 것.</div>
+    <div><b>탐험</b> = 덜 알려진 선택을 일부러 해 보는 것.</div>
+    <div><b>ε-탐욕</b> = 대개는 활용, ε 비율로 아무거나.</div>
+    <div><b>UCB</b> = 평균에 "아직 모르는 만큼의 덤"을 얹어 고르는 방법.</div>
+    <div><b>맥락 밴딧</b> = 보이는 상황(맥락)마다 따로 배우는 밴딧.</div>
+  </div>
+  <div class="next"><a href="../blackjack/index.html"><b>← ④ 블랙잭</b><br>기댓값과 몬테카를로 학습</a><a href="../coin/index.html"><b>② 코인 게임</b><br>Q 학습 — 상황이 이어지는 강화학습</a><a href="../index.html"><b>시리즈 목차</b></a></div>
+</div></section>
+
+<section class="sec" id="outro" aria-labelledby="h-outro"><div class="wrap">
+  <h2 id="h-outro">아웃트로</h2>
+  <div data-dlg="outro"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <h3>출처</h3>
+  <table><thead><tr><th>#</th><th>자료</th><th>이 페이지에서 쓴 곳</th></tr></thead><tbody>
+    <tr><td>[1]</td><td>인벤, 「[기획] 슬라임부터 버그베어까지, 울고 웃게 만들었던 리니지 경기장의 추억」 (2026-11-27 확인)</td><td>머리말·1단계 — 승률과 상태를 보고 100아데나짜리 표를 사는 방식, 판매율에 따른 배당</td></tr>
+    <tr><td>[2]</td><td>데일리게임, 「[게.이.머] 리니지, 서민에게 로또 같았던 '슬경·개경장'」 (2026-11-27 확인)</td><td>머리말·1단계 — 짧은 직선 트랙, 1등 슬라임 맞히기, 사행성 우려로 경주장 폐쇄</td></tr>
+    <tr><td>[3]</td><td>Sutton, R. S., Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press. 2장(다중 슬롯머신 문제)</td><td>1·3단계 — 밴딧, 탐험과 활용, ε-탐욕</td></tr>
+    <tr><td>[4]</td><td>Auer, P., Cesa-Bianchi, N., Fischer, P. (2002). Finite-time Analysis of the Multiarmed Bandit Problem. Machine Learning, 47, 235–256.</td><td>4단계·정리 — UCB1</td></tr>
+    <tr><td>[5]</td><td>알파경제, 「엔씨 리니지 클래식 슬라임 경주장 논란…게임이용자협회 "운영 경위 설명해야"」 (인베스팅닷컴 전재, 2026-11-27 확인)</td><td>정리 — 사행성 논란</td></tr>
+  </tbody></table>
+  <h3>예시값·설명용 모형인 것</h3>
+  <ul><li>슬라임 이름·빠르기·상태 효과·배당은 이 페이지가 정한 값입니다. 원작의 슬라임·경주 규칙·배당 방식과 다릅니다(원작은 표 판매율로 배당을 정함).</li>
+    <li>KPI·표·대결의 숫자는 이 경주 모형으로 씨앗을 고정해 시뮬레이션한 값입니다(검산: 저장소의 code/check_slime.js).</li>
+    <li>「리니지」는 엔씨소프트의 게임입니다. 이 페이지는 미니게임의 틀만 빌렸고, 게임 그림·음악·몬스터 그림·NPC는 쓰지 않았습니다. 쿠키는 연습용입니다.</li>
+    <li>표지·경주 화면은 연구실 캐릭터 그림과 직접 그린 픽셀 슬라임으로 만든 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_slime.md</li></ul>
+  <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
+  <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
+</div></footer>
+
+<script>
+/*@@SPRITES@@*/
+/*@@COMMON@@*/
+/*@@ENGINE@@*/
+/*@@SFX@@*/
+/*@@GAMEJS@@*/
+(function(){
+'use strict';
+var $=U.$,$$=U.$$,G=GK,SL=SR.SL;
+var TRUTH=@@TRUTH_JSON@@; /* 검산으로 얻은 진짜 확률(20만 번): p[i], pc[i][상태] */
+
+var DLG={
+ hero:[["doc","doc_e08","오늘은 연구실 앞마당 경주장입니다. 옛 온라인 게임의 슬라임 경주장을 빌려 왔어요."],
+  ["moa","moa_e19","슬라임이 달려요? 귀엽다! 제일 빠른 애한테 걸면 되죠?"],
+  ["sia","sia_e09","누가 제일 빠른지 모르잖아. 그리고 제일 빠른 애가 제일 남는다는 보장도 없고."],
+  ["asst","asst_e12","모르면 해 보면서 배우면 되죠! 그게 강화학습이잖아요?"]],
+ c1:[["doc","doc_e07","핵심은 이겁니다. 진짜 승률은 아무도 모르고, 응원해 본 결과만 보입니다. 결과를 보고 다음 응원을 정하는 것 — 그게 오늘 AI가 하는 일이에요."],
+  ["robo","robo_e16","매표소는 내가 지킨다! 배당은 절대 안 바꾼다!"]],
+ c2:[["moa","moa_e12","저부터 응원할게요! 상태 '좋음'인 애가 좋아 보이는데…"],
+  ["fly","fly_e09","몇 번 맞혔다고 그 슬라임이 좋은 건지는 몰라. 열 번쯤 해 보고 기록표를 봐."]],
+ c3a:[["sia","sia_e07","슬라임마다 '응원권 1장에 평균 몇 쿠키'를 적어 두면 돼요. 그리고 가장 높은 애를 고르고요."],
+  ["asst","asst_e09","그런데 처음에 운 좋게 이긴 애만 계속 고르면요? 다른 애는 해 보지도 못하잖아요."]],
+ aic:[["robo","robo_e01","1등을 제일 많이 하는 말랑이에게 걸면 무조건 남는다! 자주 이기니까!"],
+  ["doc","doc_e10","자주 이기는 것과 남는 것은 다를 수 있어요. 배당이 작으니까요. 1,000번 응원해 보고 쿠키 수지로 판정합시다."]],
+ c4a:[["moa","moa_e09","아무거나 탐험하는 건 아깝지 않아요? 이미 별로인 애한테도 쿠키를 쓰잖아요."],
+  ["doc","doc_e07","좋은 지적이에요. 그래서 '아직 잘 모르는 쪽'에만 기회를 더 주는 방법이 있습니다. 덤을 얹어 주는 거죠."]],
+ c5a:[["asst","asst_e12","그런데 경주마다 상태가 보이잖아요. 그걸 안 보는 건 아깝지 않아요?"],
+  ["fly","fly_e07","그럼 상태별로 따로 적어 봐. 15가지야. 처음엔 헤매겠지만, 몇백 번 뒤를 봐."]],
+ duel:[["doc","doc_e08","같은 1,000번 경주를 세 습관으로 응원합니다. 경주 결과까지 똑같아요."],
+  ["asst","asst_e10","저는 말랑이만! 제일 자주 이기니까요."],
+  ["sia","sia_e10","저는 ε-탐욕 10%. 평균 보고 고르고, 가끔 탐험."],
+  ["moa","moa_e19","저는 상태까지 보는 AI! 맞혀 볼래요?"]],
+ outro:[["doc","doc_e16","오늘의 세 줄입니다.<br>① 확률을 모르면 해 보며 평균을 적는다. 가끔은 탐험해야 더 좋은 선택을 찾는다.<br>② 아무거나 탐험하기보다, 덜 해 본 쪽에 덤을 주면 더 빨리 찾는다(UCB).<br>③ 보이는 정보(상태)를 함께 쓰면 그날그날 더 좋은 선택을 한다."],
+  ["asst","asst_e16","말랑이는 자주 이겼는데 쿠키는 줄었어요. 자주 이기는 것과 남는 건 다르네요."],
+  ["sia","sia_e16","천 번으로도 몽글이를 확신 못 할 때가 있었어요. 운이 섞이면 배우는 데 시간이 걸려요."],
+  ["moa","moa_e19","상태 보는 AI가 쿠키를 제일 많이 남겼어요!"],
+  ["robo","robo_e14","…배당은 내일부터 바꿔야겠군."],
+  ["fly","fly_e16","진짜 경주장은 처음부터 이런 틈이 없게 배당을 정해. 배운 건 탐험과 활용, 도박은 아니야. 그게 오늘의 숙제야."]]
+};
+U.dialogues(DLG);
+G.cast([["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","상태 보기 담당. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","평균 적기와 탐험 담당."],["moa","moa_e13","인턴 모아 · 플레이어 3","첫 응원 도전자. \"왜요?\" 담당."],["fly","fly_e13","초파리 연구원","\"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","매표소 지기. 배당은 절대 안 바꿔요."]],['(통통통)','(…끄덕)','(짝짝짝)']);
+
+function sSVG(i,mood){var s=SL[i],c=s.c,d=s.d,r=function(x,y,w,h,f){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"/>';};
+  return '<svg viewBox="0 0 16 14" shape-rendering="crispEdges" aria-hidden="true">'+r(2,12,12,2,'rgba(0,0,0,.18)')+r(5,2,6,1,c)+r(3,3,10,1,c)+r(2,4,12,2,c)+r(1,6,14,6,c)+r(1,11,14,1,d)+r(4,4,2,2,'rgba(255,255,255,.7)')+r(5,7,2,2,'#16212b')+r(10,7,2,2,'#16212b')+(mood==='win'?r(6,10,5,1,'#16212b')+r(5,9,1,1,'#16212b')+r(11,9,1,1,'#16212b'):r(7,10,3,1,d))+'</svg>';}
+function evStr(x){return x.toFixed(2);}
+var C1=SL.map(function(s,i){return [s,TRUTH.p[i]];});
+$('#c1-tbl').innerHTML='<tr><th>슬라임</th><th>배당(맞히면 돌려받는 쿠키)</th><th>1등 할 확률</th><th>돌려받는 몫</th></tr>'+SL.map(function(s,i){return '<tr><td class="nm">'+sSVG(i)+s.name+'</td><td>'+s.pay+'배</td><td class="truth">숨김 (3단계에서 공개)</td><td class="truth">숨김</td></tr>';}).join('');
+
+/* ── 단계 2 ── */
+var WHO=G.WHO,PL={who:'moa',pick:null,c:SR.conds(),busy:false,n:0,w:0,net:0,log:[],rec:SL.map(function(){return {n:0,w:0};})};
+$('#booth-robo').src=U.spr('robo_e16');
+function say(w,m,t){$('#pl-say').innerHTML=U.say(w,m,t);}
+function lanes(pos){$('#pl-lanes').innerHTML=SL.map(function(s,i){return '<div class="trk'+(PL.pick===i?' mine':'')+'"><span class="sl" id="sl'+i+'" style="left:'+(pos?pos[i]:0)+'%">'+sSVG(i)+'</span><span class="tag" id="tg'+i+'" style="left:calc('+(pos?pos[i]:0)+'% + 52px)">'+s.name+' · '+SR.COND[PL.c[i]]+'</span></div>';}).join('');}
+function picks(){$('#pl-picks').innerHTML=SL.map(function(s,i){return '<button type="button" data-i="'+i+'" aria-pressed="'+(PL.pick===i)+'" '+(PL.busy?'disabled':'')+'>'+sSVG(i)+'<span><b>'+s.name+'</b><small>배당 '+s.pay+'배 · <span class="c'+PL.c[i]+'">'+SR.COND[PL.c[i]]+'</span></small></span></button>';}).join('');
+  $$('#pl-picks button').forEach(function(b){b.onclick=function(){PL.pick=+b.dataset.i;SFX.play('hop',PL.pick);picks();lanes();status();};});}
+function status(){$('#pl-n').textContent=PL.n;$('#pl-w').textContent=PL.w;$('#pl-net').textContent=(PL.net>=0?'+':'')+PL.net.toFixed(1);$('#pl-pick').textContent=PL.pick==null?'—':SL[PL.pick].name;$('#pl-go').disabled=PL.busy||PL.pick==null;$('#pl-next').disabled=PL.busy;
+  $('#pl-rec').innerHTML=$('#pl-tip').checked?'<table class="est" style="margin-top:10px"><tr><th>하루의 기록표</th>'+SL.map(function(s,i){return '<th>'+s.name+'</th>';}).join('')+'</tr><tr><td class="nm">본 경주에서 1등</td>'+PL.rec.map(function(r){return '<td>'+r.w+' / '+r.n+'</td>';}).join('')+'</tr><tr><td class="nm">응원했다면 평균 몫</td>'+PL.rec.map(function(r,i){return '<td>'+(r.n?(r.w*SL[i].pay/r.n).toFixed(2):'—')+'</td>';}).join('')+'</tr></table><p class="calm">본 경주 수가 적으면 이 평균은 크게 흔들립니다. 3단계의 AI는 이 표를 스스로 적어 가며 고릅니다.</p>':'';
+  $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
+function newRace(){PL.c=SR.conds();PL.pick=null;picks();lanes();status();say(PL.who,WHO[PL.who][2].think,'새 경주! 상태를 보고 응원할 슬라임을 골라요.');}
+function go(){if(PL.pick==null||PL.busy)return;PL.busy=true;picks();status();SFX.play('start');var res=SR.race(PL.c,null,true),H=res.hist,k=0,mx=SR.LEN;
+  $$('#pl-lanes .sl').forEach(function(s){s.classList.add('hop');});say('robo','robo_e14','출발! 응원권은 환불 안 된다!');
+  var step=U.reduce?H.length:1;(function tick(){k=Math.min(H.length-1,k+step);var pos=H[k].map(function(d){return Math.min(1,d/mx);});SL.forEach(function(s,i){$('#sl'+i).style.left='calc((100% - 66px) * '+pos[i].toFixed(4)+')';$('#tg'+i).style.left='calc((100% - 66px) * '+pos[i].toFixed(4)+(pos[i]>0.55?' - 118px)':' + 52px)');});
+    if(k%3===0)SFX.play('hop',k%5);
+    if(k<H.length-1){setTimeout(tick,U.reduce?0:110);return;}
+    $$('#pl-lanes .sl').forEach(function(s){s.classList.remove('hop');});var w=res.win,hit=w===PL.pick,r=hit?SL[w].pay:0;$('#sl'+w).innerHTML=sSVG(w,'win');
+    PL.n++;if(hit)PL.w++;PL.net+=r-1;SL.forEach(function(s,i){PL.rec[i].n++;if(i===w)PL.rec[i].w++;});
+    PL.log.push('응원 '+SL[PL.pick].name+'('+SR.COND[PL.c[PL.pick]]+') · 1등 '+SL[w].name+'('+SR.COND[PL.c[w]]+') → '+(hit?'+'+(r-1).toFixed(1):'−1'));
+    SFX.play(hit?'win':'buzz');say(PL.who,hit?WHO[PL.who][2].happy:WHO[PL.who][2].sad,hit?SL[w].name+' 1등! 쿠키 '+r+'개를 돌려받았어요!':SL[w].name+'(이)가 1등… 제 응원권은 휴지 조각이에요.');
+    PL.busy=false;status();})();}
+G.tabs($('#pl-who'),[['asst','하루'],['sia','시아'],['moa','모아']],'moa',function(v){PL.who=v;newRace();});
+$('#pl-go').onclick=go;$('#pl-next').onclick=newRace;$('#pl-tip').onchange=status;newRace();
+
+/* ── 단계 3 ── */
+var EG={eps:0.1,A:null,net:0,ex:0};
+function egReset(){EG.A=SR.EpsGreedy(EG.eps);EG.net=0;EG.ex=0;egDraw();}
+function egRun(n){var A=EG.A;for(var k=0;k<n;k++){var c=SR.conds(),w=SR.race(c).win,g=SR.argmax(A.Q),i=A.choose(c);if(i!==g)EG.ex++;var r=SR.reward(i,w);A.learn(i,r,c);EG.net+=r-1;}SFX.play('hop',2);egDraw();}
+function egDraw(){var A=EG.A,tr=$('#eg-truth').checked,b=SR.argmax(A.Q.map(function(q,i){return A.N[i]?q:-1;})),mxn=Math.max.apply(null,A.N)||1;
+  $('#eg-tbl').innerHTML='<tr><th>슬라임</th><th>고른 횟수</th><th>어림한 몫(평균)</th>'+(tr?'<th>진짜 몫</th>':'')+'</tr>'+SL.map(function(s,i){return '<tr'+(A.t&&i===b?' class="pick"':'')+'><td class="nm">'+sSVG(i)+s.name+'</td><td><span class="bar" style="width:'+(A.N[i]/mxn*80)+'px"></span> '+A.N[i]+'</td><td>'+(A.N[i]?evStr(A.Q[i]):'—')+'</td>'+(tr?'<td class="truth">'+evStr(TRUTH.p[i]*s.pay)+'</td>':'')+'</tr>';}).join('');
+  $('#eg-n').textContent=A.t.toLocaleString();$('#eg-net').textContent=(EG.net>=0?'+':'')+EG.net.toFixed(1);$('#eg-best').textContent=A.t?SL[b].name:'—';$('#eg-ex').textContent=EG.ex;
+  U.ins($('#eg-i'),!A.t?[['m','아직 경주 전입니다. 모든 슬라임의 평균이 0이라 AI는 아무것도 모릅니다.']]:EG.eps===0&&A.t>=20?[['a','탐험 0: 처음 이긴 슬라임만 계속 고르고 있습니다. 다른 슬라임은 '+SL.map(function(s,i){return A.N[i]<3?s.name:null;}).filter(Boolean).join('·')+'처럼 거의 안 해 봤어요. 진짜 몫을 열어 비교해 보세요.']]:
+    [[b===2?'g':'a','지금 가장 좋아 보이는 슬라임: <b>'+SL[b].name+'</b> (평균 '+evStr(A.Q[b])+'). '+(b===2?'진짜로 가장 좋은 몽글이를 찾았어요.':'진짜 가장 좋은 슬라임은 아직 못 찾았습니다. 경주를 더 하거나 ε를 바꿔 보세요.')],['m',A.t+'번 중 '+EG.ex+'번 탐험했습니다. 탐험한 경주는 대개 손해지만, 그 덕분에 모든 슬라임의 평균이 생깁니다.']]);}
+G.tabs($('#eg-eps'),[[0,'0 (탐험 없음)'],[0.1,'0.1'],[0.3,'0.3']],0.1,function(v){EG.eps=v;egReset();});
+$('#eg-10').onclick=function(){egRun(10);};$('#eg-100').onclick=function(){egRun(100);};$('#eg-1000').onclick=function(){egRun(1000);};$('#eg-0').onclick=egReset;$('#eg-truth').onchange=egDraw;egReset();
+$('#aic-say').innerHTML=DLG.aic.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+$('#aic-go').onclick=function(){var w=0,net=0;for(var k=0;k<1000;k++){var c=SR.conds(),win=SR.race(c).win;if(win===0){w++;net+=SL[0].pay-1;}else net-=1;}
+  U.ins($('#aic-i'),[['r','말랑이 1,000번: <b>'+w+'번 1등</b>(가장 자주 이김) — 쿠키 수지 <b>'+(net>=0?'+':'')+net.toFixed(1)+'</b>.'],['m','자주 이기지만 배당이 2.6배라, 1등 확률이 약 '+(TRUTH.p[0]*100).toFixed(0)+'%면 돌려받는 몫은 '+evStr(TRUTH.p[0]*SL[0].pay)+' — 1보다 작아 길게 하면 잃습니다. 결론: "자주 이긴다"와 "남는다"는 다릅니다. 확률 × 배당으로 봐야 합니다.']]);SFX.play('buzz');};
+U.ins($('#aic-i'),[['m','버튼을 눌러 판정해 보세요.']]);
+
+/* ── 단계 4 ── */
+$('#ub-go').onclick=function(){var btn=this;btn.disabled=true;var M=[['탐험 없음(ε = 0)',function(r){return SR.EpsGreedy(0,r);},'#5b6874'],['ε-탐욕(10%)',function(r){return SR.EpsGreedy(0.1,r);},'#5a5a6e'],['UCB(덤 주기)',function(r){return SR.UCB(1,r);},'#0f7f86']],base=Math.floor(Math.random()*1e6);
+  var res=M.map(function(m){var f=0,net=0,share=0;for(var s=1;s<=20;s++){var R=SR.RNG(base+s*7919),A=m[1](R),o=SR.run(A,1000,R);if(SR.argmax(A.Q)===2)f++;net+=o.net;share+=o.picks[2]/1000;}return {f:f,net:net/20,share:share/20};});
+  $('#ub-res').innerHTML=M.map(function(m,i){return '<div class="cnt"><span><b>'+m[0]+'</b></span><span class="bar"><i style="width:'+(res[i].f/20*100)+'%;background:'+m[2]+'"></i></span><span>몽글이 찾음 <b>'+res[i].f+'/20</b></span></div>';}).join('')+'<div class="muted" style="font-size:13.5px;margin-top:6px">'+M.map(function(m,i){return m[0]+': 몽글이를 고른 비율 '+(res[i].share*100).toFixed(0)+'%, 쿠키 수지 평균 '+(res[i].net>=0?'+':'')+res[i].net.toFixed(0);}).join(' · ')+'</div>';
+  U.ins($('#ub-i'),[['g','UCB는 20번 중 <b>'+res[2].f+'번</b> 몽글이를 찾아냈습니다. ε-탐욕은 '+res[1].f+'번, 탐험 없음은 '+res[0].f+'번.'],['m','탐험 없이 처음 운에 휘둘리면 대개 못 찾고, 아무거나 탐험하면 찾더라도 쿠키를 흘립니다. 덤을 "모르는 쪽"에 몰아준 UCB가 가장 빨리, 덜 잃으며 찾습니다. 그래도 1,000번으로는 늘 찾지는 못합니다 — 운이 섞인 보상은 배우는 데 시간이 걸립니다.']]);
+  SFX.play('solve');btn.disabled=false;btn.textContent='다른 씨앗으로 다시 20번씩';};
+U.ins($('#ub-i'),[['m','버튼을 누르면 세 방법이 각각 20번씩(씨앗을 바꿔 가며) 1,000번 경주를 합니다. 끝났을 때 평균이 가장 높은 슬라임이 몽글이면 "찾음".']]);
+
+/* ── 단계 5 ── */
+var CS=['좋음','보통','나쁨'];
+$('#c5-pic').innerHTML='<tr><th>진짜 몫</th>'+CS.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>'+SL.map(function(s,i){return '<tr><td class="nm">'+sSVG(i)+s.name+'</td>'+[0,1,2].map(function(k){var v=TRUTH.pc[i][k]*s.pay;return '<td style="'+(v>1?'color:#13733a;font-weight:700':'color:#5b6874')+'">'+evStr(v)+'</td>';}).join('')+'</tr>';}).join('');
+var CX={A:null,net:0,cnt:null};
+function cxReset(){CX.A=SR.CtxUCB(1);CX.net=0;CX.cnt=SL.map(function(){return [0,0,0];});cxDraw();}
+function cxRun(n){var A=CX.A;for(var k=0;k<n;k++){var c=SR.conds(),w=SR.race(c).win,i=A.choose(c),r=SR.reward(i,w);A.learn(i,r,c);CX.net+=r-1;CX.cnt[i][c[i]]++;}SFX.play('hop',4);cxDraw();}
+function cxDraw(){var A=CX.A,mx=1;CX.cnt.forEach(function(r){r.forEach(function(x){if(x>mx)mx=x;});});
+  $('#cx-tbl').innerHTML='<tr><th>어림한 몫 (고른 횟수)</th>'+CS.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>'+SL.map(function(s,i){return '<tr><td class="nm">'+sSVG(i)+s.name+'</td>'+[0,1,2].map(function(k){var n=A.N[i][k],a=CX.cnt[i][k]/mx;return '<td style="background:rgba(163,92,0,'+(0.05+0.4*a)+')">'+(n?evStr(A.Q[i][k]):'—')+' <span class="muted" style="font-size:12px">('+CX.cnt[i][k]+')</span></td>';}).join('')+'</tr>';}).join('');
+  $('#cx-n').textContent=A.t.toLocaleString();$('#cx-net').textContent=(CX.net>=0?'+':'')+CX.net.toFixed(1);$('#cx-per').textContent=A.t?((CX.net/A.t>=0?'+':'')+(CX.net/A.t).toFixed(3)):'—';
+  U.ins($('#cx-i'),!A.t?[['m','아직 경주 전입니다. 15가지 평균이 모두 비어 있습니다.']]:A.t<300?[['a',A.t+'번: 15가지를 하나씩 해 보느라 아직 헤매는 중입니다. 쿠키가 줄어도 정상이에요.']]:
+    [[CX.net>0?'g':'a',A.t+'번: 경주 1번당 '+(CX.net/A.t>=0?'+':'')+(CX.net/A.t).toFixed(3)+' 쿠키. 자주 고른 곳(진한 색)은 대개 진짜 몫이 1보다 큰 곳(조수 상자의 초록 숫자)입니다 — 그날 상태에 따라 남는 슬라임을 골라 응원합니다.'],['m','상태를 다 알고 늘 가장 좋은 슬라임을 고르면 경주 1번당 약 @@CTX_ORACLE@@입니다. AI는 처음 헤맨 만큼 그보다 적습니다.']]);}
+$('#cx-100').onclick=function(){cxRun(100);};$('#cx-1000').onclick=function(){cxRun(1000);};$('#cx-0').onclick=cxReset;cxReset();
+
+/* ── 대결 ── */
+var DL=[['asst','하루 · 말랑이만','#c42a6e'],['sia','시아 · ε-탐욕 10%','#5a5a6e'],['moa','모아 · 상태 보고 고르기','#93651a']],DP=null;
+$('#dl-lanes').innerHTML=DL.map(function(x,i){return '<div class="lane" style="--cc:var(--c-'+x[0]+')"><div class="head"><img id="dl-img'+i+'" data-mood="'+x[0]+'_e13" alt=""><div><b>'+x[1]+'</b></div></div><div class="st" id="dl-s'+i+'">대기 중</div></div>';}).join('');U.fillImgs();
+G.tabs($('#dl-pred'),DL.map(function(x){return [x[0],x[1].split(' · ')[0]];}),null,function(v){DP=v;});
+G.lines($('#dl-cv'),[],{xlab:'경주'});
+$('#dl-go').onclick=function(){var btn=this;btn.disabled=true;var seed=Math.floor(Math.random()*1e9)+1,R=SR.RNG(seed),Rs=[SR.RNG(seed+1),SR.RNG(seed+2),SR.RNG(seed+3)],A=[SR.Fixed(0),SR.EpsGreedy(0.1,Rs[1]),SR.CtxUCB(1,Rs[2])],net=[0,0,0],ys=[[0],[0],[0]],g=0,N=1000;
+  (function chunk(){for(var c=0;c<50&&g<N;c++,g++){var cd=SR.conds(R),w=SR.race(cd,R).win;A.forEach(function(a,i){var p=a.choose(cd),r=SR.reward(p,w);a.learn(p,r,cd);net[i]+=r-1;});if((g+1)%10===0)for(var i=0;i<3;i++)ys[i].push(net[i]);}
+    G.lines($('#dl-cv'),DL.map(function(x,i){return {name:x[1].split(' · ')[0],color:x[2],ys:ys[i]};}),{zero:true,xlab:'경주 (0 → '+g.toLocaleString()+') · 세로 = 쿠키 수지',fmt:function(v){return Math.round(v).toLocaleString();}});
+    DL.forEach(function(x,i){$('#dl-s'+i).innerHTML=g+'번째 경주 · 쿠키 수지 <b>'+(net[i]>=0?'+':'')+net[i].toFixed(0)+'</b>';});
+    if(g<N){setTimeout(chunk,U.reduce?0:30);return;}
+    var bi=net.indexOf(Math.max.apply(null,net));DL.forEach(function(x,i){U.setMood($('#dl-img'+i),x[0]+(i===bi?(x[0]==='asst'?'_e19':'_e16'):(net[i]<0?(x[0]==='asst'?'_e24':'_e20'):'_e13')));});
+    $('#dl-say').innerHTML=[U.say('asst',net[0]<0?'asst_e20':'asst_e16','말랑이만 응원해서 '+(net[0]>=0?'+':'')+net[0].toFixed(0)+'. 자주 이기는데 쿠키는 '+(net[0]<0?'줄었어요.':'조금 남았네요. 운이 좋았나 봐요.')),
+      U.say('sia','sia_e10','ε-탐욕은 '+(net[1]>=0?'+':'')+net[1].toFixed(0)+'. 마지막에 제 AI가 꼽은 1순위: '+SL[SR.argmax(A[1].Q)].name+'.',true),
+      U.say('moa','moa_e19','상태 보는 AI는 '+(net[2]>=0?'+':'')+net[2].toFixed(0)+'!'),
+      U.say('doc','doc_e10',(bi===2?'판정: 경주 결과가 같아도, 보이는 정보를 쓰고 탐험을 잘한 쪽이 앞섭니다.':'판정: 이번 1,000번은 운이 상태 보는 AI 편이 아니었네요. 1,000번은 처음 헤매는 기간이 커서 이런 때도 있습니다. 씨앗 20개 평균으로는 상태 보기가 가장 많이 남깁니다(아래 검산).')+' 다만 이건 배당에 틈을 남겨 둔 연구실 경주장이라 가능한 일이에요.',true)].join('');
+    $('#dl-score').textContent='쿠키 수지 — 말랑이만 '+net[0].toFixed(0)+' · ε-탐욕 '+net[1].toFixed(0)+' · 상태 보고 '+net[2].toFixed(0);var my=DP?DL.map(function(x){return x[0];}).indexOf(DP):-1;$('#dl-my').hidden=my<0;$('#dl-my').textContent=my>=0?('내 예상: '+DL[my][1].split(' · ')[0]+(my===bi?' — 맞혔어요!':' — 가장 많이 남긴 쪽은 '+DL[bi][1].split(' · ')[0])):'';
+    $('#dl-res').hidden=false;SFX.play('solve');btn.disabled=false;btn.textContent='새 경주 1,000번으로 다시';})();};
+
+SFX.bind();
+U.Gloss({
+ '다중 슬롯머신 문제':['다중 슬롯머신 문제(밴딧)','강화학습','보상 확률을 모르는 선택지 중 하나를 고르고, 결과를 보고 다시 고르는 문제.'],
+ '활용':['활용','강화학습','지금까지 가장 좋아 보이는 선택을 하는 것.'],
+ '탐험':['탐험','강화학습','덜 알려진 선택을 일부러 해 보는 것.'],
+ 'ε-탐욕':['ε-탐욕','강화학습','대개는 활용, ε 비율로는 아무거나 고르는 방법.'],
+ 'UCB':['UCB','강화학습','평균에 "아직 모르는 만큼의 덤"을 얹어 고르는 방법.'],
+ '맥락 밴딧':['맥락 밴딧','강화학습','보이는 상황마다 따로 배우는 밴딧.'],
+ '배당':['배당','경주','1등을 맞혔을 때 응원권 1장으로 돌려받는 쿠키 수.']
+},['다중 슬롯머신 문제','활용','탐험','ε-탐욕','UCB','맥락 밴딧']);
+U.Study({quiz:{
+ c1:[{q:'이 경주장에서 AI가 미리 알 수 없는 것은?',o:['배당','그날의 상태','슬라임의 진짜 빠르기(1등 할 확률)'],a:2,why:'빠르기는 숨겨져 있어, 응원해 본 결과로 어림해야 합니다.',hint:'규칙 ①.'},
+     {q:'"돌려받는 몫"이 0.84라면?',o:['길게 하면 응원권 1장에 0.16쿠키씩 잃는다','84% 확률로 이긴다','84쿠키를 받는다'],a:0,why:'몫이 1보다 작으면 평균적으로 잃습니다.',hint:'1이 본전.'}],
+ c2:[{q:'몇 번 응원해서 한 슬라임이 자주 이겼다. 그 슬라임이 가장 좋다고 말할 수 있을까?',o:['그렇다','아직 모른다 — 몇 번으로는 운의 몫이 크다','배당과는 상관없다'],a:1,why:'적은 횟수의 평균은 크게 흔들리고, 배당까지 곱해 봐야 합니다.',hint:'하루의 기록표.'}],
+ c3:[{q:'탐험 없이(ε = 0) 늘 평균이 가장 높은 것만 고르면?',o:['가장 빨리 최고를 찾는다','처음 운 좋게 이긴 슬라임에 갇힐 수 있다','늘 손해 없이 끝난다'],a:1,why:'다른 슬라임의 평균은 0에 머물러 비교할 기회가 없습니다.',hint:'ε를 0으로 두고 돌려 보기.'},
+     {q:'말랑이가 가장 자주 1등을 하는데도 쿠키가 줄어드는 이유는?',o:['주판봇이 속여서','1등 확률 × 배당(2.6배)이 1보다 작아서','상태가 나빠서'],a:1,why:'자주 이기는 것과 남는 것은 다릅니다.',hint:'AI 판단 코너.'}],
+ c4:[{q:'UCB에서 덤이 큰 슬라임은?',o:['평균이 높은 슬라임','덜 해 본 슬라임','배당이 큰 슬라임'],a:1,why:'해 본 횟수가 적을수록 아직 모르는 몫이 커서 덤이 큽니다.',hint:'조수 수식 상자의 표.'},
+     {q:'해 본 횟수가 4배가 되면 덤은?',o:['4분의 1','절반','그대로'],a:1,why:'덤은 횟수의 제곱근에 반비례합니다.',hint:'4번 → 16번.'}],
+ c5:[{q:'상태 보고 고르는 AI가 처음엔 오히려 헤매는 이유는?',o:['상태가 거짓이라서','배울 평균이 5개에서 15개로 늘어서','덤이 없어서'],a:1,why:'(슬라임 × 상태)마다 따로 해 봐야 하니 처음엔 경험이 나뉩니다.',hint:'5단계 왜 상자 ③.'},
+     {q:'몽글이 "나쁨", 쫀득이 "좋음"인 날 상태를 보는 AI의 선택은?',o:['몽글이','쫀득이','말랑이'],a:1,why:'상태별 진짜 몫이 쫀득이(좋음) 쪽이 훨씬 큽니다.',hint:'숫자로 한 번 해 보기.'}],
+ duel:[{q:'세 습관 중 경주 결과가 같아도 차이가 나는 이유는?',o:['경주가 달라서','고르는 방법(탐험·보는 정보)이 달라서','쿠키가 달라서'],a:1,why:'같은 경주를 주었으니 차이는 오직 고르는 방법에서 옵니다.',hint:'대결 첫 문단.'}]
+}});
+G.cover();
+U.start();
+})();
+</script>
+</body>
+</html>

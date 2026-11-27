@@ -1,0 +1,40 @@
+{
+ "title": "AI로 풀어보는 게임 시리즈 ④ 대항해시대 2 블랙잭 — AI는 받을지 설지 어떻게 정할까?",
+ "series": "AI로 풀어보는 게임 시리즈",
+ "number": "4",
+ "creator": [
+  {
+   "name": "안상선",
+   "role": "author",
+   "affiliation": "(주)M-Robo"
+  }
+ ],
+ "contributor": [
+  {
+   "name": "AI 보조 제작",
+   "role": "assistant"
+  }
+ ],
+ "date": "2026-11-27",
+ "version": "1.0",
+ "language": [
+  "ko"
+ ],
+ "license": "",
+ "url": "https://adminmrobo.github.io/ai_game_lab/blackjack/",
+ "about": [
+  "lab:method/expected-value-recursion",
+  "lab:method/monte-carlo-control",
+  "lab:concept/expected-value",
+  "lab:concept/policy-table"
+ ],
+ "basedOn": [
+  "namu_uw2",
+  "sutton2018rl",
+  "thorp1962"
+ ],
+ "educationalLevel": "입문",
+ "learningResourceType": "interactive explainer",
+ "registry": "KG_00_registry 0.2",
+ "suggestedCitation": "안상선 (2026). AI로 풀어보는 게임 시리즈 ④ 대항해시대 2 블랙잭 — AI는 받을지 설지 어떻게 정할까? v1.0."
+}

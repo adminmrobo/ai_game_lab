@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI로 풀어보는 게임 시리즈 ③ 대항해시대 2 다이스 — AI는 확률로 어떻게 고를까?</title>
+<meta name="description" content="옛 PC 게임 대항해시대 2의 술집 도박 '다이스'(주사위 다섯 개 포커)를 하루·시아·모아가 직접 해 보고, AI가 다시 굴릴 주사위를 고르는 두 가지 방법(모든 경우 세기, 굴려 보며 어림하기)을 따라가는 연구실 해설.">
+<meta property="og:title" content="대항해시대 2 다이스 — AI는 확률로 어떻게 고를까? (AI로 풀어보는 게임 시리즈 ③)">
+<meta property="og:description" content="주사위 다섯 개, 다시 굴릴 기회는 한 번. 모든 경우를 세고, 수천 번 굴려 보며 가장 좋은 선택을 찾습니다.">
+<meta property="og:image" content="https://adminmrobo.github.io/ai_game_lab/dice/img/dice_cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<!--@@CSS@@-->
+<style>
+/*@@PAGECSS@@*/
+/*@@GAMECSS@@*/
+.die{--dw:46px;display:inline-grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:var(--dw);height:var(--dw);background:#fffdf6;border:3px solid #16212b;border-radius:16%;padding:calc(var(--dw)*.11);box-shadow:0 4px 0 #b9ad8f;flex:none;transition:transform .2s,box-shadow .2s;vertical-align:middle}
+.die i{width:72%;height:72%;background:#16212b;place-self:center;border-radius:1px}
+.die.r1 i,.die.r6 i{background:#c9302c}
+.die.sm{--dw:26px;border-width:2px;box-shadow:0 2px 0 #b9ad8f}
+.die.hold{transform:translateY(-16%);border-color:#a35c00;box-shadow:0 0 0 3px #ffe36b,0 6px 0 #b9ad8f}
+.die.ghost{opacity:.3}
+.die.shake{animation:shake .45s}
+@keyframes shake{0%{transform:rotate(0)}25%{transform:rotate(-18deg) translateY(-20%)}50%{transform:rotate(14deg)}75%{transform:rotate(-8deg) translateY(-8%)}100%{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){.die.shake{animation:none}}
+button.dbtn{background:none;border:0;padding:4px;cursor:pointer;border-radius:10px}
+button.dbtn:disabled{cursor:default}
+button.dbtn:focus-visible{outline:3px solid var(--amber)}
+.felt{background:radial-gradient(ellipse at 50% 40%,#3a8f5c,#1f5d3a 75%);border:8px solid #6b4423;border-radius:18px;padding:14px;box-shadow:inset 0 0 0 3px #8a5a2f}
+.seat{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;background:rgba(255,255,255,.1);border-radius:12px;padding:8px 10px;margin:8px 0;color:#fff}
+.seat img.av{width:72px;height:72px;background:#fff;border-radius:10px;border:3px solid var(--cc,#fff)}
+.seat .dice{display:flex;gap:8px;flex-wrap:wrap}
+.seat .nm{font-weight:700;font-size:14px;margin-bottom:4px}
+.seat .rk{background:#fff;color:#16212b;border-radius:999px;padding:2px 12px;font-weight:700;font-size:14px;white-space:nowrap}
+.seat.me{background:rgba(255,236,170,.18);outline:2px dashed #ffe36b}
+.seat.win .rk{background:#ffe36b}
+.ranks{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff}
+.ranks td,.ranks th{border:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:middle}
+.ranks th{background:var(--panel2);color:var(--muted)}
+.ranks td.n{text-align:right;font-variant-numeric:tabular-nums}
+.ranks .bar{display:inline-block;height:12px;background:var(--terrain);border-radius:3px;vertical-align:middle}
+.keeps{display:grid;gap:6px;margin:10px 0}
+.keeps .k{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;font-size:14px;background:#fff;border:1px solid var(--rule);border-radius:8px;padding:5px 10px}
+.keeps .k.best{border-color:var(--gfp);background:var(--gfp-soft)}
+.keeps .k.gutk{outline:2px dashed var(--amber);outline-offset:1px}
+.keeps .bars{position:relative;height:16px;background:var(--panel2);border-radius:4px;overflow:hidden}
+.keeps .bars i{position:absolute;left:0;top:0;bottom:0;background:var(--terrain);border-radius:4px}
+.keeps .bars em{position:absolute;top:-2px;bottom:-2px;width:3px;background:#c9302c}
+.keeps .p{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.vs3{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.vs3>div{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:8px 12px}
+.vs3 b{display:block;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="섹션 바로가기"><div class="row">
+  <a class="logo" href="../index.html">AI로 풀어보는 <i>게임</i> · 다이스</a>
+  <div class="links">
+    <a href="../index.html">← 시리즈</a><a href="#c1">1 게임</a><a href="#c2">2 해 보기</a><a href="#c3">3 모든 경우 세기</a><a href="#c4">4 다시 굴릴 주사위</a><a href="#c5">5 굴려 보기</a><a href="#duel">대결</a><a href="#sum">정리</a><a href="#kg">색인</a><a href="#export">꾸러미</a>
+  </div>
+</div></nav>
+
+<!-- lab-cover -->
+<div class="cover" id="cover" data-img="dice_cover"><div class="frame" id="coverframe">
+  <!--@@COVER@@-->
+  <span class="cover-chip">AI로 풀어보는 게임 시리즈 · ③ 대항해시대 2 다이스</span>
+</div></div>
+<!-- /lab-cover -->
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow"><a href="../index.html">AI로 풀어보는 게임 시리즈</a> · ③ 대항해시대 2 다이스</div>
+  <h1>대항해시대 2 다이스 — AI는 확률로 어떻게 고를까?</h1>
+  <p class="question">옛 PC 게임 「대항해시대 2」의 항구 술집에서는 블랙잭과 '다이스'라는 두 가지 도박을 할 수 있었습니다. 다이스는 주사위 다섯 개로 하는 포커 같은 게임이고, 플레이어를 포함해 세 사람이 겨룹니다 [1]. 주사위는 운이라는데, AI는 이 게임에서 무엇을 따질 수 있을까요?</p>
+  <p class="lead">오늘의 상대는 주판봇과 초파리 연구원입니다. 하루·시아·모아가 차례로 플레이어가 되어 직접 굴려 본 뒤, AI가 "어떤 주사위를 남기고 다시 굴릴까"를 고르는 두 가지 방법을 따라갑니다.</p>
+  <p class="byline">글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · 2026-11-27 · v1.0</p>
+  <div class="three"><b>처음 오신 분께 — 이 페이지를 3줄로</b><ol>
+    <li><b>무엇을</b>: 주사위 다섯 개 중 몇 개를 남기고 나머지를 다시 굴릴지 고르는 문제를 AI가 푸는 길 두 가지를 봅니다. ① 나올 수 있는 결과를 모두 세기 ② 수천 번 굴려 보고 비율로 어림하기.</li>
+    <li><b>왜 중요한가</b>: 운이 섞인 일에서도 "이길 확률이 가장 높은 선택"은 있습니다. 다만 그 선택으로 이길 확률은 겨우 몇 %p 오를 뿐이라, 한 판의 결과로 실력을 판단하면 안 됩니다.</li>
+    <li><b>일상·현장에서는</b>: 일기예보의 강수 확률, 보험료 계산, 신약 시험의 성공 가능성처럼 "모두 셀 수 있으면 세고, 못 세면 많이 시험해 본다"는 방식이 곳곳에 쓰입니다.</li></ol>
+    <p class="calm" style="margin:8px 0 0">코드나 수식을 몰라도 됩니다. 이 페이지의 판돈은 없습니다. 이기고 지는 것만 셉니다.</p>
+    <details class="fold"><summary>영어 약어 풀이</summary><p><b>AI</b> 인공지능 · <b>몬테카를로</b> 무작위로 많이 시험해 보고 비율로 답을 어림하는 방법(도박 도시 이름에서 따옴)</p></details>
+  </div>
+  <div class="kpis" aria-label="숫자 요약">
+    <div class="kpi r"><b>7,776</b><span>주사위 다섯 개가 나올 수 있는 모든 경우<sup>①</sup></span></div>
+    <div class="kpi m"><b>46.3%</b><span>첫 굴림이 원페어일 확률(가장 흔함)<sup>①</sup></span></div>
+    <div class="kpi a"><b>@@KPI_GAP@@</b><span>감 대신 모든 경우를 세면 오르는 승률<sup>②</sup></span></div>
+    <div class="kpi g"><b>300번</b><span>굴려 보기로 "세기"를 거의 따라잡는 횟수<sup>②</sup></span></div>
+  </div>
+  <p class="muted" style="font-size:13px">① 이 페이지가 7,776가지를 직접 세어 얻은 값입니다. ② 이 페이지의 검산(씨앗 고정 1,500판)에서 얻은 평균값입니다(대결 참고).</p>
+</div></header>
+
+<main>
+<section class="sec" id="cast" aria-labelledby="h-cast"><div class="wrap">
+  <h2 id="h-cast">오늘의 플레이어와 연구실 식구</h2>
+  <div class="cast" id="castgrid"></div>
+  <div class="secret"><button class="bt" id="secretbtn" type="button" aria-expanded="false">방청석 보기 (미공개 식구)</button><div class="row" id="secretrow" hidden></div></div>
+  <div data-dlg="hero"></div>
+</div></section>
+
+<!-- 단계 1 -->
+<section class="sec" id="c1" aria-labelledby="h-c1"><div class="wrap">
+  <h2 id="h-c1"><span class="hex">1</span>어떤 게임일까 — 주사위 다섯 개 포커 <span class="sub">박사의 규칙 설명</span></h2>
+  <div data-dlg="c1"></div>
+  <p>원작의 다이스는 "다섯 개의 주사위를 쓰는 포커"이고 세 사람이 겨룹니다 [1][2]. 다시 굴리는 횟수나 판돈 올리기 같은 세부 규칙은 자료마다 달라서, 이 페이지는 다섯 주사위 포커에서 가장 흔한 규칙으로 각색했습니다.</p>
+  <div class="rules">
+    <div><b>① 굴리기</b>세 사람이 각자 주사위 다섯 개(1~6)를 한 번 굴립니다.</div>
+    <div><b>② 한 번 다시 굴리기</b>남길 주사위를 고르고, 나머지를 <b>딱 한 번</b> 다시 굴립니다. 다 남겨도, 다 다시 굴려도 됩니다.</div>
+    <div><b>③ 족보 겨루기</b>족보가 가장 높은 사람이 이깁니다. 같은 족보면 많이 나온 숫자부터 큰 쪽이 이기고, 완전히 같으면 무승부입니다.</div>
+  </div>
+  <div class="tblwrap"><table class="ranks" id="ranktbl"></table></div>
+  <p class="calm">이 페이지에서는 주판봇과 초파리 연구원이 먼저 굴리고, 플레이어는 두 사람의 결과를 본 뒤 마지막으로 고릅니다. 마지막에 고르는 사람은 "무엇을 이겨야 하는지" 알고 고를 수 있습니다.</p>
+  <div class="pair">
+    <div><div class="tl">일상으로 치면</div>시험 전날 밤, 과목 다섯 개 중 이미 잘하는 과목은 두고 몇 과목만 다시 공부하는 것과 비슷합니다. 무엇을 남기고 무엇을 다시 할지는 "목표 점수"에 따라 달라집니다.</div>
+    <div><div class="tr">AI에서는</div>결과가 확률로 정해지는 상황에서 선택지마다 <b>이길 확률</b>을 계산해 가장 높은 것을 고르는 문제입니다. 확률을 정확히 셀 수 있으면 세고, 못 세면 시험해 보고 어림합니다.</div>
+  </div>
+  <div class="quiz" data-quiz="c1"></div>
+</div></section>
+
+<!-- 단계 2 -->
+<section class="sec" id="c2" aria-labelledby="h-c2"><div class="wrap">
+  <h2 id="h-c2"><span class="hex">2</span>직접 해 보기 — 술집 탁자의 세 사람 <span class="sub">모아의 도전</span></h2>
+  <div data-dlg="c2"></div>
+  <div class="panel game" id="play">
+    <div class="ptitle">다이스 — 주사위를 눌러 남길 것을 고른 뒤 "다시 굴리기" (남긴 주사위는 위로 들려요)</div>
+    <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
+      <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
+    <div class="felt">
+      <div class="seat" style="--cc:var(--c-robo)"><img class="av" id="av-robo" alt="주판봇"><div><div class="nm">주판봇</div><div class="dice" id="d-robo"></div></div><span class="rk" id="r-robo">—</span></div>
+      <div class="seat" style="--cc:var(--c-fly)"><img class="av" id="av-fly" alt="초파리 연구원"><div><div class="nm">초파리 연구원</div><div class="dice" id="d-fly"></div></div><span class="rk" id="r-fly">—</span></div>
+      <div class="seat me" id="seat-me"><img class="av" id="av-me" alt=""><div><div class="nm" id="nm-me"></div><div class="dice" id="d-me" role="group" aria-label="내 주사위 — 눌러서 남기기"></div></div><span class="rk" id="r-me">—</span></div>
+    </div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-roll">다시 굴리기</button><button class="bt" type="button" id="pl-stay">이대로 겨루기</button></div></div>
+    <div id="pl-say" aria-live="polite"></div>
+    <div class="minis"><div class="mini a"><span>남긴 주사위</span><b id="pl-keep">0개</b></div><div class="mini m"><span>이겨야 할 패</span><b id="pl-target" style="font-size:16px">—</b></div><div class="mini g"><span>전적</span><b id="pl-rec">0승 0패</b></div><div class="mini r"><span>하루의 귀띔</span><b id="pl-hint" style="font-size:15px">꺼짐</b></div></div>
+    <div class="glog" id="pl-log" aria-live="polite"></div>
+  </div>
+  <p class="calm">세 사람이 겨루니 아무렇게나 해도 세 판에 한 판쯤은 이깁니다. 몇 판 해 보고, "하루의 귀띔"을 켜서 내 선택과 비교해 보세요.</p>
+  <div class="quiz" data-quiz="c2"></div>
+</div></section>
+
+<!-- 단계 3 -->
+<section class="sec" id="c3" aria-labelledby="h-c3"><div class="wrap">
+  <h2 id="h-c3"><span class="hex">3</span>모든 경우 세기 — 족보마다 몇 가지? <span class="sub">시아의 정리 · AI 방법 ①의 준비</span></h2>
+  <div data-dlg="c3a"></div>
+  <p>주사위 하나는 6가지, 두 개는 6 × 6 = 36가지, 다섯 개는 6을 다섯 번 곱한 <b>7,776가지</b>로 나옵니다. 이 정도면 컴퓨터가 하나하나 다 세어 볼 수 있습니다. 시아는 7,776가지를 모두 늘어놓고 족보별로 세기로 했습니다.</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 하나하나 다 세나</h4>
+      <ol><li><b>문제 상황</b>: "트리플이 잘 나온다", "스트레이트는 귀하다" 같은 말은 느낌일 뿐입니다.</li>
+        <li><b>앞 방법의 한계</b>: 몇십 번 굴려서 센 비율은 굴릴 때마다 달라집니다.</li>
+        <li><b>해법</b>: 나올 수 있는 결과를 빠짐없이 세면 <b>확률 = 그 족보가 나오는 경우 수 ÷ 모든 경우 수</b>로 정확한 값이 나옵니다. 주사위는 어느 면이든 똑같이 잘 나오니까요.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 반 학생 수를 어림하지 않고 출석부를 처음부터 끝까지 세는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e04" alt=""><p><b>하루</b> 파이브다이스(다섯 개가 다 같은 숫자)는 왜 딱 6가지예요?</p></div>
+      <div class="words"><b>"다 같은 숫자"가 되는 길은 숫자마다 하나뿐이라서요.</b> 11111, 22222, … 66666. 숫자가 1부터 6까지 여섯 개니 6가지입니다. 7,776가지 중 6가지니까 아주 드물죠.</div>
+      <div class="pic"><div class="row"><span id="pic5"></span></div><div class="row muted" style="font-size:13px">다섯 개가 다 같은 경우는 이 여섯 줄이 전부입니다.</div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 주사위 <b>두 개</b>만 굴린다면? 모든 경우 36가지 중 두 개가 같은 경우(11, 22, … 66)는 6가지 → 6 ÷ 36, 곧 <b>여섯 번에 한 번</b>꼴입니다.</div>
+      <div class="q"><img data-mood="asst_e16" alt=""><p><b>하루</b> 세어 보면 되는 거였네요. 다섯 개는 컴퓨터가 7,776가지를 다 세 주고요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>6⁵ = 7,776</td><td>주사위 5개의 모든 결과 수(6을 다섯 번 곱함)</td></tr><tr><td>P(족보) = 경우 수 ÷ 7,776</td><td>모든 결과가 똑같이 잘 나올 때의 확률</td></tr><tr><td>6 ÷ 7,776 ≈ 0.08%</td><td>파이브다이스가 처음부터 나올 확률</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 경우의 수와 확률의 정의(수학적 확률)입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">7,776가지를 모두 늘어놓고 족보별로 세기</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="ct-go">모두 세기</button><button class="bt" type="button" id="ct-reset">처음부터</button></div><div class="group"><span class="glabel">지금 센 경우</span><b class="val" id="ct-n">0</b><span class="glabel">/ 7,776</span></div></div>
+    <div class="tblwrap"><table class="ranks" id="ct-tbl"></table></div>
+    <div class="insight" id="ct-i" aria-live="polite"></div>
+  </div>
+  <div class="aicheck" id="aic">
+    <h4>AI 판단 코너 — "족보는 귀한 순서대로 매겨져 있다", 맞을까?</h4>
+    <div id="aic-say"></div>
+    <div class="ctrl"><div class="group"><span class="glabel">두 족보를 골라 비교</span><span class="tabs" id="aic-pick"></span></div></div>
+    <div class="insight" id="aic-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c3"></div>
+</div></section>
+
+<!-- 단계 4 -->
+<section class="sec" id="c4" aria-labelledby="h-c4"><div class="wrap">
+  <h2 id="h-c4"><span class="hex">4</span>다시 굴릴 주사위 고르기 — 이길 확률 세기 <span class="sub">모아의 질문 · AI 방법 ①</span></h2>
+  <div data-dlg="c4a"></div>
+  <p>이제 진짜 문제입니다. 내 주사위 다섯 개에서 남길 것을 고르는 방법은 모두 32가지(같은 숫자끼리 겹치는 것을 빼면 더 적음)입니다. AI는 남기기마다 <b>다시 굴릴 주사위의 모든 결과</b>를 세어, 그중 상대 두 사람의 패를 이기는 경우가 몇 가지인지 봅니다.</p>
+  <ol class="steps5">
+    <li><b>남기기를 하나 정한다</b>: 예를 들어 3·3을 남기고 나머지 세 개를 다시 굴린다.</li>
+    <li><b>다시 굴릴 주사위의 모든 결과를 늘어놓는다</b>: 세 개면 6 × 6 × 6 = 216가지.</li>
+    <li><b>이기는 결과를 센다</b>: 216가지 중 상대의 가장 센 패보다 높은 것이 몇 가지인지 센다. 그 비율이 이 남기기의 <b>이길 확률</b>.</li>
+    <li><b>모든 남기기에 대해 반복하고, 확률이 가장 높은 것을 고른다.</b></li>
+  </ol>
+  <div class="why2">
+    <div class="whyb"><h4>왜 "족보가 좋은 쪽"이 아니라 "이길 확률"로 고르나</h4>
+      <ol><li><b>문제 상황</b>: 투페어를 들고 있으면 대개 두 쌍을 다 남깁니다(감).</li>
+        <li><b>앞 방법의 한계</b>: 상대가 이미 나보다 높은 투페어라면, 두 쌍을 남겨 봐야 풀하우스가 나오지 않는 한 집니다. 감은 상대를 보지 않습니다.</li>
+        <li><b>해법</b>: 상대의 패를 "넘어야 할 선"으로 두고, 남기기마다 그 선을 넘는 확률을 셉니다. 그러면 "작은 쌍은 버리고 큰 쌍만 남기기"처럼 감과 다른 답이 나오기도 합니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 달리기 시합에서 기록을 줄이는 게 아니라, 앞사람을 이기는 데 필요한 만큼만 무리하는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 이길 확률을 센다는 게 구체적으로 어떻게 하는 거예요?</p></div>
+      <div class="words"><b>다시 굴릴 주사위가 만들 수 있는 결과를 모두 적고, 이기는 것에 동그라미를 쳐요.</b> 동그라미 개수 ÷ 전체 개수가 이길 확률입니다.</div>
+      <div class="pic"><div class="row"><span id="pic-keep"></span></div><div class="row muted" style="font-size:13px">2·2·2·6을 남기고 하나만 다시 굴릴 때, 상대가 2·2·2·5·5(풀하우스)라면 — 2나 6이 나와야 이깁니다(포다이스·더 센 풀하우스). 여섯 가지 중 두 가지.</div></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 동그라미 2개 ÷ 6가지 = <b>3분의 1</b>. 반면 2·2·2만 남기고 두 개를 다시 굴리면 36가지 중 이기는 결과가 <b>12가지</b>로 똑같이 3분의 1입니다. 남기는 방법이 달라도 확률이 같을 수 있어요.</div>
+      <div class="q"><img data-mood="asst_e01" alt=""><p><b>하루</b> 남기기마다 이렇게 세서 가장 큰 걸 고르면 되는군요!</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">이길 확률(남기기) = 이기는 결과 수 ÷ 6^(다시 굴리는 개수)</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>6^(다시 굴리는 개수)</td><td>1개면 6, 2개면 36, 5개면 7,776가지</td></tr><tr><td>가장 큰 값 고르기</td><td>모든 남기기 중 이길 확률이 최대인 것(argmax)</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 경우의 수로 구하는 확률을 선택지마다 비교하는 일입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">남기기마다 이길 확률 — 초록 = AI의 선택, 점선 = 감(같은 숫자 남기기)의 선택</div>
+    <div class="ctrl"><div class="group"><span class="glabel">상황</span><span class="tabs" id="kp-case"></span><button class="bt" type="button" id="kp-rand">무작위 상황</button></div></div>
+    <div class="vs3" id="kp-vs"></div>
+    <div class="keeps" id="kp-list"></div>
+    <div class="insight" id="kp-i" aria-live="polite"></div>
+  </div>
+  <div class="quiz" data-quiz="c4"></div>
+</div></section>
+
+<!-- 단계 5 -->
+<section class="sec" id="c5" aria-labelledby="h-c5"><div class="wrap">
+  <h2 id="h-c5"><span class="hex">5</span>굴려 보며 어림하기 — 몬테카를로 <span class="sub">하루의 차례 · AI 방법 ②</span></h2>
+  <div data-dlg="c5a"></div>
+  <p>주사위 다섯 개는 다 셀 수 있었지만, 주사위가 스무 개거나 규칙이 복잡하면 경우의 수가 너무 많아 다 셀 수 없습니다. 그럴 때 AI는 <b>남기기마다 실제로 여러 번 굴려 보고</b>, 이긴 비율로 확률을 어림합니다. 이 방법을 <b>몬테카를로 방법</b>이라고 부릅니다 [3]. 굴리는 횟수가 많을수록 어림값은 정확한 값에 가까워집니다(큰수의 법칙).</p>
+  <div class="why2">
+    <div class="whyb"><h4>왜 다 세지 않고 굴려 보나</h4>
+      <ol><li><b>문제 상황</b>: 주사위가 10개면 6을 열 번 곱한 6천만 가지가 넘습니다. 카드 게임, 날씨, 주식처럼 경우가 끝없이 많은 문제도 있습니다.</li>
+        <li><b>앞 방법의 한계</b>: 모든 경우 세기는 경우가 많아지면 시간이 기하급수로 늘어납니다.</li>
+        <li><b>해법</b>: 무작위로 N번만 굴려 봅니다. 경우의 수가 아무리 많아도 일은 N번이면 끝나고, N을 늘릴수록 오차가 줄어듭니다.</li></ol>
+      <div class="easy"><b>쉽게 말하면</b> 국을 다 마셔 보지 않고 잘 저어서 한 숟가락씩 여러 번 맛보는 것.</div></div>
+    <div class="mathb"><h4>수학 수식을 어려워하는 조수가 대신 물어봅니다</h4>
+      <div class="q"><img data-mood="asst_e09" alt=""><p><b>하루</b> 몇 번 굴려 봐야 믿을 만해요? 10번이면 되나요?</p></div>
+      <div class="words"><b>10번이면 들쭉날쭉해요.</b> 진짜 확률이 3분의 1이어도, 10번 중 이긴 횟수는 1번일 수도 6번일 수도 있거든요. 굴리는 횟수를 100배로 늘리면 흔들림은 10분의 1로 줄어듭니다.</div>
+      <div class="pic"><table class="tbl2"><tr><th>굴린 횟수</th><th>어림값이 보통 흔들리는 폭(진짜 33%일 때)</th></tr><tr><td>10번</td><td>약 ±15%p</td></tr><tr><td>100번</td><td>약 ±5%p</td></tr><tr><td>10,000번</td><td>약 ±0.5%p</td></tr></table></div>
+      <div class="try"><b>숫자로 한 번 해 보기</b> 아래 패널에서 "10번 더"를 몇 번 눌러 보세요. 처음엔 막대가 정답선(빨간 줄)에서 멀리 튀다가, 1,000번쯤부터는 빨간 줄에 붙습니다.</div>
+      <div class="q"><img data-mood="asst_e19" alt=""><p><b>하루</b> 많이 굴릴수록 흔들림이 줄어드니까, 시간만 있으면 세기를 따라잡는군요.</p></div>
+      <details class="fold"><summary>수식으로 쓰면 (몰라도 됩니다)</summary><div class="eqx">어림값 = 이긴 횟수 ÷ N, 흔들림 ≈ √(p × (1 − p) ÷ N)</div><table><tr><th>식 조각</th><th>뜻</th></tr><tr><td>N</td><td>굴려 본 횟수</td></tr><tr><td>p</td><td>진짜 이길 확률</td></tr><tr><td>√(… ÷ N)</td><td>N이 100배가 되면 흔들림은 10분의 1</td></tr></table><p style="font-size:14px;margin:6px 0 0"><b>학교 수학으로 보면</b> 통계적 확률(상대도수)과 큰수의 법칙입니다.</p></details></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">굴려 보며 어림하기 — 막대 = 굴려 본 비율, 빨간 줄 = 다 세어 얻은 정확한 값</div>
+    <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="mc-10">10번 더</button><button class="bt" type="button" id="mc-100">100번 더</button><button class="bt" type="button" id="mc-1000">1,000번 더</button><button class="bt" type="button" id="mc-0">처음부터</button></div><div class="group"><span class="glabel">남기기마다 굴린 횟수</span><b class="val" id="mc-n">0</b></div></div>
+    <div class="vs3" id="mc-vs"></div>
+    <div class="keeps" id="mc-list"></div>
+    <div class="insight" id="mc-i" aria-live="polite"></div>
+  </div>
+  <p class="calm">이 패널은 4단계에서 고른 상황을 그대로 씁니다. 4단계에서 상황을 바꾸면 여기도 바뀝니다.</p>
+  <div class="quiz" data-quiz="c5"></div>
+</div></section>
+
+<!-- 대결 -->
+<section class="sec" id="duel" aria-labelledby="h-duel"><div class="wrap">
+  <h2 id="h-duel">대결 — 굴려 보는 횟수가 다른 세 AI</h2>
+  <div data-dlg="duel"></div>
+  <p class="lead">같은 200판을 세 AI에게 똑같이 줍니다(상대 패, 내 첫 굴림까지 같음). 하루의 AI는 남기기마다 30번, 시아의 AI는 300번 굴려 보고 고르고, 모아의 AI는 모든 경우를 셉니다. 비교용으로 주판봇의 "감"도 같은 판을 둡니다.</p>
+  <div class="race" id="dl-lanes"></div>
+  <div class="panel">
+    <div class="ctrl"><div class="group"><span class="glabel">먼저 맞혀 보기 — 기대 승률이 가장 낮은 쪽은?</span><span class="tabs" id="dl-pred"></span></div>
+      <div class="group"><button class="bt primary" type="button" id="dl-go">200판 대결 시작</button></div></div>
+    <div id="dl-res" hidden><div id="dl-say"></div><div class="score"><span id="dl-score"></span><span id="dl-my"></span></div></div>
+  </div>
+  <p><b>기대 승률</b>은 고른 남기기의 정확한 이길 확률을 200판 평균한 값이고, <b>실제 승</b>은 그 뒤 주사위를 진짜로 굴려 이긴 판 수입니다. 실제 승은 운이 섞여 순위가 뒤바뀌기도 하니, 선택의 질은 기대 승률로 봅니다. 이 페이지의 검산(1,500판)에서는 감 @@GUT@@, 30번 @@MC30@@, 300번 @@MC300@@, 모든 경우 세기 @@EXACT@@였습니다.</p>
+  <div class="quiz" data-quiz="duel"></div>
+</div></section>
+
+<!-- 정리 -->
+<section class="sec" id="sum" aria-labelledby="h-sum"><div class="wrap">
+  <h2 id="h-sum">정리 — 셀 수 있으면 세고, 못 세면 굴려 본다</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th></th><th>감(같은 숫자 남기기)</th><th>① 모든 경우 세기</th><th>② 굴려 보며 어림하기</th></tr></thead><tbody>
+    <tr><td>보는 것</td><td>내 주사위만</td><td>내 주사위 + 상대의 패</td><td>내 주사위 + 상대의 패</td></tr>
+    <tr><td>얻는 것</td><td>대개 괜찮은 선택</td><td>정확한 이길 확률과 가장 좋은 선택</td><td>어림한 확률(횟수가 많을수록 정확)</td></tr>
+    <tr><td>약점</td><td>상대를 보지 않음</td><td>경우가 많아지면 너무 오래 걸림</td><td>횟수가 적으면 엉뚱한 선택</td></tr>
+    <tr><td>오늘의 결과(기대 승률)</td><td>@@GUT@@</td><td>@@EXACT@@</td><td>30번 @@MC30@@ · 300번 @@MC300@@</td></tr>
+    <tr><td>②편 코인 게임과 비교</td><td colspan="3">코인 게임에는 운이 없어서 끝에서부터 따지면 <b>반드시 이기는 수</b>가 나왔습니다. 다이스에는 운이 있어서 가장 좋은 수도 <b>이길 확률을 조금 높일 뿐</b>입니다. 그래서 AI의 실력은 한 판이 아니라 많은 판의 평균으로 봐야 합니다.</td></tr>
+  </tbody></table></div>
+  <div class="paper"><b>이 방법의 뿌리 [3]</b> — 1949년 메트로폴리스와 울람은 "모든 경우를 계산하기 어려운 문제는 무작위 시험을 많이 해서 답을 어림하자"는 방법을 정리하고, 도박 도시의 이름을 따 몬테카를로 방법이라 불렀습니다. 오늘날 바둑 AI의 수 읽기, 날씨 예측, 금융 위험 계산에 두루 쓰입니다.</div>
+  <h3>용어 대응 카드</h3>
+  <div class="gloss">
+    <div><b>족보</b> = 주사위 다섯 개가 이루는 패의 등급(원페어, 트리플 …).</div>
+    <div><b>경우의 수</b> = 나올 수 있는 결과의 가짓수. 주사위 다섯 개는 7,776.</div>
+    <div><b>확률</b> = 그 일이 일어나는 경우 수 ÷ 모든 경우 수.</div>
+    <div><b>모든 경우 세기(완전 열거)</b> = 결과를 하나도 빠짐없이 늘어놓고 세는 방법.</div>
+    <div><b>몬테카를로 방법</b> = 무작위로 많이 시험해 보고 비율로 어림하는 방법.</div>
+    <div><b>큰수의 법칙</b> = 시험 횟수가 늘수록 비율이 진짜 확률에 가까워진다는 성질.</div>
+    <div><b>기대 승률</b> = 고른 선택의 이길 확률을 여러 판 평균한 값. 운을 뺀 선택의 질.</div>
+  </div>
+  <div class="next"><a href="../coin/index.html"><b>← ② 코인 게임</b><br>운 없는 게임의 필승법</a><a href="../blackjack/index.html"><b>④ 블랙잭 →</b><br>같은 술집의 다른 도박, 기댓값과 몬테카를로 학습</a><a href="../index.html"><b>시리즈 목차</b></a></div>
+</div></section>
+
+<section class="sec" id="outro" aria-labelledby="h-outro"><div class="wrap">
+  <h2 id="h-outro">아웃트로</h2>
+  <div data-dlg="outro"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <h3>출처</h3>
+  <table><thead><tr><th>#</th><th>자료</th><th>이 페이지에서 쓴 곳</th></tr></thead><tbody>
+    <tr><td>[1]</td><td>나무위키, 「대항해시대 2」 — 그 외 항목 (2026-11-27 확인)</td><td>머리말·1단계 — 술집의 블랙잭과 다이스, 다섯 주사위 포커, 참가자 3명</td></tr>
+    <tr><td>[2]</td><td>알티, 「[알티의 인생 게임] 대항해시대 2」, Steemit (2026-11-27 확인)</td><td>1단계 — 술집 도박으로 블랙잭과 다이스가 있었다는 회고</td></tr>
+    <tr><td>[3]</td><td>Metropolis, N., Ulam, S. (1949). The Monte Carlo Method. Journal of the American Statistical Association, 44(247), 335–341.</td><td>5단계·정리 — 몬테카를로 방법</td></tr>
+  </tbody></table>
+  <h3>예시값·설명용 모형인 것</h3>
+  <ul><li>원작 다이스의 세부 규칙(다시 굴리는 횟수, 판돈 올리기, 동점 처리)은 확인하지 못해, 다섯 주사위 포커의 흔한 규칙(한 번 다시 굴리기, 스트레이트는 1~5 또는 2~6)으로 각색했습니다.</li>
+    <li>주판봇·초파리 연구원은 "감"(스트레이트 이상이면 그대로, 아니면 가장 많이 나온 숫자만 남기기)으로 둡니다. 대결과 KPI의 숫자는 이 규칙으로 얻은 값입니다(검산: 저장소의 code/check_dice.js).</li>
+    <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다. 판돈은 다루지 않습니다.</li>
+    <li>표지·게임 화면은 연구실 캐릭터 그림과 CSS로 그린 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_dice.md</li></ul>
+  <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
+  <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
+</div></footer>
+
+<script>
+/*@@SPRITES@@*/
+/*@@COMMON@@*/
+/*@@ENGINE@@*/
+/*@@SFX@@*/
+/*@@GAMEJS@@*/
+(function(){
+'use strict';
+var $=U.$,$$=U.$$,G=GK;
+var reduce=U.reduce;
+
+/* ── 대사 ── */
+var DLG={
+ hero:[["doc","doc_e08","오늘은 대항해시대 2의 술집으로 가 봅시다. 항해에 지친 선원들이 주사위를 굴리던 곳이에요."],
+  ["moa","moa_e19","주사위는 순전히 운 아니에요? AI가 할 일이 있어요?"],
+  ["sia","sia_e09","굴리는 건 운이지만, 어떤 걸 다시 굴릴지는 고를 수 있잖아요."],
+  ["asst","asst_e12","골라야 하는 게 있으면 따질 것도 있겠네요. 일단 굴려 봐요!"]],
+ c1:[["doc","doc_e07","족보 표를 먼저 보세요. 오른쪽 두 줄은 처음 한 번 굴렸을 때 그 족보가 나오는 경우 수와 확률입니다. 3단계에서 직접 세어 확인할 거예요."],
+  ["robo","robo_e16","나는 주사위의 달인! 같은 숫자만 남기면 된다!"]],
+ c2:[["moa","moa_e12","주판봇이랑 초파리 선배가 먼저 굴렸어요. 저는 그걸 보고 고르면 되죠?"],
+  ["fly","fly_e09","내 패보다 세게 나와야 이겨. 뭘 남길지는 내 패를 보고 정해 봐."]],
+ c3a:[["sia","sia_e07","느낌으로 말하지 말고 다 세어 봐요. 7,776가지면 컴퓨터는 눈 깜짝할 새예요."],
+  ["asst","asst_e19","하나씩 다 세는 거, 제가 버튼 누를게요!"]],
+ aic:[["robo","robo_e01","족보는 귀한 순서대로 정한 거다! 높은 족보일수록 나오기 어렵지!"],
+  ["doc","doc_e10","표에 센 숫자가 있으니 확인해 봅시다. 두 족보를 골라 나오는 경우 수를 비교해 보세요."]],
+ c4a:[["moa","moa_e09","그럼 다시 굴릴 때는 뭘 남겨야 해요? 그냥 같은 숫자 남기면 안 돼요?"],
+  ["doc","doc_e07","대개는 그게 맞아요. 그런데 상대 패를 보면 답이 달라지기도 합니다. AI는 남기기마다 이길 확률을 셉니다."]],
+ c5a:[["asst","asst_e12","만약 주사위가 스무 개라서 다 셀 수 없으면요? 그땐 AI도 손을 놔요?"],
+  ["fly","fly_e07","굴려 보면 되지. 남기기마다 몇백 번씩 굴려 보고 이긴 비율을 봐. 10번만 굴리면 어떻게 되는지도 보고."]],
+ duel:[["doc","doc_e08","세 분의 AI는 굴려 보는 횟수만 다릅니다. 같은 200판으로 겨뤄 봅시다."],
+  ["asst","asst_e10","저는 30번씩만 굴려 봐요. 빠르게!"],
+  ["sia","sia_e10","저는 300번씩. 적당히요."],
+  ["moa","moa_e19","저는 다 세요! 모든 경우!"]],
+ outro:[["doc","doc_e16","오늘의 세 줄입니다.<br>① 주사위 다섯 개는 7,776가지 — 다 세면 정확한 확률이 나온다.<br>② 다시 굴릴 주사위는 상대 패를 넘을 확률로 고른다. 감보다 승률이 몇 %p 오른다.<br>③ 다 셀 수 없으면 많이 굴려 본다. 횟수가 적으면 엉뚱한 선택을 한다."],
+  ["asst","asst_e16","30번만 굴려 본 제 AI가 감보다 못할 때도 있었어요. 대충 시험하면 안 하느니만 못하네요."],
+  ["sia","sia_e16","스트레이트가 풀하우스보다 귀한데 더 낮은 족보라니, 세어 보길 잘했어요."],
+  ["moa","moa_e19","제일 좋은 선택을 해도 세 판에 한 판 조금 넘게 이겨요. 운은 운이네요!"],
+  ["robo","robo_e14","같은 숫자만 남기던 내 감도 나쁘진 않았다… 상대를 안 봤을 뿐."],
+  ["fly","fly_e16","한 판 이겼다고 실력이라고 하지 말 것. 많이 해 본 평균으로 말하기. 그게 오늘의 숙제야."]]
+};
+U.dialogues(DLG);
+G.cast([["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","굴려 보기 담당. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","모든 경우 세기 담당."],["moa","moa_e13","인턴 모아 · 플레이어 3","탁자에 먼저 앉은 도전자. \"왜요?\" 담당."],["fly","fly_e13","초파리 연구원","탁자의 두 번째 상대. \"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","탁자의 첫 번째 상대. 같은 숫자만 남기는 감파."]],['(주사위 달그락)','(…끄덕)','(짝짝짝)']);
+
+function die(v,cls){var P={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[v],h='';for(var i=0;i<9;i++)h+=P.indexOf(i)>=0?'<i></i>':'<span></span>';return '<span class="die r'+v+(cls?' '+cls:'')+'" aria-label="'+v+'">'+h+'</span>';}
+function dice(a,cls){return a.map(function(v){return die(v,cls);}).join('');}
+function rk(h){return DG.rank(h);}
+function keepStr(h,m){var k=DG.keepOf(h,m).slice().sort();return k.length?k.join('·')+' 남기기':'모두 다시 굴리기';}
+
+/* 족보 표 (첫 굴림 경우 수) */
+var FT=DG.firstTable(),EX={7:[3,3,3,3,3],6:[5,5,5,5,2],5:[4,4,4,1,1],4:[2,3,4,5,6],3:[6,6,6,2,1],2:[5,5,3,3,1],1:[2,2,6,4,1],0:[1,2,3,4,6]};
+$('#ranktbl').innerHTML='<tr><th>순위</th><th>족보</th><th>예</th><th>처음 굴려 나오는 경우</th><th>확률</th></tr>'+[7,6,5,4,3,2,1,0].map(function(c,i){return '<tr><td>'+(i+1)+'</td><td><b>'+DG.NAMES[c]+'</b></td><td>'+dice(EX[c],'sm')+'</td><td class="n">'+FT[c].toLocaleString()+'</td><td class="n">'+(FT[c]/77.76).toFixed(2)+'%</td></tr>';}).join('')+'<tr><td colspan="5" class="muted" style="font-size:13px">포다이스 = 같은 숫자 4개, 풀하우스 = 3개 + 2개, 스트레이트 = 1·2·3·4·5 또는 2·3·4·5·6</td></tr>';
+$('#pic5').innerHTML=[1,2,3,4,5,6].map(function(v){return '<span style="display:inline-flex;gap:2px;margin:2px 8px 2px 0">'+dice([v,v,v,v,v],'sm')+'</span>';}).join('');
+$('#pic-keep').innerHTML=dice([2,2,2,6],'sm')+' + ? → '+[1,2,3,4,5,6].map(function(v){var w=v===2||v===6;return '<span style="display:inline-block;margin:0 3px;padding:1px;border-radius:50%;'+(w?'outline:2px solid #13733a':'')+'">'+die(v,'sm')+'</span>';}).join('');
+
+/* ── 단계 2: 직접 해 보기 ── */
+var WHO=G.WHO,PL={who:'moa',w:0,l:0,t:0,phase:'idle',hold:[],me:[],robo:[],fly:[],log:[]};
+$('#av-robo').src=U.spr('robo_e16');$('#av-fly').src=U.spr('fly_e13');
+function say(who,mood,txt){$('#pl-say').innerHTML=U.say(who,mood,txt);}
+function target(){return Math.max(rk(PL.robo).score,rk(PL.fly).score);}
+function holdMask(){var m=0;PL.hold.forEach(function(h,i){if(h)m|=1<<i;});return m;}
+function drawMe(shake){var busy=PL.phase!=='choose';$('#d-me').innerHTML=PL.me.map(function(v,i){return '<button type="button" class="dbtn" data-i="'+i+'" aria-pressed="'+!!PL.hold[i]+'" '+(busy?'disabled':'')+'>'+die(v,(PL.hold[i]?'hold':'')+(shake&&!PL.hold[i]?' shake':''))+'</button>';}).join('');
+  $$('#d-me .dbtn').forEach(function(b){b.onclick=function(){var i=+b.dataset.i;PL.hold[i]=!PL.hold[i];SFX.play('lift');drawMe();status();};});
+  $('#r-me').textContent=PL.me.length?rk(PL.me).name:'—';}
+function status(){var k=PL.hold.filter(Boolean).length;$('#pl-keep').textContent=k+'개';$('#pl-rec').textContent=PL.w+'승 '+PL.l+'패'+(PL.t?' '+PL.t+'무':'');
+  $('#pl-target').textContent=PL.robo.length?(rk(PL.robo).score>=rk(PL.fly).score?'주판봇 '+rk(PL.robo).name:'초파리 '+rk(PL.fly).name):'—';
+  $('#pl-roll').disabled=PL.phase!=='choose';$('#pl-stay').disabled=PL.phase!=='choose';
+  var tip=$('#pl-tip').checked;if(!tip||PL.phase!=='choose'){$('#pl-hint').textContent=tip?'—':'꺼짐';}
+  else{var b=DG.bestExact(PL.me,target()),mine=DG.exactWin(PL.me,holdMask(),target());$('#pl-hint').textContent=keepStr(PL.me,b.m).replace(' 남기기','')+' '+Math.round(b.p*100)+'%';
+    say('asst','asst_e07','<span class="muted">(하루의 귀띔)</span> 다 세어 보니 <b>'+keepStr(PL.me,b.m)+'</b>가 이길 확률 '+(b.p*100).toFixed(1)+'%로 가장 높아요. 지금 고른 대로면 '+(mine*100).toFixed(1)+'%예요.');}
+  $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
+function plNew(){PL.phase='busy';PL.hold=[0,0,0,0,0];PL.me=[];PL.robo=DG.roll(5);PL.fly=[];$('#d-robo').innerHTML=dice(PL.robo,'shake');$('#d-fly').innerHTML='';$('#d-me').innerHTML='';$('#r-robo').textContent='…';$('#r-fly').textContent='—';$('#r-me').textContent='—';
+  $$('.seat').forEach(function(s){s.classList.remove('win');});$('#av-me').src=U.spr(WHO[PL.who][2].start);$('#av-me').style.borderColor=WHO[PL.who][1];$('#nm-me').textContent=WHO[PL.who][0];
+  SFX.play('roll');say('robo','robo_e16','내 차례! 데굴데굴…');status();
+  G.later(function(){var m=DG.gut(PL.robo);PL.robo=DG.reroll(PL.robo,m);$('#d-robo').innerHTML=dice(PL.robo);$('#r-robo').textContent=rk(PL.robo).name;SFX.play('roll');
+    PL.fly=DG.roll(5);$('#d-fly').innerHTML=dice(PL.fly,'shake');say('fly','fly_e09','주판봇은 '+rk(PL.robo).name+'. 이제 내 차례.');
+    G.later(function(){PL.fly=DG.reroll(PL.fly,DG.gut(PL.fly));$('#d-fly').innerHTML=dice(PL.fly);$('#r-fly').textContent=rk(PL.fly).name;SFX.play('roll');
+      PL.me=DG.roll(5);PL.phase='choose';drawMe(true);say(PL.who,WHO[PL.who][2].think,'초파리 선배는 '+rk(PL.fly).name+'. 제 첫 굴림은 <b>'+rk(PL.me).name+'</b>… 뭘 남길까요? 주사위를 눌러 고르세요.');
+      PL.log.push('주판봇 '+rk(PL.robo).name+' · 초파리 '+rk(PL.fly).name+' · '+WHO[PL.who][0].split(' ')[1]+' 첫 굴림 '+rk(PL.me).name);status();},900);},900);}
+function finish(rolled){var m=holdMask();PL.phase='busy';if(rolled){PL.me=DG.reroll(PL.me,m);SFX.play('roll');}PL.hold=[0,0,0,0,0];drawMe(rolled);
+  G.later(function(){var me=rk(PL.me).score,t=target(),res=me>t?'w':me===t?'t':'l';PL.phase='over';if(res==='w')PL.w++;else if(res==='l')PL.l++;else PL.t++;
+    var who=rk(PL.robo).score>=rk(PL.fly).score?'robo':'fly';$$('.seat')[res==='w'?2:who==='robo'?0:1].classList.add('win');
+    PL.log.push((rolled?'다시 굴려 ':'그대로 ')+rk(PL.me).name+' → '+(res==='w'?'승리!':res==='t'?'무승부':'패배'));
+    SFX.play(res==='w'?'win':res==='t'?'click':'gameover');
+    say(PL.who,res==='w'?WHO[PL.who][2].happy:res==='l'?WHO[PL.who][2].sad:WHO[PL.who][2].think,res==='w'?rk(PL.me).name+'(으)로 이겼어요!':res==='t'?'완전히 같은 패라 무승부예요.':rk(PL.me).name+'… 졌어요. 다시 한 판!');status();},rolled?650:100);}
+G.tabs($('#pl-who'),[['asst','하루'],['sia','시아'],['moa','모아']],'moa',function(v){PL.who=v;plNew();});
+$('#pl-new').onclick=plNew;$('#pl-roll').onclick=function(){finish(true);};$('#pl-stay').onclick=function(){finish(false);};$('#pl-tip').onchange=status;
+plNew();
+
+/* ── 단계 3: 모든 경우 세기 ── */
+var CT={n:0,t:[0,0,0,0,0,0,0,0],it:null,timer:null};
+function ctDraw(){var mx=Math.max.apply(null,CT.t)||1;$('#ct-n').textContent=CT.n.toLocaleString();
+  $('#ct-tbl').innerHTML='<tr><th>족보</th><th>센 경우</th><th>지금까지 비율</th><th></th></tr>'+[7,6,5,4,3,2,1,0].map(function(c){return '<tr><td><b>'+DG.NAMES[c]+'</b></td><td class="n">'+CT.t[c].toLocaleString()+'</td><td class="n">'+(CT.n?(CT.t[c]/CT.n*100).toFixed(2)+'%':'—')+'</td><td style="width:45%"><span class="bar" style="width:'+(CT.t[c]/mx*100)+'%"></span></td></tr>';}).join('');
+  U.ins($('#ct-i'),!CT.n?[['m','"모두 세기"를 누르면 11111부터 66666까지 차례로 세어 갑니다.']]:CT.n<7776?[['a',CT.n.toLocaleString()+'가지째. 아직 세는 중입니다. 앞쪽(1이 많은 결과)부터 세니 지금 비율은 치우쳐 있어요.']]:
+    [['g','7,776가지를 다 셌습니다. 원페어 3,600(46.3%)이 가장 흔하고, 파이브다이스는 6가지(0.08%)뿐입니다.'],['m','눈여겨볼 곳: 노페어 480가지는 원페어·투페어·트리플보다 드뭅니다. 스트레이트 240가지는 풀하우스 300가지보다 드뭅니다. 아래 AI 판단 코너에서 따져 봅시다.']]);}
+function* gen(){var a=[1,1,1,1,1];while(true){yield a.slice();var j=4;while(j>=0&&a[j]===6){a[j]=1;j--;}if(j<0)return;a[j]++;}}
+$('#ct-go').onclick=function(){if(CT.timer)return;if(CT.n>=7776)return;if(!CT.it)CT.it=gen();
+  (function step(){var k=reduce?7776:160;for(var i=0;i<k;i++){var r=CT.it.next();if(r.done)break;CT.t[DG.rank(r.value).cat]++;CT.n++;}ctDraw();if(CT.n<7776)CT.timer=setTimeout(step,16);else{CT.timer=null;SFX.play('solve');}})();};
+$('#ct-reset').onclick=function(){clearTimeout(CT.timer);CT.timer=null;CT={n:0,t:[0,0,0,0,0,0,0,0],it:null,timer:null};ctDraw();};ctDraw();
+$('#aic-say').innerHTML=DLG.aic.map(function(x,i){return U.say(x[0],x[1],x[2],i%2===1);}).join('');
+G.tabs($('#aic-pick'),[['fh','풀하우스 vs 스트레이트'],['np','노페어 vs 원페어'],['q','포다이스 vs 풀하우스']],null,function(k){
+  var P={fh:[5,4],np:[1,0],q:[6,5]}[k],hi=P[0],lo=P[1],ok=FT[hi]<FT[lo];
+  U.ins($('#aic-i'),[[ok?'g':'r','<b>'+DG.NAMES[hi]+'</b>(순위가 더 높음) '+FT[hi].toLocaleString()+'가지 · <b>'+DG.NAMES[lo]+'</b> '+FT[lo].toLocaleString()+'가지 → '+(ok?'높은 족보가 더 드뭅니다. 이 둘은 주판봇 말이 맞아요.':'낮은 족보가 오히려 더 드뭅니다! 귀한 순서와 족보 순서가 어긋납니다.')],
+    ['m','결론: 다섯 주사위 포커의 족보는 카드 포커의 순서를 빌려 와서, 주사위로 세면 <b>스트레이트(240) &lt; 풀하우스(300)</b>, <b>노페어(480) &lt; 원페어(3,600)</b>처럼 귀한 순서와 어긋나는 곳이 있습니다. "원래 그렇다"는 말도 세어서 확인하세요.']]);});
+U.ins($('#aic-i'),[['m','비교할 두 족보를 골라 보세요.']]);
+
+/* ── 단계 4: 다시 굴릴 주사위 고르기 ── */
+var CASES={a:{me:[2,2,5,5,6],robo:[3,3,6,6,1],fly:[4,4,1,2,3],name:'투페어 대 더 센 투페어'},b:{me:[2,3,4,5,5],robo:[6,6,6,1,2],fly:[1,1,3,4,6],name:'스트레이트를 노릴까'},c:{me:[3,3,3,5,1],robo:[2,2,2,4,4],fly:[5,5,2,2,6],name:'트리플 대 풀하우스'}};
+var KP={me:null,t:0,rows:[]};
+function kpSet(c){KP.me=c.me;KP.robo=c.robo;KP.fly=c.fly;KP.t=Math.max(rk(c.robo).score,rk(c.fly).score);
+  KP.rows=DG.masks(c.me).map(function(m){return {m:m,p:DG.exactWin(c.me,m,KP.t)};}).sort(function(a,b){return b.p-a.p;});KP.gut=DG.gut(c.me);kpDraw();mcReset();}
+function vs(el){var t=rk(KP.robo).score>=rk(KP.fly).score?['주판봇',KP.robo]:['초파리',KP.fly];el.innerHTML='<div><b>내 첫 굴림</b>'+dice(KP.me,'sm')+' '+rk(KP.me).name+'</div><div><b>넘어야 할 패 ('+t[0]+')</b>'+dice(t[1],'sm')+' '+rk(t[1]).name+'</div>';}
+function kpDraw(){vs($('#kp-vs'));var best=KP.rows[0],gk=DG.keepOf(KP.me,KP.gut).slice().sort().join(''),gp=DG.exactWin(KP.me,KP.gut,KP.t);
+  $('#kp-list').innerHTML=KP.rows.slice(0,10).map(function(r,i){var isg=DG.keepOf(KP.me,r.m).slice().sort().join('')===gk;return '<div class="k'+(i===0?' best':'')+(isg?' gutk':'')+'"><span>'+keepStr(KP.me,r.m)+'</span><span class="bars"><i style="width:'+(r.p*100)+'%"></i></span><span class="p">'+(r.p*100).toFixed(1)+'%</span></div>';}).join('')+(KP.rows.length>10?'<div class="muted" style="font-size:13px">… 나머지 '+(KP.rows.length-10)+'가지는 확률이 더 낮아 생략</div>':'');
+  var same=Math.abs(gp-best.p)<1e-9;
+  U.ins($('#kp-i'),[['g','AI(모든 경우 세기)의 선택: <b>'+keepStr(KP.me,best.m)+'</b> — 이길 확률 '+(best.p*100).toFixed(1)+'%'],same?['m','감(같은 숫자 남기기)도 같은 답입니다. 대부분의 판에서는 감과 AI가 같은 선택을 합니다.']:['a','감의 선택 <b>'+keepStr(KP.me,KP.gut)+'</b>은 '+(gp*100).toFixed(1)+'%. 상대 패를 보면 '+((best.p-gp)*100).toFixed(1)+'%p 더 높은 선택이 있습니다.']]);}
+G.tabs($('#kp-case'),Object.keys(CASES).map(function(k){return [k,CASES[k].name];}),'a',function(k){kpSet(CASES[k]);});
+$('#kp-rand').onclick=function(){$$('#kp-case .bt').forEach(function(b){b.setAttribute('aria-pressed','false');});var a=DG.roll(5);a=DG.reroll(a,DG.gut(a));var b=DG.roll(5);b=DG.reroll(b,DG.gut(b));kpSet({me:DG.roll(5),robo:a,fly:b});};
+
+/* ── 단계 5: 굴려 보며 어림하기 ── */
+var MC={n:0,w:[]};
+function mcReset(){MC={n:0,w:KP.rows.map(function(){return 0;})};mcDraw();}
+function mcDraw(){vs($('#mc-vs'));$('#mc-n').textContent=MC.n.toLocaleString();var est=KP.rows.map(function(r,i){return {i:i,e:MC.n?MC.w[i]/MC.n:0};}),pick=est.slice().sort(function(a,b){return b.e-a.e;})[0];
+  $('#mc-list').innerHTML=KP.rows.slice(0,8).map(function(r,i){return '<div class="k'+(MC.n&&pick.i===i?' best':'')+'"><span>'+keepStr(KP.me,r.m)+'</span><span class="bars"><i style="width:'+(est[i].e*100)+'%;background:#93651a"></i><em style="left:calc('+(r.p*100)+'% - 1px)"></em></span><span class="p">'+(MC.n?(est[i].e*100).toFixed(1)+'%':'—')+'</span></div>';}).join('');
+  if(!MC.n){U.ins($('#mc-i'),[['m','아직 한 번도 굴리지 않았습니다. 갈색 막대는 굴려 본 비율, 빨간 줄은 4단계에서 센 정확한 값입니다.']]);return;}
+  var right=pick.i===0,err=Math.max.apply(null,KP.rows.slice(0,8).map(function(r,i){return Math.abs(est[i].e-r.p);}));
+  U.ins($('#mc-i'),[[right?'g':'a','굴려 본 비율로 고른 남기기: <b>'+keepStr(KP.me,KP.rows[pick.i].m)+'</b> — '+(right?'다 세어 얻은 정답과 같습니다.':'정답('+keepStr(KP.me,KP.rows[0].m)+')과 다릅니다! 횟수가 적어 우연에 휘둘렸어요.')],['m','남기기마다 '+MC.n.toLocaleString()+'번 굴림. 정확한 값과의 가장 큰 차이 '+(err*100).toFixed(1)+'%p. '+(MC.n<300?'아직 흔들림이 큽니다.':'빨간 줄에 꽤 붙었습니다.')]]);}
+function mcRun(k){KP.rows.forEach(function(r,i){var keep=DG.keepOf(KP.me,r.m),n=5-keep.length;for(var t=0;t<k;t++){var x=keep.concat(DG.roll(n));if(DG.rank(x).score>KP.t)MC.w[i]++;}});MC.n+=k;SFX.play('roll');mcDraw();}
+$('#mc-10').onclick=function(){mcRun(10);};$('#mc-100').onclick=function(){mcRun(100);};$('#mc-1000').onclick=function(){mcRun(1000);};$('#mc-0').onclick=mcReset;
+kpSet(CASES.a);
+
+/* ── 대결 ── */
+var DL=[['robo','주판봇의 감',null,'#0b7a86'],['asst','하루 · 30번 굴려 보기',30,'#c42a6e'],['sia','시아 · 300번 굴려 보기',300,'#5a5a6e'],['moa','모아 · 모든 경우 세기',0,'#93651a']],DP=null;
+$('#dl-lanes').style.gridTemplateColumns='repeat(auto-fit,minmax(210px,1fr))';
+$('#dl-lanes').innerHTML=DL.map(function(x,i){return '<div class="lane" style="--cc:var(--c-'+x[0]+')"><div class="head"><img id="dl-img'+i+'" data-mood="'+x[0]+'_e13" alt=""><div><b>'+x[1]+'</b></div></div><div class="st" id="dl-s'+i+'">대기 중</div><div class="resbar"><div class="bar"><i id="dl-b'+i+'" style="background:'+x[3]+';width:0"></i></div></div></div>';}).join('');U.fillImgs();
+G.tabs($('#dl-pred'),DL.map(function(x){return [x[0],x[1].split(' · ')[0]];}),null,function(v){DP=v;});
+$('#dl-go').onclick=function(){var btn=this;btn.disabled=true;var R=DG.RNG(Math.floor(Math.random()*1e9)+1),N=200,g=0,S=DL.map(function(){return {e:0,w:0};});
+  DL.forEach(function(x,i){$('#dl-s'+i).textContent='두는 중…';$('#dl-b'+i).style.width='0';});
+  (function chunk(){for(var c=0;c<10&&g<N;c++,g++){var a=DG.roll(5,R);a=DG.reroll(a,DG.gut(a),R);var b=DG.roll(5,R);b=DG.reroll(b,DG.gut(b),R);var t=Math.max(DG.rank(a).score,DG.rank(b).score),h=DG.roll(5,R),seed=Math.floor(R()*1e9)+1;
+      DL.forEach(function(x,i){var m=x[2]==null?DG.gut(h):x[2]===0?DG.bestExact(h,t).m:DG.bestMC(h,t,x[2],DG.RNG(seed+i*7)).m;S[i].e+=DG.exactWin(h,m,t);var f=DG.reroll(h,m,DG.RNG(seed));if(DG.rank(f).score>t)S[i].w++;});}
+    DL.forEach(function(x,i){$('#dl-s'+i).innerHTML=g+'판째 · 기대 승률 <b>'+(S[i].e/g*100).toFixed(1)+'%</b><br><span class="muted">실제 승: '+S[i].w+'판</span>';$('#dl-b'+i).style.width=(S[i].e/g*100*2)+'%';});
+    if(g<N){setTimeout(chunk,0);return;}
+    var E=S.map(function(s){return s.e/N*100;}),lo=E.indexOf(Math.min.apply(null,E));
+    DL.forEach(function(x,i){U.setMood($('#dl-img'+i),x[0]+(i===lo?(x[0]==='robo'?'_e20':'_e20'):E[i]===Math.max.apply(null,E)?(x[0]==='robo'?'_e16':'_e16'):'_e13'));});
+    $('#dl-say').innerHTML=[U.say('asst',E[1]<=E[0]+0.3?'asst_e20':'asst_e16','30번씩 굴려 본 제 AI는 기대 승률 '+E[1].toFixed(1)+'%. 주판봇의 감은 '+E[0].toFixed(1)+'%. '+(E[1]<=E[0]+0.3?'대충 굴려 보면 감보다 나을 게 없네요.':'그래도 감보단 나았어요.')),
+      U.say('sia','sia_e10','300번씩이면 '+E[2].toFixed(1)+'%. 모든 경우 세기와 거의 같아요.',true),
+      U.say('moa','moa_e19','다 센 제 AI는 '+E[3].toFixed(1)+'%! 감보다 '+(E[3]-E[0]).toFixed(1)+'%p 높아요.'),
+      U.say('doc','doc_e10','판정: 실제 승 수는 운에 따라 뒤바뀌지만, 기대 승률은 대개 "세기 ≥ 300번 > 감 ≈ 30번" 순서입니다. 차이는 몇 %p지만 판이 쌓이면 분명해집니다.',true)].join('');
+    var my=DP?DL.map(function(x){return x[0];}).indexOf(DP):-1;
+    $('#dl-score').textContent='기대 승률 — 감 '+E[0].toFixed(1)+' · 30번 '+E[1].toFixed(1)+' · 300번 '+E[2].toFixed(1)+' · 세기 '+E[3].toFixed(1)+' (%)';$('#dl-my').textContent=my>=0?('내 예상: '+DL[my][1].split(' · ')[0]+(my===lo?' — 맞혔어요!':' — 가장 낮은 쪽은 '+DL[lo][1].split(' · ')[0])):'';
+    $('#dl-res').hidden=false;SFX.play('solve');btn.disabled=false;btn.textContent='새 200판으로 다시 대결';})();};
+
+/* ── 용어·퀴즈 ── */
+SFX.bind();
+U.Gloss({
+ '족보':['족보','게임','주사위 다섯 개가 이루는 패의 등급.'],
+ '경우의 수':['경우의 수','수학','나올 수 있는 결과의 가짓수.'],
+ '이길 확률':['이길 확률','확률','고른 남기기로 다시 굴렸을 때 상대 패를 넘는 결과의 비율.'],
+ '몬테카를로 방법':['몬테카를로 방법','AI·통계','무작위로 많이 시험해 보고 비율로 답을 어림하는 방법.'],
+ '큰수의 법칙':['큰수의 법칙','통계','시험 횟수가 늘수록 비율이 진짜 확률에 가까워진다는 성질.'],
+ '기대 승률':['기대 승률','확률','고른 선택의 이길 확률을 여러 판 평균한 값.'],
+ '감':['감(같은 숫자 남기기)','이 페이지','스트레이트 이상이면 그대로, 아니면 가장 많이 나온 숫자만 남기는 규칙.']
+},['족보','경우의 수','이길 확률','몬테카를로 방법','큰수의 법칙','기대 승률']);
+U.Study({quiz:{
+ c1:[{q:'이 페이지의 다이스에서 다시 굴릴 수 있는 횟수는?',o:['딱 한 번','세 번','원하는 만큼'],a:0,why:'남길 주사위를 고르고 나머지를 한 번만 다시 굴립니다.',hint:'규칙 ②.'},
+     {q:'다음 중 더 높은 족보는?',o:['풀하우스(3개+2개)','스트레이트(2·3·4·5·6)','트리플'],a:0,why:'족보 표 순서: 풀하우스 > 스트레이트 > 트리플.',hint:'족보 표 3·4·5위.'}],
+ c2:[{q:'이 페이지에서 플레이어가 마지막에 고르는 것이 유리한 이유는?',o:['주사위가 더 잘 나와서','넘어야 할 상대 패를 보고 고를 수 있어서','다시 굴리는 횟수가 많아서'],a:1,why:'무엇을 이겨야 하는지 알면 남기기를 그에 맞춰 고를 수 있습니다.',hint:'1단계 끝의 설명.'}],
+ c3:[{q:'주사위 다섯 개의 모든 결과는 몇 가지?',o:['30','7,776','36'],a:1,why:'6을 다섯 번 곱하면 7,776입니다.',hint:'6 × 6 × 6 × 6 × 6.'},
+     {q:'스트레이트와 풀하우스 중 처음에 더 드물게 나오는 것은?',o:['스트레이트(240가지)','풀하우스(300가지)','똑같다'],a:0,why:'스트레이트가 더 드문데 족보는 더 낮습니다.',hint:'AI 판단 코너.'}],
+ c4:[{q:'AI가 남길 주사위를 고르는 기준은?',o:['같은 숫자가 많은 것','넘어야 할 패를 이길 확률이 가장 높은 것','큰 숫자'],a:1,why:'남기기마다 다시 굴린 모든 결과를 세어 이기는 비율이 가장 높은 것을 고릅니다.',hint:'4단계의 네 단계.'},
+     {q:'주사위 두 개를 다시 굴리면 나올 수 있는 결과는?',o:['12가지','36가지','6가지'],a:1,why:'6 × 6 = 36.',hint:'하나에 6가지씩.'}],
+ c5:[{q:'굴려 보는 횟수를 100배로 늘리면 어림값의 흔들림은?',o:['100분의 1','10분의 1','그대로'],a:1,why:'흔들림은 횟수의 제곱근에 반비례합니다.',hint:'조수 수식 상자의 표.'},
+     {q:'남기기마다 10번만 굴려 보고 고르면?',o:['언제나 정답','우연 때문에 엉뚱한 남기기를 고를 수 있다','더 정확하다'],a:1,why:'횟수가 적으면 운 좋게 많이 이긴 남기기를 최고로 착각합니다.',hint:'"10번 더"를 몇 번 눌러 보기.'}],
+ duel:[{q:'선택의 질을 비교할 때 실제 승 수보다 기대 승률을 보는 이유는?',o:['실제 승 수는 운이 섞여 뒤바뀌기 때문','기대 승률이 더 커서','계산이 쉬워서'],a:0,why:'같은 선택도 주사위 운에 따라 이기고 집니다. 이길 확률의 평균은 운을 걸러 냅니다.',hint:'대결 아래 설명.'}]
+}});
+G.cover('dice');
+U.start();
+})();
+</script>
+</body>
+</html>

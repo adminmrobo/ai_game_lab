@@ -1,0 +1,216 @@
+[
+ {
+  "id": "inven_lineage_race",
+  "type": "webpage",
+  "title": "[기획] 슬라임부터 버그베어까지, 울고 웃게 만들었던 리니지 경기장의 추억",
+  "author": [
+   {
+    "literal": "인벤"
+   }
+  ],
+  "URL": "https://www.inven.co.kr/webzine/news/?news=177414",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/inven_lineage_race",
+   "role": "primary",
+   "supports": [
+    "lab:concept/slime-race"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ },
+ {
+  "id": "dailygame_lineage_race",
+  "type": "webpage",
+  "title": "[게.이.머] 리니지, 서민에게 로또 같았던 '슬경·개경장'",
+  "author": [
+   {
+    "literal": "데일리게임"
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2015
+    ]
+   ]
+  },
+  "URL": "https://www.dailygame.co.kr/view.php?ud=2015100217513448041_26",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/dailygame_lineage_race",
+   "role": "primary",
+   "supports": [
+    "lab:concept/slime-race"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ },
+ {
+  "id": "sutton2018rl",
+  "type": "book",
+  "title": "Reinforcement Learning: An Introduction",
+  "author": [
+   {
+    "family": "Sutton",
+    "given": "Richard S."
+   },
+   {
+    "family": "Barto",
+    "given": "Andrew G."
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2018
+    ]
+   ]
+  },
+  "edition": "2",
+  "publisher": "MIT Press",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/sutton2018rl",
+   "role": "background",
+   "supports": [
+    "lab:concept/multi-armed-bandit",
+    "lab:method/epsilon-greedy"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값"
+  }
+ },
+ {
+  "id": "auer2002ucb",
+  "type": "article-journal",
+  "title": "Finite-time Analysis of the Multiarmed Bandit Problem",
+  "author": [
+   {
+    "family": "Auer",
+    "given": "Peter"
+   },
+   {
+    "family": "Cesa-Bianchi",
+    "given": "Nicolò"
+   },
+   {
+    "family": "Fischer",
+    "given": "Paul"
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2002
+    ]
+   ]
+  },
+  "container-title": "Machine Learning",
+  "volume": "47",
+  "page": "235-256",
+  "DOI": "10.1023/A:1013689704352",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/auer2002ucb",
+   "role": "background",
+   "supports": [
+    "lab:method/ucb1"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "author": true,
+    "year": true
+   },
+   "checkedBy": "서지 기억값, 원문 대조 필요"
+  }
+ },
+ {
+  "id": "alphabiz_lineage_classic",
+  "type": "webpage",
+  "title": "엔씨 리니지 클래식 슬라임 경주장 논란…게임이용자협회 \"운영 경위 설명해야\"",
+  "author": [
+   {
+    "literal": "알파경제(인베스팅닷컴 전재)"
+   }
+  ],
+  "issued": {
+   "date-parts": [
+    [
+     2026
+    ]
+   ]
+  },
+  "URL": "https://kr.investing.com/news/stock-market-news/article-2009975",
+  "accessed": {
+   "date-parts": [
+    [
+     2026,
+     11,
+     27
+    ]
+   ]
+  },
+  "lab": {
+   "work": "lab:work/alphabiz_lineage_classic",
+   "role": "background",
+   "supports": [
+    "lab:limitation/odds-fixed-by-design"
+   ],
+   "locs": [],
+   "verified": {
+    "title": true,
+    "url": true
+   },
+   "checkedBy": "웹 검색 2026-11-27"
+  }
+ }
+]
