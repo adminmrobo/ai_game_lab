@@ -27,5 +27,10 @@ function lines(cv,series,o){o=o||{};var S=U.setup(cv),g=S.g,w=S.w,h=S.h,L=44,Rr=
   if(o.zero){g.strokeStyle='rgba(22,33,43,.35)';g.setLineDash([4,3]);g.beginPath();g.moveTo(L,Y(0));g.lineTo(w-Rr,Y(0));g.stroke();g.setLineDash([]);}
   series.forEach(function(s){g.strokeStyle=s.color;g.lineWidth=2.2;g.beginPath();s.ys.forEach(function(y,i){if(i)g.lineTo(X(i),Y(y));else g.moveTo(X(i),Y(y));});g.stroke();
     if(s.ys.length){var last=s.ys[s.ys.length-1];U.label(g,Math.min(X(s.ys.length-1),w-60),Y(last)-10,s.name,s.color,'right');}});}
-return {WHO:WHO,tabs:tabs,later:later,cast:cast,cover:cover,lines:lines};
+/* 결과 장면: host(position:relative) 위에 그림 + 한 줄 + "화면 보기"·"한 판 더" */
+function result(host,o){var el=host.querySelector('.gres');if(!el){el=document.createElement('div');el.className='gres';host.appendChild(el);}
+  el.innerHTML='<img src="'+o.src+'" alt="'+U.esc(o.alt||'')+'"><div class="rbar"><b>'+o.text+'</b><button class="bt" type="button" data-k="close">'+(o.closeLabel||'화면 보기')+'</button><button class="bt primary" type="button" data-k="again">한 판 더</button></div>';
+  el.hidden=false;el.querySelector('[data-k=close]').onclick=function(){el.hidden=true;};el.querySelector('[data-k=again]').onclick=function(){el.hidden=true;if(o.again)o.again();};}
+function hideResult(host){var el=host.querySelector('.gres');if(el)el.hidden=true;}
+return {result:result,hideResult:hideResult,WHO:WHO,tabs:tabs,later:later,cast:cast,cover:cover,lines:lines};
 })();

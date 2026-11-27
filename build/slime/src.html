@@ -14,22 +14,23 @@
 <style>
 /*@@PAGECSS@@*/
 /*@@GAMECSS@@*/
-.track{position:relative;background:linear-gradient(#9fd3f2 0 14%,#7cbf5a 14% 20%,#d9b27a 20%);border:6px solid #6b4423;border-radius:14px;padding:46px 12px 10px;overflow:hidden}
-.trk{position:relative;height:54px;border-bottom:2px dashed rgba(255,255,255,.7)}
-.trk .sl{position:absolute;left:0;top:4px;width:46px;height:46px;transition:left .12s linear;image-rendering:pixelated}
-.trk .sl svg{width:100%;height:100%;display:block}
-.trk .tag{position:absolute;left:52px;top:14px;font-size:12.5px;font-weight:700;color:#5b3a1f;background:rgba(255,255,255,.75);border-radius:6px;padding:0 6px;white-space:nowrap}
+.track{position:relative;aspect-ratio:16/9;background:#d9b27a url(img/bg_track.webp) center/100% 100% no-repeat;border:3px solid #16212b;border-radius:14px;overflow:hidden}
+.trk{position:absolute;left:0;right:0;height:10.2%}
+.trk .sl{position:absolute;left:2%;top:-8%;height:112%;aspect-ratio:1;transition:left .12s linear}
+.trk .sl img{width:100%;height:100%;display:block;image-rendering:pixelated}
+.trk .tag{position:absolute;top:22%;font-size:clamp(10px,1.25vw,12.5px);font-weight:700;color:#5b3a1f;background:rgba(255,255,255,.85);border-radius:6px;padding:0 6px;white-space:nowrap;transition:left .12s linear}
 .trk.mine .tag{background:#ffe36b}
-.finish{position:absolute;right:30px;top:40px;bottom:6px;width:8px;background:repeating-linear-gradient(#fff 0 6px,#16212b 6px 12px)}
 .trk .sl.hop{animation:hop .3s infinite}
-@keyframes hop{50%{transform:translateY(-18%) scaleX(.92)}}
-@media(prefers-reduced-motion:reduce){.trk .sl.hop{animation:none}.trk .sl{transition:none}}
-.booth{position:absolute;left:12px;top:6px;display:flex;gap:8px;align-items:center;color:#16212b;font-size:13px;font-weight:700}
-.booth img{width:34px;height:34px;background:#fff;border-radius:8px;border:2px solid var(--c-robo)}
+@keyframes hop{50%{transform:translateY(-14%) scaleX(.94)}}
+@media(prefers-reduced-motion:reduce){.trk .sl.hop{animation:none}.trk .sl,.trk .tag{transition:none}}
+@media(max-width:600px){.trk .tag{display:none}}
+.booth{position:absolute;left:4.6%;top:7%;width:8.6%;aspect-ratio:1;display:grid;place-items:center}
+.booth img{width:78%;height:auto;background:#fff;border-radius:8px;border:2px solid var(--c-robo)}
+img.si{width:34px;height:34px;flex:none;image-rendering:pixelated}
 .picks{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
 @media(max-width:700px){.picks{grid-template-columns:repeat(2,1fr)}}
 .picks button{font:inherit;display:flex;gap:8px;align-items:center;text-align:left;background:#fff;border:2px solid var(--rule);border-radius:10px;padding:6px 8px;cursor:pointer}
-.picks button svg{width:34px;height:34px;flex:none}
+
 .picks button small{display:block;color:var(--muted);font-size:12px}
 .picks button[aria-pressed="true"]{border-color:#a35c00;background:#fff6d6}
 .picks .c0{color:#13733a}.picks .c2{color:#c9302c}
@@ -37,7 +38,7 @@
 .est td,.est th{border:1px solid var(--rule);padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums}
 .est th{background:var(--panel2);color:var(--muted)}
 .est td.nm{text-align:left;white-space:nowrap}
-.est td.nm svg{width:22px;height:22px;vertical-align:-6px;margin-right:4px}
+.est td.nm img.si{width:24px;height:24px;vertical-align:-7px;margin-right:4px}
 .est .pick{background:#fff6d6;font-weight:700}
 .est .truth{color:var(--stain)}
 .est .bar{display:inline-block;height:10px;background:var(--terrain);border-radius:3px;vertical-align:middle}
@@ -119,7 +120,7 @@
     <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
       <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 기록표 보기</label></div></div>
     <div class="picks" id="pl-picks" role="group" aria-label="응원할 슬라임"></div>
-    <div class="track" id="pl-track"><div class="booth"><img id="booth-robo" alt="">매표소 · 주판봇</div><div class="finish"></div><div id="pl-lanes"></div></div>
+    <div class="track" id="pl-track"><div class="booth"><img id="booth-robo" alt="매표소의 주판봇"></div><div id="pl-lanes"></div></div>
     <div class="ctrl"><div class="group"><button class="bt primary" type="button" id="pl-go">출발!</button><button class="bt" type="button" id="pl-next">다음 경주(상태 새로)</button></div></div>
     <div id="pl-say" aria-live="polite"></div>
     <div class="minis"><div class="mini a"><span>응원한 경주</span><b id="pl-n">0</b></div><div class="mini g"><span>맞힌 경주</span><b id="pl-w">0</b></div><div class="mini m"><span>쿠키 수지</span><b id="pl-net">0</b></div><div class="mini r"><span>지금 응원</span><b id="pl-pick" style="font-size:16px">—</b></div></div>
@@ -289,7 +290,7 @@
   <ul><li>슬라임 이름·빠르기·상태 효과·배당은 이 페이지가 정한 값입니다. 원작의 슬라임·경주 규칙·배당 방식과 다릅니다(원작은 표 판매율로 배당을 정함).</li>
     <li>KPI·표·대결의 숫자는 이 경주 모형으로 씨앗을 고정해 시뮬레이션한 값입니다(검산: 저장소의 code/check_slime.js).</li>
     <li>「리니지」는 엔씨소프트의 게임입니다. 이 페이지는 미니게임의 틀만 빌렸고, 게임 그림·음악·몬스터 그림·NPC는 쓰지 않았습니다. 쿠키는 연습용입니다.</li>
-    <li>표지·경주 화면은 연구실 캐릭터 그림과 직접 그린 픽셀 슬라임으로 만든 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_slime.md</li></ul>
+    <li>표지·경주장·슬라임 다섯 마리·결과 장면은 연구실 시리즈 화풍(16비트 픽셀아트)으로 새로 만든 그림이며, 원작 게임의 슬라임·NPC 그림이 아닙니다. 그림 지시문: COVER_PROMPTS_ai_game_slime.md</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
 </div></footer>
@@ -336,8 +337,7 @@ var DLG={
 U.dialogues(DLG);
 G.cast([["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","상태 보기 담당. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","평균 적기와 탐험 담당."],["moa","moa_e13","인턴 모아 · 플레이어 3","첫 응원 도전자. \"왜요?\" 담당."],["fly","fly_e13","초파리 연구원","\"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","매표소 지기. 배당은 절대 안 바꿔요."]],['(통통통)','(…끄덕)','(짝짝짝)']);
 
-function sSVG(i,mood){var s=SL[i],c=s.c,d=s.d,r=function(x,y,w,h,f){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"/>';};
-  return '<svg viewBox="0 0 16 14" shape-rendering="crispEdges" aria-hidden="true">'+r(2,12,12,2,'rgba(0,0,0,.18)')+r(5,2,6,1,c)+r(3,3,10,1,c)+r(2,4,12,2,c)+r(1,6,14,6,c)+r(1,11,14,1,d)+r(4,4,2,2,'rgba(255,255,255,.7)')+r(5,7,2,2,'#16212b')+r(10,7,2,2,'#16212b')+(mood==='win'?r(6,10,5,1,'#16212b')+r(5,9,1,1,'#16212b')+r(11,9,1,1,'#16212b'):r(7,10,3,1,d))+'</svg>';}
+function sSVG(i,mood){return '<img class="si" src="img/slime_'+(i+1)+(mood==='win'?'_jump':'')+'.webp" width="256" height="256" alt="">';}
 function evStr(x){return x.toFixed(2);}
 var C1=SL.map(function(s,i){return [s,TRUTH.p[i]];});
 $('#c1-tbl').innerHTML='<tr><th>슬라임</th><th>배당(맞히면 돌려받는 쿠키)</th><th>1등 할 확률</th><th>돌려받는 몫</th></tr>'+SL.map(function(s,i){return '<tr><td class="nm">'+sSVG(i)+s.name+'</td><td>'+s.pay+'배</td><td class="truth">숨김 (3단계에서 공개)</td><td class="truth">숨김</td></tr>';}).join('');
@@ -346,22 +346,25 @@ $('#c1-tbl').innerHTML='<tr><th>슬라임</th><th>배당(맞히면 돌려받는 
 var WHO=G.WHO,PL={who:'moa',pick:null,c:SR.conds(),busy:false,n:0,w:0,net:0,log:[],rec:SL.map(function(){return {n:0,w:0};})};
 $('#booth-robo').src=U.spr('robo_e16');
 function say(w,m,t){$('#pl-say').innerHTML=U.say(w,m,t);}
-function lanes(pos){$('#pl-lanes').innerHTML=SL.map(function(s,i){return '<div class="trk'+(PL.pick===i?' mine':'')+'"><span class="sl" id="sl'+i+'" style="left:'+(pos?pos[i]:0)+'%">'+sSVG(i)+'</span><span class="tag" id="tg'+i+'" style="left:calc('+(pos?pos[i]:0)+'% + 52px)">'+s.name+' · '+SR.COND[PL.c[i]]+'</span></div>';}).join('');}
+var LT=[29.8,40.6,50.7,60.8,70.9];
+function lx(p){return 'calc(2% + '+(p*82.8).toFixed(2)+'%)';}
+function tx(p){return p>0.55?'calc(2% + '+(p*82.8).toFixed(2)+'% - 4px)':'calc(2% + '+(p*82.8+6).toFixed(2)+'%)';}
+function lanes(pos){$('#pl-lanes').innerHTML=SL.map(function(s,i){var p=pos?pos[i]:0;return '<div class="trk'+(PL.pick===i?' mine':'')+'" style="top:'+LT[i]+'%"><span class="sl" id="sl'+i+'" style="left:'+lx(p)+'"><img src="img/slime_'+(i+1)+'.webp" alt="'+s.name+'"></span><span class="tag" id="tg'+i+'" style="left:'+tx(p)+(p>0.55?';transform:translateX(-100%)':'')+'">'+s.name+' · '+SR.COND[PL.c[i]]+'</span></div>';}).join('');}
 function picks(){$('#pl-picks').innerHTML=SL.map(function(s,i){return '<button type="button" data-i="'+i+'" aria-pressed="'+(PL.pick===i)+'" '+(PL.busy?'disabled':'')+'>'+sSVG(i)+'<span><b>'+s.name+'</b><small>배당 '+s.pay+'배 · <span class="c'+PL.c[i]+'">'+SR.COND[PL.c[i]]+'</span></small></span></button>';}).join('');
   $$('#pl-picks button').forEach(function(b){b.onclick=function(){PL.pick=+b.dataset.i;SFX.play('hop',PL.pick);picks();lanes();status();};});}
 function status(){$('#pl-n').textContent=PL.n;$('#pl-w').textContent=PL.w;$('#pl-net').textContent=(PL.net>=0?'+':'')+PL.net.toFixed(1);$('#pl-pick').textContent=PL.pick==null?'—':SL[PL.pick].name;$('#pl-go').disabled=PL.busy||PL.pick==null;$('#pl-next').disabled=PL.busy;
   $('#pl-rec').innerHTML=$('#pl-tip').checked?'<table class="est" style="margin-top:10px"><tr><th>하루의 기록표</th>'+SL.map(function(s,i){return '<th>'+s.name+'</th>';}).join('')+'</tr><tr><td class="nm">본 경주에서 1등</td>'+PL.rec.map(function(r){return '<td>'+r.w+' / '+r.n+'</td>';}).join('')+'</tr><tr><td class="nm">응원했다면 평균 몫</td>'+PL.rec.map(function(r,i){return '<td>'+(r.n?(r.w*SL[i].pay/r.n).toFixed(2):'—')+'</td>';}).join('')+'</tr></table><p class="calm">본 경주 수가 적으면 이 평균은 크게 흔들립니다. 3단계의 AI는 이 표를 스스로 적어 가며 고릅니다.</p>':'';
   $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
-function newRace(){PL.c=SR.conds();PL.pick=null;picks();lanes();status();say(PL.who,WHO[PL.who][2].think,'새 경주! 상태를 보고 응원할 슬라임을 골라요.');}
+function newRace(){G.hideResult($('#pl-track'));PL.c=SR.conds();PL.pick=null;picks();lanes();status();say(PL.who,WHO[PL.who][2].think,'새 경주! 상태를 보고 응원할 슬라임을 골라요.');}
 function go(){if(PL.pick==null||PL.busy)return;PL.busy=true;picks();status();SFX.play('start');var res=SR.race(PL.c,null,true),H=res.hist,k=0,mx=SR.LEN;
   $$('#pl-lanes .sl').forEach(function(s){s.classList.add('hop');});say('robo','robo_e14','출발! 응원권은 환불 안 된다!');
-  var step=U.reduce?H.length:1;(function tick(){k=Math.min(H.length-1,k+step);var pos=H[k].map(function(d){return Math.min(1,d/mx);});SL.forEach(function(s,i){$('#sl'+i).style.left='calc((100% - 66px) * '+pos[i].toFixed(4)+')';$('#tg'+i).style.left='calc((100% - 66px) * '+pos[i].toFixed(4)+(pos[i]>0.55?' - 118px)':' + 52px)');});
+  var step=U.reduce?H.length:1;(function tick(){k=Math.min(H.length-1,k+step);var pos=H[k].map(function(d){return Math.min(1,d/mx);});SL.forEach(function(s,i){$('#sl'+i).style.left=lx(pos[i]);var t=$('#tg'+i);t.style.left=tx(pos[i]);t.style.transform=pos[i]>0.55?'translateX(-100%)':'';var im=$('#sl'+i+' img');im.src='img/slime_'+(i+1)+(k%2?'_jump':'')+'.webp';});
     if(k%3===0)SFX.play('hop',k%5);
     if(k<H.length-1){setTimeout(tick,U.reduce?0:110);return;}
-    $$('#pl-lanes .sl').forEach(function(s){s.classList.remove('hop');});var w=res.win,hit=w===PL.pick,r=hit?SL[w].pay:0;$('#sl'+w).innerHTML=sSVG(w,'win');
+    $$('#pl-lanes .sl').forEach(function(s){s.classList.remove('hop');});var w=res.win,hit=w===PL.pick,r=hit?SL[w].pay:0;SL.forEach(function(s,i){$('#sl'+i+' img').src='img/slime_'+(i+1)+(i===w?'_jump':'')+'.webp';});
     PL.n++;if(hit)PL.w++;PL.net+=r-1;SL.forEach(function(s,i){PL.rec[i].n++;if(i===w)PL.rec[i].w++;});
     PL.log.push('응원 '+SL[PL.pick].name+'('+SR.COND[PL.c[PL.pick]]+') · 1등 '+SL[w].name+'('+SR.COND[PL.c[w]]+') → '+(hit?'+'+(r-1).toFixed(1):'−1'));
-    SFX.play(hit?'win':'buzz');say(PL.who,hit?WHO[PL.who][2].happy:WHO[PL.who][2].sad,hit?SL[w].name+' 1등! 쿠키 '+r+'개를 돌려받았어요!':SL[w].name+'(이)가 1등… 제 응원권은 휴지 조각이에요.');
+    SFX.play(hit?'win':'buzz');G.later(function(){G.result($('#pl-track'),{src:'img/scene_'+(hit?'win':'lose')+'_s.webp',alt:hit?'분홍 슬라임이 1등으로 들어오고 하루·시아·모아가 환호하는 장면':'응원권이 바람에 날아가고 하루·시아·모아가 아쉬워하는 장면',text:hit?SL[w].name+' 1등! 쿠키 '+SL[w].pay+'개':SL[w].name+'(이)가 1등… 응원권은 휴지 조각',closeLabel:'경주장 보기',again:newRace});},700);say(PL.who,hit?WHO[PL.who][2].happy:WHO[PL.who][2].sad,hit?SL[w].name+' 1등! 쿠키 '+r+'개를 돌려받았어요!':SL[w].name+'(이)가 1등… 제 응원권은 휴지 조각이에요.');
     PL.busy=false;status();})();}
 G.tabs($('#pl-who'),[['asst','하루'],['sia','시아'],['moa','모아']],'moa',function(v){PL.who=v;newRace();});
 $('#pl-go').onclick=go;$('#pl-next').onclick=newRace;$('#pl-tip').onchange=status;newRace();

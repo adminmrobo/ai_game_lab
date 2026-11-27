@@ -78,7 +78,7 @@ Haru holds a single die with comic teary eyes, Sia sighs with a hand on her fore
 ```
 
 ## 6. 받은 뒤 할 일 (제가 맡음)
-- [ ] 표지 반영(빌드가 자동 전환), og:image·목차 썸네일 확인
-- [ ] 2단계 탁자 배경·주사위 그림 연결(지금은 CSS 주사위)
-- [ ] 결과 장면 연결
-- [ ] 원작 게임 그림·인물과 닮은 요소가 없는지 확인
+- [x] 표지 반영(2026-11-27), og:image·목차 썸네일 자동 전환 확인
+- [x] 2단계 탁자 배경(bg_felt)·주사위 그림(die_1~6) 연결 — 4·5단계 표와 족보 표의 작은 주사위도 같은 그림
+- [x] 결과 장면 연결(scene_win_d · scene_lose_d, "탁자 보기"로 닫기)
+- [x] 원작 게임 그림·인물과 닮은 요소 없음 확인

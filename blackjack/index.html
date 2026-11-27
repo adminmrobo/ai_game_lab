@@ -311,25 +311,30 @@ p,li{line-height:1.8}
 .cover .cast4{bottom:3%}
 .cover .cast4 img{width:10%;max-width:110px;background:rgba(255,255,255,.75);border-radius:12px;padding:4px}
 .cover .tmp{position:absolute;right:16px;bottom:14px;padding:2px 10px;border-radius:6px;background:rgba(255,255,255,.88);border:1px dashed var(--amber);color:var(--amber);font-size:12px}
+/* 결과 장면 덮개 (③·④·⑤) */
+.gres{position:absolute;inset:0;z-index:4;border-radius:inherit;overflow:hidden;background:#16212b}
+.gres[hidden]{display:none}
+.gres img{width:100%;height:100%;object-fit:cover;display:block}
+.gres .rbar{position:absolute;left:50%;top:5%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:3px solid #16212b;border-radius:12px;padding:.4em .9em;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;color:#16212b;font-size:clamp(13px,1.8vw,18px);max-width:94%}
 
 .card{--cw:58px;position:relative;display:inline-block;width:var(--cw);height:calc(var(--cw)*1.4);background:#fff;border:3px solid #16212b;border-radius:8px;box-shadow:0 4px 0 rgba(0,0,0,.25);flex:none;font-weight:700;color:#16212b;transition:transform .3s,opacity .3s;vertical-align:middle}
 .card.red{color:#c9302c}
 .card .tl{position:absolute;left:5px;top:2px;font-size:calc(var(--cw)*.28);line-height:1.1;text-align:center}
 .card .ct{position:absolute;left:0;right:0;bottom:6%;top:30%;display:grid;place-items:center;font-size:calc(var(--cw)*.42)}
-.card.back{background:repeating-linear-gradient(45deg,#2b4fa3 0 6px,#3d63bf 6px 12px)}
+.card.back{background:url(img/card_back.webp) center/cover;border-color:#16212b}
 .card.back>*{display:none}
 .card.deal{animation:deal .35s ease-out}
 .card.sm{--cw:30px;border-width:2px;border-radius:5px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
 @keyframes deal{from{transform:translate(40px,-30px) rotate(12deg);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.card.deal{animation:none}}
-.felt{background:radial-gradient(ellipse at 50% 30%,#2f8a63,#1b5c40 75%);border:8px solid #6b4423;border-radius:18px 18px 60px 60px;padding:14px 16px 20px;box-shadow:inset 0 0 0 3px #8a5a2f;color:#fff}
-.hand{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;margin:8px 0;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.08)}
+.felt{position:relative;background:#1b5c40 url(img/bg_table.webp) center 70%/cover;border:3px solid #16212b;border-radius:18px;padding:4% 7% 5%;color:#fff;min-height:380px}
+.hand{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;margin:8px 0;padding:8px 10px;border-radius:12px;background:rgba(10,40,24,.55)}
 .hand img.av{width:72px;height:72px;background:#fff;border-radius:10px;border:3px solid var(--cc,#fff)}
 .hand .cards{display:flex;gap:8px;flex-wrap:wrap;min-height:84px;align-items:center}
 .hand .nm{font-weight:700;font-size:14px}
 .hand .tot{background:#fff;color:#16212b;border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px;white-space:nowrap}
 .hand.me{outline:2px dashed #ffe36b;background:rgba(255,236,170,.14)}
-.arc{text-align:center;font-size:12.5px;color:#e7c76b;letter-spacing:.08em;margin:4px 0}
+.arc{text-align:center;font-size:12.5px;color:#ffe9a8;text-shadow:0 1px 2px #000;letter-spacing:.08em;margin:4px 0}
 .dist{display:grid;gap:5px;margin:10px 0}
 .dist .row{display:grid;grid-template-columns:80px 1fr 64px;gap:10px;align-items:center;font-size:14px}
 .dist .bar{height:16px;background:var(--panel2);border-radius:4px;overflow:hidden}
@@ -343,6 +348,7 @@ p,li{line-height:1.8}
 .strat .diff{outline:2px solid #a35c00;outline-offset:-2px}
 .strat button.on{outline:3px solid #16212b;outline-offset:-3px}
 .strat .sep{grid-column:1/-1;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:6px;text-align:left;background:none}
+@media(max-width:640px){.felt{padding:8px;min-height:0}.hand{grid-template-columns:44px 1fr;gap:8px}.hand img.av{width:42px;height:42px}.hand .tot{grid-column:2;justify-self:start}.card{--cw:44px}}
 </style>
 <!-- lab-kg:head -->
 <meta name="citation_title" content="AI로 풀어보는 게임 시리즈 ④ 대항해시대 2 블랙잭 — AI는 받을지 설지 어떻게 정할까?">
@@ -364,7 +370,7 @@ p,li{line-height:1.8}
 
 <!-- lab-cover -->
 <div class="cover" id="cover" data-img="blackjack_cover"><div class="frame" id="coverframe">
-  <svg class="scene" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="160" height="90" fill="#d9c3e8"/><rect x="0" y="0" width="160" height="40" fill="#d9c3e8"/><rect x="0" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="16" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="32" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="48" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="64" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="80" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="96" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="112" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="128" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="144" y="0" width="15" height="5" fill="#e6d4f0"/><rect x="8" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="24" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="40" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="56" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="72" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="88" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="104" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="120" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="136" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="152" y="6" width="15" height="5" fill="#e6d4f0"/><rect x="0" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="16" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="32" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="48" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="64" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="80" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="96" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="112" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="128" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="144" y="12" width="15" height="5" fill="#e6d4f0"/><rect x="8" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="24" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="40" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="56" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="72" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="88" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="104" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="120" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="136" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="152" y="18" width="15" height="5" fill="#e6d4f0"/><rect x="0" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="16" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="32" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="48" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="64" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="80" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="96" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="112" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="128" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="144" y="24" width="15" height="5" fill="#e6d4f0"/><rect x="8" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="24" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="40" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="56" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="72" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="88" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="104" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="120" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="136" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="152" y="30" width="15" height="5" fill="#e6d4f0"/><rect x="0" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="16" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="32" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="48" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="64" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="80" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="96" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="112" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="128" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="144" y="36" width="15" height="5" fill="#e6d4f0"/><rect x="10" y="6" width="30" height="22" fill="#7fb6e0"/><rect x="10" y="6" width="30" height="1" fill="#5b3a1f"/><rect x="24" y="6" width="1" height="22" fill="#5b3a1f"/><rect x="10" y="17" width="30" height="1" fill="#5b3a1f"/><rect x="120" y="6" width="30" height="22" fill="#7fb6e0"/><rect x="120" y="6" width="30" height="1" fill="#5b3a1f"/><rect x="134" y="6" width="1" height="22" fill="#5b3a1f"/><rect x="120" y="17" width="30" height="1" fill="#5b3a1f"/><rect x="0" y="40" width="160" height="50" fill="#5b3a1f"/><rect x="8" y="42" width="144" height="46" fill="#6b4423"/><rect x="12" y="45" width="136" height="40" fill="#1f6b4a"/><rect x="14" y="47" width="132" height="36" fill="#27805a"/><rect x="40" y="60" width="80" height="1" fill="#e7c76b"/><rect x="63" y="47" width="14" height="20" fill="#00000033"/><rect x="62" y="46" width="14" height="20" fill="#16212b"/><rect x="63" y="47" width="12" height="18" fill="#ffffff"/><rect x="65" y="49" width="2" height="3" fill="#c9302c"/><rect x="68" y="54" width="3" height="4" fill="#c9302c"/><rect x="71" y="60" width="2" height="3" fill="#c9302c"/><rect x="79" y="47" width="14" height="20" fill="#00000033"/><rect x="78" y="46" width="14" height="20" fill="#16212b"/><rect x="79" y="47" width="12" height="18" fill="#2b4fa3"/><rect x="81" y="49" width="8" height="1" fill="#7f9ce0"/><rect x="81" y="52" width="8" height="1" fill="#7f9ce0"/><rect x="81" y="55" width="8" height="1" fill="#7f9ce0"/><rect x="81" y="58" width="8" height="1" fill="#7f9ce0"/><rect x="81" y="61" width="8" height="1" fill="#7f9ce0"/><rect x="49" y="59" width="14" height="20" fill="#00000033"/><rect x="48" y="58" width="14" height="20" fill="#16212b"/><rect x="49" y="59" width="12" height="18" fill="#ffffff"/><rect x="51" y="61" width="2" height="3" fill="#16212b"/><rect x="54" y="66" width="3" height="4" fill="#16212b"/><rect x="57" y="72" width="2" height="3" fill="#16212b"/><rect x="65" y="59" width="14" height="20" fill="#00000033"/><rect x="64" y="58" width="14" height="20" fill="#16212b"/><rect x="65" y="59" width="12" height="18" fill="#ffffff"/><rect x="67" y="61" width="2" height="3" fill="#c9302c"/><rect x="70" y="66" width="3" height="4" fill="#c9302c"/><rect x="73" y="72" width="2" height="3" fill="#c9302c"/><rect x="110" y="70" width="8" height="2" fill="#c9302c"/><rect x="112" y="68" width="8" height="2" fill="#2b4fa3"/><rect x="114" y="66" width="8" height="2" fill="#e7c76b"/><rect x="116" y="64" width="8" height="2" fill="#13733a"/><rect x="118" y="62" width="8" height="2" fill="#ffffff"/></svg><div class="cast4"><img data-mood="asst_e09" alt=""><img data-mood="robo_e16" alt=""><img data-mood="sia_e07" alt=""><img data-mood="moa_e12" alt=""></div><span class="tmp">임시 표지 · 픽셀아트 준비 중</span>
+  <picture><source type="image/webp" srcset="img/blackjack_cover_960.webp 960w, img/blackjack_cover.webp 1600w" sizes="(max-width:1080px) 100vw, 1080px"><img class="art" src="img/blackjack_cover.webp" width="1600" height="900" alt="항구 술집의 초록 카드 탁자에서 딜러 주판봇과 하루·시아·모아가 블랙잭을 하는 픽셀아트 표지" fetchpriority="high" decoding="async"></picture>
   <span class="cover-chip">AI로 풀어보는 게임 시리즈 · ④ 대항해시대 2 블랙잭</span>
 </div></div>
 <!-- /lab-cover -->
@@ -426,7 +432,7 @@ p,li{line-height:1.8}
     <div class="ptitle">블랙잭 — 받기 또는 서기 (연습 칩 10개씩 걸기)</div>
     <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
       <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
-    <div class="felt">
+    <div class="felt" id="felt">
       <div class="hand" style="--cc:var(--c-robo)"><img class="av" id="av-robo" alt="딜러 주판봇"><div><div class="nm">딜러 주판봇</div><div class="cards" id="c-dealer"></div></div><span class="tot" id="t-dealer">—</span></div>
       <div class="arc">BLACKJACK PAYS 3 TO 2 · DEALER STANDS ON 17</div>
       <div class="hand me" id="hand-me"><img class="av" id="av-me" alt=""><div><div class="nm" id="nm-me"></div><div class="cards" id="c-me"></div></div><span class="tot" id="t-me">—</span></div>
@@ -616,7 +622,7 @@ p,li{line-height:1.8}
   <ul><li>규칙은 받기·서기만 쓰고(더블다운·스플릿·보험 없음), 딜러는 17(소프트 17 포함)에서 서며, 카드 뭉치는 끝없이 많다고 봤습니다. 실제 카지노 규칙과 숫자가 조금 다릅니다.</li>
     <li>KPI·표·대결의 숫자는 이 규칙으로 정확히 계산하거나 씨앗을 고정해 시뮬레이션한 값입니다(검산: 저장소의 code/check_blackjack.js).</li>
     <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다. 칩은 연습용입니다.</li>
-    <li>표지·게임 화면은 연구실 캐릭터 그림과 CSS로 그린 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_blackjack.md</li></ul>
+    <li>표지·카드 탁자·딜러 주판봇·카드 뒷면·결과 장면은 연구실 시리즈 화풍(16비트 픽셀아트)으로 새로 만든 그림이며, 원작 게임이나 실제 카지노의 그림이 아닙니다. 그림 지시문: COVER_PROMPTS_ai_game_blackjack.md</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
 </div></footer>
@@ -976,7 +982,12 @@ function lines(cv,series,o){o=o||{};var S=U.setup(cv),g=S.g,w=S.w,h=S.h,L=44,Rr=
   if(o.zero){g.strokeStyle='rgba(22,33,43,.35)';g.setLineDash([4,3]);g.beginPath();g.moveTo(L,Y(0));g.lineTo(w-Rr,Y(0));g.stroke();g.setLineDash([]);}
   series.forEach(function(s){g.strokeStyle=s.color;g.lineWidth=2.2;g.beginPath();s.ys.forEach(function(y,i){if(i)g.lineTo(X(i),Y(y));else g.moveTo(X(i),Y(y));});g.stroke();
     if(s.ys.length){var last=s.ys[s.ys.length-1];U.label(g,Math.min(X(s.ys.length-1),w-60),Y(last)-10,s.name,s.color,'right');}});}
-return {WHO:WHO,tabs:tabs,later:later,cast:cast,cover:cover,lines:lines};
+/* 결과 장면: host(position:relative) 위에 그림 + 한 줄 + "화면 보기"·"한 판 더" */
+function result(host,o){var el=host.querySelector('.gres');if(!el){el=document.createElement('div');el.className='gres';host.appendChild(el);}
+  el.innerHTML='<img src="'+o.src+'" alt="'+U.esc(o.alt||'')+'"><div class="rbar"><b>'+o.text+'</b><button class="bt" type="button" data-k="close">'+(o.closeLabel||'화면 보기')+'</button><button class="bt primary" type="button" data-k="again">한 판 더</button></div>';
+  el.hidden=false;el.querySelector('[data-k=close]').onclick=function(){el.hidden=true;};el.querySelector('[data-k=again]').onclick=function(){el.hidden=true;if(o.again)o.again();};}
+function hideResult(host){var el=host.querySelector('.gres');if(el)el.hidden=true;}
+return {result:result,hideResult:hideResult,WHO:WHO,tabs:tabs,later:later,cast:cast,cover:cover,lines:lines};
 })();
 
 (function(){
@@ -1022,7 +1033,8 @@ function upName(u){return u===1?'A':String(u);}
 
 /* ── 단계 2 ── */
 var WHO=G.WHO,PL={who:'asst',me:[],dl:[],w:0,l:0,t:0,chip:0,phase:'idle',log:[]};
-$('#av-robo').src=U.spr('robo_e16');
+function dealerFace(k){$('#av-robo').src='img/robo_dealer_'+k+'.webp';}
+dealerFace('e13');
 function say(w,m,t){$('#pl-say').innerHTML=U.say(w,m,t);}
 function tot(cs){var t=0,a=false;cs.forEach(function(c){t+=c.v;if(c.v===1)a=true;});return {t:t,a:a,v:BJ.val(t,a),s:BJ.soft(t,a)};}
 function draw(newMe,newDl,reveal){$('#c-me').innerHTML=PL.me.map(function(c,i){return cardH(c,i>=PL.me.length-newMe?'deal':'');}).join('');
@@ -1037,9 +1049,10 @@ function status(){var m=tot(PL.me);$('#pl-sum').textContent=PL.me.length?(m.s?'�
   $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
 function end(res,txt){PL.phase='over';var bet=res==='bj'?15:res==='w'?10:res==='l'?-10:0;PL.chip+=bet;if(bet>0)PL.w++;else if(bet<0)PL.l++;else PL.t++;
   PL.log.push('내 '+tot(PL.me).v+(tot(PL.me).t>21?'(터짐)':'')+' · 딜러 '+(tot(PL.dl).t>21?'터짐':tot(PL.dl).v)+' → '+txt+' ('+(bet>=0?'+':'')+bet+')');
-  SFX.play(bet>0?'win':bet<0?'gameover':'click');$('#av-robo').src=U.spr(bet>0?'robo_e20':'robo_e16');
+  SFX.play(bet>0?'win':bet<0?'gameover':'click');dealerFace(bet>0?'e20':bet<0?'e16':'e13');
+  if(bet!==0)G.later(function(){G.result($('#felt'),{src:'img/scene_'+(bet>0?'win':'lose')+'_b.webp',alt:bet>0?'딜러 주판봇의 카드가 쏟아지고 하루·시아·모아가 환호하는 장면':'딜러 주판봇이 칩을 쓸어 가고 하루·시아·모아가 아쉬워하는 장면',text:txt,closeLabel:'탁자 보기',again:plNew});},700);
   say(PL.who,bet>0?WHO[PL.who][2].happy:bet<0?WHO[PL.who][2].sad:WHO[PL.who][2].think,txt);status();}
-function plNew(){PL.me=[mk(BJ.draw()),mk(BJ.draw())];PL.dl=[mk(BJ.draw()),mk(BJ.draw())];PL.phase='me';$('#av-robo').src=U.spr('robo_e16');
+function plNew(){PL.me=[mk(BJ.draw()),mk(BJ.draw())];PL.dl=[mk(BJ.draw()),mk(BJ.draw())];PL.phase='me';G.hideResult($('#felt'));dealerFace('e13');
   $('#av-me').src=U.spr(WHO[PL.who][2].start);$('#av-me').style.borderColor=WHO[PL.who][1];$('#nm-me').textContent=WHO[PL.who][0];SFX.play('card');draw(2,2,false);
   var pbj=BJ.isBJ(PL.me.map(function(c){return c.v;})),dbj=BJ.isBJ(PL.dl.map(function(c){return c.v;}));
   if(dbj){draw(0,0,true);end(pbj?'t':'l',pbj?'둘 다 블랙잭! 비겼어요.':'딜러 블랙잭… 확인하자마자 졌어요.');return;}

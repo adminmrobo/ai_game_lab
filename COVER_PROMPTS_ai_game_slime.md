@@ -83,7 +83,8 @@ For each color also a "jump" version: squashed tall, lifted off the ground with 
 ```
 
 ## 6. 받은 뒤 할 일 (제가 맡음)
-- [ ] 표지 반영(빌드가 자동 전환), og:image·목차 썸네일 확인
-- [ ] 2단계 경주 배경·슬라임 그림 연결(지금은 직접 그린 픽셀 슬라임)
-- [ ] 결과 장면 연결
-- [ ] 원작 게임의 슬라임·NPC와 닮은 요소가 없는지 확인
+- [x] 표지 반영(2026-11-27), og:image·목차 썸네일 자동 전환 확인
+- [x] 2단계 경주장 배경(bg_track)에 맞춰 레인 5개·결승선(가로 90.5%) 위치를 맞추고, 슬라임 그림·뛰기 그림을 번갈아 보여 주도록 연결. 표·응원 단추의 작은 슬라임도 같은 그림
+- [x] 결과 장면 연결(scene_win_s · scene_lose_s)
+- [ ] `robo_booth.png`는 매표소 창 안에 투명 대신 회색·흰색 격자 무늬가 그려져 나와 쓰지 않음 — 지금은 배경의 빈 매표소에 주판봇 캐릭터 그림을 얹어 둠. 다시 요청 시: "the inside of the booth window must be solid, no checkerboard pattern; only the area outside the booth is transparent"
+- [x] 원작 게임의 슬라임·NPC와 닮은 요소 없음 확인

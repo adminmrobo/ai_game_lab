@@ -18,20 +18,20 @@
 .card.red{color:#c9302c}
 .card .tl{position:absolute;left:5px;top:2px;font-size:calc(var(--cw)*.28);line-height:1.1;text-align:center}
 .card .ct{position:absolute;left:0;right:0;bottom:6%;top:30%;display:grid;place-items:center;font-size:calc(var(--cw)*.42)}
-.card.back{background:repeating-linear-gradient(45deg,#2b4fa3 0 6px,#3d63bf 6px 12px)}
+.card.back{background:url(img/card_back.webp) center/cover;border-color:#16212b}
 .card.back>*{display:none}
 .card.deal{animation:deal .35s ease-out}
 .card.sm{--cw:30px;border-width:2px;border-radius:5px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
 @keyframes deal{from{transform:translate(40px,-30px) rotate(12deg);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.card.deal{animation:none}}
-.felt{background:radial-gradient(ellipse at 50% 30%,#2f8a63,#1b5c40 75%);border:8px solid #6b4423;border-radius:18px 18px 60px 60px;padding:14px 16px 20px;box-shadow:inset 0 0 0 3px #8a5a2f;color:#fff}
-.hand{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;margin:8px 0;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.08)}
+.felt{position:relative;background:#1b5c40 url(img/bg_table.webp) center 70%/cover;border:3px solid #16212b;border-radius:18px;padding:4% 7% 5%;color:#fff;min-height:380px}
+.hand{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;margin:8px 0;padding:8px 10px;border-radius:12px;background:rgba(10,40,24,.55)}
 .hand img.av{width:72px;height:72px;background:#fff;border-radius:10px;border:3px solid var(--cc,#fff)}
 .hand .cards{display:flex;gap:8px;flex-wrap:wrap;min-height:84px;align-items:center}
 .hand .nm{font-weight:700;font-size:14px}
 .hand .tot{background:#fff;color:#16212b;border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px;white-space:nowrap}
 .hand.me{outline:2px dashed #ffe36b;background:rgba(255,236,170,.14)}
-.arc{text-align:center;font-size:12.5px;color:#e7c76b;letter-spacing:.08em;margin:4px 0}
+.arc{text-align:center;font-size:12.5px;color:#ffe9a8;text-shadow:0 1px 2px #000;letter-spacing:.08em;margin:4px 0}
 .dist{display:grid;gap:5px;margin:10px 0}
 .dist .row{display:grid;grid-template-columns:80px 1fr 64px;gap:10px;align-items:center;font-size:14px}
 .dist .bar{height:16px;background:var(--panel2);border-radius:4px;overflow:hidden}
@@ -45,6 +45,7 @@
 .strat .diff{outline:2px solid #a35c00;outline-offset:-2px}
 .strat button.on{outline:3px solid #16212b;outline-offset:-3px}
 .strat .sep{grid-column:1/-1;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:6px;text-align:left;background:none}
+@media(max-width:640px){.felt{padding:8px;min-height:0}.hand{grid-template-columns:44px 1fr;gap:8px}.hand img.av{width:42px;height:42px}.hand .tot{grid-column:2;justify-self:start}.card{--cw:44px}}
 </style>
 </head>
 <body>
@@ -119,7 +120,7 @@
     <div class="ptitle">블랙잭 — 받기 또는 서기 (연습 칩 10개씩 걸기)</div>
     <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
       <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
-    <div class="felt">
+    <div class="felt" id="felt">
       <div class="hand" style="--cc:var(--c-robo)"><img class="av" id="av-robo" alt="딜러 주판봇"><div><div class="nm">딜러 주판봇</div><div class="cards" id="c-dealer"></div></div><span class="tot" id="t-dealer">—</span></div>
       <div class="arc">BLACKJACK PAYS 3 TO 2 · DEALER STANDS ON 17</div>
       <div class="hand me" id="hand-me"><img class="av" id="av-me" alt=""><div><div class="nm" id="nm-me"></div><div class="cards" id="c-me"></div></div><span class="tot" id="t-me">—</span></div>
@@ -293,7 +294,7 @@
   <ul><li>규칙은 받기·서기만 쓰고(더블다운·스플릿·보험 없음), 딜러는 17(소프트 17 포함)에서 서며, 카드 뭉치는 끝없이 많다고 봤습니다. 실제 카지노 규칙과 숫자가 조금 다릅니다.</li>
     <li>KPI·표·대결의 숫자는 이 규칙으로 정확히 계산하거나 씨앗을 고정해 시뮬레이션한 값입니다(검산: 저장소의 code/check_blackjack.js).</li>
     <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다. 칩은 연습용입니다.</li>
-    <li>표지·게임 화면은 연구실 캐릭터 그림과 CSS로 그린 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_blackjack.md</li></ul>
+    <li>표지·카드 탁자·딜러 주판봇·카드 뒷면·결과 장면은 연구실 시리즈 화풍(16비트 픽셀아트)으로 새로 만든 그림이며, 원작 게임이나 실제 카지노의 그림이 아닙니다. 그림 지시문: COVER_PROMPTS_ai_game_blackjack.md</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
 </div></footer>
@@ -347,7 +348,8 @@ function upName(u){return u===1?'A':String(u);}
 
 /* ── 단계 2 ── */
 var WHO=G.WHO,PL={who:'asst',me:[],dl:[],w:0,l:0,t:0,chip:0,phase:'idle',log:[]};
-$('#av-robo').src=U.spr('robo_e16');
+function dealerFace(k){$('#av-robo').src='img/robo_dealer_'+k+'.webp';}
+dealerFace('e13');
 function say(w,m,t){$('#pl-say').innerHTML=U.say(w,m,t);}
 function tot(cs){var t=0,a=false;cs.forEach(function(c){t+=c.v;if(c.v===1)a=true;});return {t:t,a:a,v:BJ.val(t,a),s:BJ.soft(t,a)};}
 function draw(newMe,newDl,reveal){$('#c-me').innerHTML=PL.me.map(function(c,i){return cardH(c,i>=PL.me.length-newMe?'deal':'');}).join('');
@@ -362,9 +364,10 @@ function status(){var m=tot(PL.me);$('#pl-sum').textContent=PL.me.length?(m.s?'�
   $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
 function end(res,txt){PL.phase='over';var bet=res==='bj'?15:res==='w'?10:res==='l'?-10:0;PL.chip+=bet;if(bet>0)PL.w++;else if(bet<0)PL.l++;else PL.t++;
   PL.log.push('내 '+tot(PL.me).v+(tot(PL.me).t>21?'(터짐)':'')+' · 딜러 '+(tot(PL.dl).t>21?'터짐':tot(PL.dl).v)+' → '+txt+' ('+(bet>=0?'+':'')+bet+')');
-  SFX.play(bet>0?'win':bet<0?'gameover':'click');$('#av-robo').src=U.spr(bet>0?'robo_e20':'robo_e16');
+  SFX.play(bet>0?'win':bet<0?'gameover':'click');dealerFace(bet>0?'e20':bet<0?'e16':'e13');
+  if(bet!==0)G.later(function(){G.result($('#felt'),{src:'img/scene_'+(bet>0?'win':'lose')+'_b.webp',alt:bet>0?'딜러 주판봇의 카드가 쏟아지고 하루·시아·모아가 환호하는 장면':'딜러 주판봇이 칩을 쓸어 가고 하루·시아·모아가 아쉬워하는 장면',text:txt,closeLabel:'탁자 보기',again:plNew});},700);
   say(PL.who,bet>0?WHO[PL.who][2].happy:bet<0?WHO[PL.who][2].sad:WHO[PL.who][2].think,txt);status();}
-function plNew(){PL.me=[mk(BJ.draw()),mk(BJ.draw())];PL.dl=[mk(BJ.draw()),mk(BJ.draw())];PL.phase='me';$('#av-robo').src=U.spr('robo_e16');
+function plNew(){PL.me=[mk(BJ.draw()),mk(BJ.draw())];PL.dl=[mk(BJ.draw()),mk(BJ.draw())];PL.phase='me';G.hideResult($('#felt'));dealerFace('e13');
   $('#av-me').src=U.spr(WHO[PL.who][2].start);$('#av-me').style.borderColor=WHO[PL.who][1];$('#nm-me').textContent=WHO[PL.who][0];SFX.play('card');draw(2,2,false);
   var pbj=BJ.isBJ(PL.me.map(function(c){return c.v;})),dbj=BJ.isBJ(PL.dl.map(function(c){return c.v;}));
   if(dbj){draw(0,0,true);end(pbj?'t':'l',pbj?'둘 다 블랙잭! 비겼어요.':'딜러 블랙잭… 확인하자마자 졌어요.');return;}

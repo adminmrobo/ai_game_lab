@@ -14,20 +14,16 @@
 <style>
 /*@@PAGECSS@@*/
 /*@@GAMECSS@@*/
-.die{--dw:46px;display:inline-grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:var(--dw);height:var(--dw);background:#fffdf6;border:3px solid #16212b;border-radius:16%;padding:calc(var(--dw)*.11);box-shadow:0 4px 0 #b9ad8f;flex:none;transition:transform .2s,box-shadow .2s;vertical-align:middle}
-.die i{width:72%;height:72%;background:#16212b;place-self:center;border-radius:1px}
-.die.r1 i,.die.r6 i{background:#c9302c}
-.die.sm{--dw:26px;border-width:2px;box-shadow:0 2px 0 #b9ad8f}
-.die.hold{transform:translateY(-16%);border-color:#a35c00;box-shadow:0 0 0 3px #ffe36b,0 6px 0 #b9ad8f}
-.die.ghost{opacity:.3}
+.die{--dw:46px;display:inline-block;width:var(--dw);height:var(--dw);flex:none;vertical-align:middle;image-rendering:pixelated;transition:transform .2s,filter .2s}
+.die.sm{--dw:26px}
+.die.hold{transform:translateY(-18%);filter:drop-shadow(0 0 3px #ffe36b) drop-shadow(0 0 6px #ffcf3a)}
 .die.shake{animation:shake .45s}
 @keyframes shake{0%{transform:rotate(0)}25%{transform:rotate(-18deg) translateY(-20%)}50%{transform:rotate(14deg)}75%{transform:rotate(-8deg) translateY(-8%)}100%{transform:rotate(0)}}
-@media(prefers-reduced-motion:reduce){.die.shake{animation:none}}
 button.dbtn{background:none;border:0;padding:4px;cursor:pointer;border-radius:10px}
 button.dbtn:disabled{cursor:default}
 button.dbtn:focus-visible{outline:3px solid var(--amber)}
-.felt{background:radial-gradient(ellipse at 50% 40%,#3a8f5c,#1f5d3a 75%);border:8px solid #6b4423;border-radius:18px;padding:14px;box-shadow:inset 0 0 0 3px #8a5a2f}
-.seat{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;background:rgba(255,255,255,.1);border-radius:12px;padding:8px 10px;margin:8px 0;color:#fff}
+.felt{position:relative;background:#1f5d3a url(img/bg_felt.webp) center/cover;border:3px solid #16212b;border-radius:18px;padding:5% 7%;min-height:360px}
+.seat{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;background:rgba(10,40,24,.55);border-radius:12px;padding:8px 10px;margin:8px 0;color:#fff}
 .seat img.av{width:72px;height:72px;background:#fff;border-radius:10px;border:3px solid var(--cc,#fff)}
 .seat .dice{display:flex;gap:8px;flex-wrap:wrap}
 .seat .nm{font-weight:700;font-size:14px;margin-bottom:4px}
@@ -50,6 +46,7 @@ button.dbtn:focus-visible{outline:3px solid var(--amber)}
 .vs3{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .vs3>div{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:8px 12px}
 .vs3 b{display:block;font-size:13px;color:var(--muted)}
+@media(max-width:640px){.felt{padding:8px;min-height:0}.seat{grid-template-columns:44px 1fr;gap:8px}.seat img.av{width:42px;height:42px}.seat .rk{grid-column:2;justify-self:start}.seat .dice{gap:4px}.seat .die{--dw:34px}}
 </style>
 </head>
 <body>
@@ -124,7 +121,7 @@ button.dbtn:focus-visible{outline:3px solid var(--amber)}
     <div class="ptitle">다이스 — 주사위를 눌러 남길 것을 고른 뒤 "다시 굴리기" (남긴 주사위는 위로 들려요)</div>
     <div class="ctrl"><div class="group"><span class="glabel">플레이어</span><span class="tabs" id="pl-who" role="group" aria-label="플레이어 고르기"></span></div>
       <div class="group"><button class="bt sfx-btn" type="button" aria-pressed="true">🔊 효과음 켜짐</button><button class="bt" type="button" id="pl-new">새 판</button><label class="glabel" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="pl-tip"> 하루의 귀띔 보기</label></div></div>
-    <div class="felt">
+    <div class="felt" id="felt">
       <div class="seat" style="--cc:var(--c-robo)"><img class="av" id="av-robo" alt="주판봇"><div><div class="nm">주판봇</div><div class="dice" id="d-robo"></div></div><span class="rk" id="r-robo">—</span></div>
       <div class="seat" style="--cc:var(--c-fly)"><img class="av" id="av-fly" alt="초파리 연구원"><div><div class="nm">초파리 연구원</div><div class="dice" id="d-fly"></div></div><span class="rk" id="r-fly">—</span></div>
       <div class="seat me" id="seat-me"><img class="av" id="av-me" alt=""><div><div class="nm" id="nm-me"></div><div class="dice" id="d-me" role="group" aria-label="내 주사위 — 눌러서 남기기"></div></div><span class="rk" id="r-me">—</span></div>
@@ -293,7 +290,7 @@ button.dbtn:focus-visible{outline:3px solid var(--amber)}
   <ul><li>원작 다이스의 세부 규칙(다시 굴리는 횟수, 판돈 올리기, 동점 처리)은 확인하지 못해, 다섯 주사위 포커의 흔한 규칙(한 번 다시 굴리기, 스트레이트는 1~5 또는 2~6)으로 각색했습니다.</li>
     <li>주판봇·초파리 연구원은 "감"(스트레이트 이상이면 그대로, 아니면 가장 많이 나온 숫자만 남기기)으로 둡니다. 대결과 KPI의 숫자는 이 규칙으로 얻은 값입니다(검산: 저장소의 code/check_dice.js).</li>
     <li>「대항해시대」는 KOEI(현 코에이테크모게임스)의 게임입니다. 이 페이지는 미니게임 규칙만 설명하고, 게임 그림·음악·인물 그림은 쓰지 않았습니다. 판돈은 다루지 않습니다.</li>
-    <li>표지·게임 화면은 연구실 캐릭터 그림과 CSS로 그린 임시 화면입니다. 픽셀아트 그림 지시문: COVER_PROMPTS_ai_game_dice.md</li></ul>
+    <li>표지·탁자·주사위·결과 장면은 연구실 시리즈 화풍(16비트 픽셀아트)으로 새로 만든 그림이며, 원작 게임의 그림이 아닙니다. 그림 지시문: COVER_PROMPTS_ai_game_dice.md</li></ul>
   <p>캐릭터 이름·설정·그림은 저작권자 안상선의 허락 없이 사용할 수 없습니다.</p>
   <p>글 · 안상선 ((주)M-Robo 대표) · <a href="https://adminmrobo.github.io/who_am_i/who_am_i.html">저자 소개</a> · <a href="../index.html">AI로 풀어보는 게임 시리즈 목차</a></p>
 </div></footer>
@@ -341,7 +338,7 @@ var DLG={
 U.dialogues(DLG);
 G.cast([["doc","doc_e08","박사","진행과 판정. 왜 그런지 먼저 설명해요."],["asst","asst_e13","조수 하루 · 플레이어 1","굴려 보기 담당. 식이 나오면 대신 물어봐요."],["sia","sia_e13","인턴 시아 · 플레이어 2","모든 경우 세기 담당."],["moa","moa_e13","인턴 모아 · 플레이어 3","탁자에 먼저 앉은 도전자. \"왜요?\" 담당."],["fly","fly_e13","초파리 연구원","탁자의 두 번째 상대. \"눌러서 확인해 봐\" 담당."],["robo","robo_e13","주판봇","탁자의 첫 번째 상대. 같은 숫자만 남기는 감파."]],['(주사위 달그락)','(…끄덕)','(짝짝짝)']);
 
-function die(v,cls){var P={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[v],h='';for(var i=0;i<9;i++)h+=P.indexOf(i)>=0?'<i></i>':'<span></span>';return '<span class="die r'+v+(cls?' '+cls:'')+'" aria-label="'+v+'">'+h+'</span>';}
+function die(v,cls){return '<img class="die r'+v+(cls?' '+cls:'')+'" src="img/die_'+v+'.webp" width="256" height="256" alt="'+v+'">';}
 function dice(a,cls){return a.map(function(v){return die(v,cls);}).join('');}
 function rk(h){return DG.rank(h);}
 function keepStr(h,m){var k=DG.keepOf(h,m).slice().sort();return k.length?k.join('·')+' 남기기':'모두 다시 굴리기';}
@@ -368,7 +365,7 @@ function status(){var k=PL.hold.filter(Boolean).length;$('#pl-keep').textContent
   else{var b=DG.bestExact(PL.me,target()),mine=DG.exactWin(PL.me,holdMask(),target());$('#pl-hint').textContent=keepStr(PL.me,b.m).replace(' 남기기','')+' '+Math.round(b.p*100)+'%';
     say('asst','asst_e07','<span class="muted">(하루의 귀띔)</span> 다 세어 보니 <b>'+keepStr(PL.me,b.m)+'</b>가 이길 확률 '+(b.p*100).toFixed(1)+'%로 가장 높아요. 지금 고른 대로면 '+(mine*100).toFixed(1)+'%예요.');}
   $('#pl-log').innerHTML=PL.log.slice(-4).map(function(t){return '<div>'+t+'</div>';}).join('');}
-function plNew(){PL.phase='busy';PL.hold=[0,0,0,0,0];PL.me=[];PL.robo=DG.roll(5);PL.fly=[];$('#d-robo').innerHTML=dice(PL.robo,'shake');$('#d-fly').innerHTML='';$('#d-me').innerHTML='';$('#r-robo').textContent='…';$('#r-fly').textContent='—';$('#r-me').textContent='—';
+function plNew(){G.hideResult($('#felt'));PL.phase='busy';PL.hold=[0,0,0,0,0];PL.me=[];PL.robo=DG.roll(5);PL.fly=[];$('#d-robo').innerHTML=dice(PL.robo,'shake');$('#d-fly').innerHTML='';$('#d-me').innerHTML='';$('#r-robo').textContent='…';$('#r-fly').textContent='—';$('#r-me').textContent='—';
   $$('.seat').forEach(function(s){s.classList.remove('win');});$('#av-me').src=U.spr(WHO[PL.who][2].start);$('#av-me').style.borderColor=WHO[PL.who][1];$('#nm-me').textContent=WHO[PL.who][0];
   SFX.play('roll');say('robo','robo_e16','내 차례! 데굴데굴…');status();
   G.later(function(){var m=DG.gut(PL.robo);PL.robo=DG.reroll(PL.robo,m);$('#d-robo').innerHTML=dice(PL.robo);$('#r-robo').textContent=rk(PL.robo).name;SFX.play('roll');
@@ -381,6 +378,7 @@ function finish(rolled){var m=holdMask();PL.phase='busy';if(rolled){PL.me=DG.rer
     var who=rk(PL.robo).score>=rk(PL.fly).score?'robo':'fly';$$('.seat')[res==='w'?2:who==='robo'?0:1].classList.add('win');
     PL.log.push((rolled?'다시 굴려 ':'그대로 ')+rk(PL.me).name+' → '+(res==='w'?'승리!':res==='t'?'무승부':'패배'));
     SFX.play(res==='w'?'win':res==='t'?'click':'gameover');
+    if(res!=='t')G.later(function(){G.result($('#felt'),{src:'img/scene_'+(res==='w'?'win':'lose')+'_d.webp',alt:res==='w'?'하루·시아·모아가 탁자에서 환호하고 주판봇이 눈이 빙글빙글 돈 장면':'주판봇이 의기양양하고 하루·시아·모아가 아쉬워하는 장면',text:res==='w'?rk(PL.me).name+'(으)로 승리!':'패배… '+(rk(PL.robo).score>=rk(PL.fly).score?'주판봇의 '+rk(PL.robo).name:'초파리 연구원의 '+rk(PL.fly).name)+'에 졌어요',closeLabel:'탁자 보기',again:plNew});},500);
     say(PL.who,res==='w'?WHO[PL.who][2].happy:res==='l'?WHO[PL.who][2].sad:WHO[PL.who][2].think,res==='w'?rk(PL.me).name+'(으)로 이겼어요!':res==='t'?'완전히 같은 패라 무승부예요.':rk(PL.me).name+'… 졌어요. 다시 한 판!');status();},rolled?650:100);}
 G.tabs($('#pl-who'),[['asst','하루'],['sia','시아'],['moa','모아']],'moa',function(v){PL.who=v;plNew();});
 $('#pl-new').onclick=plNew;$('#pl-roll').onclick=function(){finish(true);};$('#pl-stay').onclick=function(){finish(false);};$('#pl-tip').onchange=status;
